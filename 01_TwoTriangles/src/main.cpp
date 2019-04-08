@@ -39,17 +39,7 @@ void init()
 																						// which we'd like to use
 																						// when name is zero, we stop using any buffer object bound to "GL_ARRAY_BUFFER" target
 
-	// 3. configure the shaders
-	ShaderInfo shaders[] =
-	{
-		{GL_VERTEX_SHADER,"res/shaders/triangles.vert"},
-		{GL_FRAGMENT_SHADER,"res/shaders/triangles.frag"},
-		{GL_NONE,NULL}
-	};
-	GLuint program = LoadShaders(shaders);
-	glUseProgram(program);
-
-	// 4. connect the data in application to the variables in shader
+	// 3. connect the data in application to the variables in shader
 	// we need to connect our shader 'in' variables to a 'vertex-attribute array'
 	// below two function modify the state of currently bound vertex-array object
 	glVertexAttribPointer(
@@ -60,6 +50,16 @@ void init()
 		0,										// stride: the byte offset between consecutive elements in the array
 		BUFFER_OFFSET(0));						// pointer: this is offset from the start of the buffer object(unit: based-machine,ie.:bytes)
 	glEnableVertexAttribArray(vPosition);		// enable vertex-attribute
+
+	// 4. configure the shaders
+	ShaderInfo shaders[] =
+	{
+		{GL_VERTEX_SHADER,"res/shaders/triangles.vert"},
+		{GL_FRAGMENT_SHADER,"res/shaders/triangles.frag"},
+		{GL_NONE,NULL}
+	};
+	GLuint program = LoadShaders(shaders);
+	glUseProgram(program);
 }
 
 void display()
