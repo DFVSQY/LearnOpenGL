@@ -1,8 +1,26 @@
 #include "GLFW/glfw3.h"
+#include <cstdio>
+#include <gl/GL.h>
+
+// 错误回调函数
+void glfw_error_callback(int error, const char *description)
+{
+    printf("Error: %s\n", description);
+}
+
+// 键盘输入回调函数
+void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+}
 
 int main()
 {
-    GLFWwindow *window = nullptr;
+    // 设置错误回调函数
+    glfwSetErrorCallback(glfw_error_callback);
 
     // 初始化GLFW
     if (!glfwInit())
@@ -11,7 +29,7 @@ int main()
     }
 
     // 创建window窗口以及OpenGL上下文
-    window = glfwCreateWindow(640, 480, "LearnOpenGL", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(640, 480, "LearnOpenGL", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -20,6 +38,9 @@ int main()
 
     // 设置为当前上下文
     glfwMakeContextCurrent(window);
+
+    // 设置键盘输入回调函数
+    glfwSetKeyCallback(window, glfw_key_callback);
 
     while (!glfwWindowShouldClose(window))
     {
