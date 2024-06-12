@@ -15,6 +15,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall)
 
 add_subdirectory(lib/glfw)
+add_subdirectory(lib/glad)
 
 # 将 src 目录下的所有 .cpp 文件添加到变量 SRC 中
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS "src/*.cpp")
@@ -26,4 +27,4 @@ add_executable(main ${SRC})
 target_include_directories(main PRIVATE "includes")
 
 # 链接 glfw, opengl32 库
-target_link_libraries(main PRIVATE glfw opengl32)
+target_link_libraries(main PRIVATE glfw opengl32 glad)
