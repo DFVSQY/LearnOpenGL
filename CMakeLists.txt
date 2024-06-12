@@ -12,9 +12,18 @@ set(CMAKE_CXX_STANDARD 20)
 # 要求必须使用这个版本的标准
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_compile_options(-Wall)
+
+add_subdirectory(lib/glfw)
+
 # 将 src 目录下的所有 .cpp 文件添加到变量 SRC 中
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS "src/*.cpp")
 
 # 添加可执行文件
 add_executable(main ${SRC})
+
+# 指定头文件搜索目录
 target_include_directories(main PRIVATE "includes")
+
+# 链接 glfw 库
+target_link_libraries(main PRIVATE glfw)
