@@ -2,7 +2,6 @@
 #include "GLFW/glfw3.h"
 #include <cstdio>
 #include <gl/GL.h>
-#include <stdio.h>
 
 // 错误回调函数
 void glfw_error_callback(int error, const char *description)
@@ -21,7 +20,6 @@ void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, in
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    printf("Framebuffer size changed: %d, %d\n", width, height);
     glViewport(0, 0, width, height);
 }
 
