@@ -1,2 +1,9 @@
 BasedOnStyle: Microsoft
 SortIncludes: false
+
+---
+Language:        Cpp
+# 设置注释样式
+CommentPragmas:  '^'
+# 设置是否重新格式化注释
+ReflowComments:  false
