@@ -256,18 +256,18 @@ void setup_vertex_data(GLuint *pVAO, GLuint *pVBO)
      * glGenVertexArrays 是 OpenGL 中的一个函数，用于生成一个或多个顶点数组对象 (VAO, Vertex Array Object)。
 
      * VAO 是一种容器对象，它存储所有与顶点属性相关的状态。VAO 记录了顶点属性的配置以及用于绘制的顶点缓冲对象的绑定情况。
-     * VAO 是一个非常方便的工具，可以帮助你管理顶点属性配置。你只需要配置一次 VAO，然后在绘制时绑定相应的 VAO，就能恢复之前配置好的顶点属性状态。
+     * VAO 是一个非常方便的工具，可以帮助管理顶点属性配置。你只需要配置一次 VAO，然后在绘制时绑定相应的 VAO，就能恢复之前配置好的顶点属性状态。
 
      * glGenVertexArrays 是生成 VAO 的关键函数，它生成一个或多个 VAO 并返回其 ID。VAO 是一个强大的工具，用于管理与顶点属性相关的状态。
-     * 通过使用 VAO，你可以简化顶点属性的配置过程，并在绘制时快速切换不同的顶点属性配置。这对于提高渲染性能和代码可维护性非常有帮助。
+     * 通过使用 VAO，可以简化顶点属性的配置过程，并在绘制时快速切换不同的顶点属性配置。这对于提高渲染性能和代码可维护性非常有帮助。
     */
     glGenVertexArrays(1, pVAO);
 
     /*
-     * 在OpenGL中，glGenBuffers函数的作用是分配一个"Buffer Object"的名称1。"Buffer Object"代表了一个可以被应用程序和GPU（图形处理单元）访问的内存块。
-     * 当你调用glGenBuffers时，它实际上并没有创建任何东西。它只是返回一组当前未被用作缓冲区名称的整数。实际的’对象’并不会在你调用glBindBuffer之前被创建。
-     * 因此，glGenBuffers实际上并不是必需的，它只是作为一个方便函数，为你提供一个未使用的整数。
-     * 所以，如果你只是创建了一组随机的整数，只要它们之间没有重叠，你就可以将其作为你的缓冲区列表，而无需调用glGenBuffers。
+     * 在OpenGL中，glGenBuffers函数的作用是分配一个"Buffer Object"的名称。"Buffer Object"代表了一个可以被应用程序和GPU（图形处理单元）访问的内存块。
+     * 当调用glGenBuffers时，它实际上并没有创建任何东西。它只是返回一组当前未被用作缓冲区名称的整数。实际的’对象’并不会在调用glBindBuffer之前被创建。
+     * 因此，glGenBuffers实际上并不是必需的，它只是作为一个方便函数，提供一个未使用的整数。
+     * 所以，如果只是创建了一组随机的整数，只要它们之间没有重叠，就可以将其作为缓冲区列表，而无需调用glGenBuffers。
     */
     glGenBuffers(1, pVBO);
 
@@ -284,7 +284,7 @@ void setup_vertex_data(GLuint *pVAO, GLuint *pVBO)
      * 在OpenGL中，glBindBuffer函数用于将一个缓冲区对象（Buffer Object）绑定到一个指定的缓冲区绑定点。
      * 这个函数接受两个参数：一个是目标（target），另一个是缓冲区对象的名称（buffer）。
 
-     * 当你调用glBindBuffer函数时，以下几件事情会发生：
+     * 当调用glBindBuffer函数时，以下几件事情会发生：
      *  1. 如果这个缓冲区对象之前没有被初始化（也就是说，这是第一次绑定这个缓冲区对象），那么OpenGL会为其分配内存。
      *  2. 这个缓冲区对象会被设置为当前活动的缓冲区对象。这意味着，之后对指定目标的所有操作都会影响到这个缓冲区对象。
      *  3. 如果你之后调用了例如glBufferData或glBufferSubData等函数，这些函数会改变当前活动的缓冲区对象的数据。
@@ -299,7 +299,7 @@ void setup_vertex_data(GLuint *pVAO, GLuint *pVBO)
      * 这个函数接受四个参数：目标（target）、大小（size）、数据（data）和用途（usage）。
      *  目标（target）：这个参数定义了缓冲区对象的类型。例如，GL_ARRAY_BUFFER表示顶点数据，GL_ELEMENT_ARRAY_BUFFER表示索引数据等。
      *  大小（size）：这个参数指定了缓冲区对象的大小，以字节为单位。
-     *  数据（data）：这个参数是一个指向你希望存储在缓冲区对象中的数据的指针。如果这个参数不为NULL，那么缓冲区对象将会被初始化为这个指针指向的数据。
+     *  数据（data）：这个参数是一个指向希望存储在缓冲区对象中的数据的指针。如果这个参数不为NULL，那么缓冲区对象将会被初始化为这个指针指向的数据。
      *  用途（usage）：这个参数给出了缓冲区对象的预期使用模式。例如，GL_STATIC_DRAW表示数据将会被修改一次，但被读取多次。
 
      * 当调用glBufferData函数时，以下几件事情会发生：
