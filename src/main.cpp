@@ -256,7 +256,7 @@ void setup_vertex_data(GLuint *pVAO, GLuint *pVBO)
      * glGenVertexArrays 是 OpenGL 中的一个函数，用于生成一个或多个顶点数组对象 (VAO, Vertex Array Object)。
 
      * VAO 是一种容器对象，它存储所有与顶点属性相关的状态。VAO 记录了顶点属性的配置以及用于绘制的顶点缓冲对象的绑定情况。
-     * VAO 是一个非常方便的工具，可以帮助管理顶点属性配置。你只需要配置一次 VAO，然后在绘制时绑定相应的 VAO，就能恢复之前配置好的顶点属性状态。
+     * VAO 是一个非常方便的工具，可以帮助管理顶点属性配置。只需要配置一次 VAO，然后在绘制时绑定相应的 VAO，就能恢复之前配置好的顶点属性状态。
 
      * glGenVertexArrays 是生成 VAO 的关键函数，它生成一个或多个 VAO 并返回其 ID。VAO 是一个强大的工具，用于管理与顶点属性相关的状态。
      * 通过使用 VAO，可以简化顶点属性的配置过程，并在绘制时快速切换不同的顶点属性配置。这对于提高渲染性能和代码可维护性非常有帮助。
@@ -287,7 +287,7 @@ void setup_vertex_data(GLuint *pVAO, GLuint *pVBO)
      * 当调用glBindBuffer函数时，以下几件事情会发生：
      *  1. 如果这个缓冲区对象之前没有被初始化（也就是说，这是第一次绑定这个缓冲区对象），那么OpenGL会为其分配内存。
      *  2. 这个缓冲区对象会被设置为当前活动的缓冲区对象。这意味着，之后对指定目标的所有操作都会影响到这个缓冲区对象。
-     *  3. 如果你之后调用了例如glBufferData或glBufferSubData等函数，这些函数会改变当前活动的缓冲区对象的数据。
+     *  3. 如果之后调用了例如glBufferData或glBufferSubData等函数，这些函数会改变当前活动的缓冲区对象的数据。
 
      * GL_ARRAY_BUFFER：用于顶点属性数据，如顶点坐标、法线、颜色等。
     */
