@@ -10,7 +10,7 @@
 			"name": "Debug",
 			"program": "${workspaceFolder}/build/main.exe",
 			"args": [],
-			"cwd": "${workspaceFolder}"
+			"cwd": "${workspaceFolder}/build"
 		}
 	]
 }

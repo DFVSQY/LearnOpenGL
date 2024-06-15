@@ -15,27 +15,27 @@ GLuint Shader::Init(const char *vertexFilePath, const char *fragmentFilePath)
 
     if (vertex_file_path == nullptr || vertex_file_path[0] == '\0')
     {
-        std::cerr << "vertex file path is null or empty!" << std::endl;
+        std::cerr << "Shader vertex file path is null or empty!" << std::endl;
         return 0;
     }
 
     if (fragment_file_path == nullptr || fragment_file_path[0] == '\0')
     {
-        std::cerr << "fragment file path is null or empty!" << std::endl;
+        std::cerr << "Shader fragment file path is null or empty!" << std::endl;
         return 0;
     }
 
     GLuint vertex_shader = Compile(GL_VERTEX_SHADER);
     if (vertex_shader == 0)
     {
-        std::cerr << "Init failed, vertex shader compile failed!" << std::endl;
+        std::cerr << "Shader Init failed, vertex shader compile failed!" << std::endl;
         return 0;
     }
 
     GLuint fragment_shader = Compile(GL_FRAGMENT_SHADER);
     if (fragment_shader == 0)
     {
-        std::cerr << "Init failed, fragment shader compile failed!" << std::endl;
+        std::cerr << "Shader Init failed, fragment shader compile failed!" << std::endl;
         return 0;
     }
 
