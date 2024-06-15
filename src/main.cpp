@@ -98,8 +98,6 @@ int main()
     glViewport(0, 0, win_width, win_height);
 #endif
 
-    // glfwSetWindowSize(window, win_width, win_height);
-
     while (!glfwWindowShouldClose(window))
     {
         // 绘制渲染内容
