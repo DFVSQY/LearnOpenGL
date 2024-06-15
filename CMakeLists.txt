@@ -26,5 +26,9 @@ add_executable(main ${SRC})
 # 指定头文件搜索目录
 target_include_directories(main PRIVATE "includes")
 
-# 链接 glfw, opengl32 库
-target_link_libraries(main PRIVATE glfw opengl32 glad)
+# 链接 glfw, glad 库
+target_link_libraries(main PRIVATE glfw glad)
+
+if(WIN32)
+    target_link_libraries(main PRIVATE opengl32)
+endif()

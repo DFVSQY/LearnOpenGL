@@ -153,12 +153,22 @@ const char *Shader::ReadShaderContent(const char *filePath)
     }
 
     FILE *file = nullptr;
+
+#ifdef _WIN32
     errno_t err = fopen_s(&file, file_path, "rb");
     if (err != 0 || !file)
     {
         std::cerr << "Failed to open shader file: " << file_path << std::endl;
         return nullptr;
     }
+#else
+    file = fopen(file_path, "rb");
+    if (!file)
+    {
+        std::cerr << "Failed to open shader file: " << file_path << std::endl;
+        return nullptr;
+    }
+#endif
 
     // 移动文件指针到文件末尾
     fseek(file, 0, SEEK_END);

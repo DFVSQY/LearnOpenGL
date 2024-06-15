@@ -1,6 +1,10 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+
+#ifdef _WIN32
 #include <gl/GL.h>
+#endif
+
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -85,8 +89,16 @@ int main()
     // 当窗口改变时，在回调函数里面重新设置视口大小
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // 定义视口的宽高，铺满整个窗口
+// 定义视口的宽高，铺满整个窗口
+#ifdef __APPLE__
+    int fb_width, fb_height;
+    glfwGetFramebufferSize(window, &fb_width, &fb_height);
+    glViewport(0, 0, fb_width, fb_height);
+#else
     glViewport(0, 0, win_width, win_height);
+#endif
+
+    // glfwSetWindowSize(window, win_width, win_height);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -108,6 +120,10 @@ void setup_window_hint()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#if __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 }
 
 // 错误回调函数
