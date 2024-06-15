@@ -192,8 +192,29 @@ int create_shader_program(GLuint *pShader)
     }
 
     // vertex shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    /*
+     * glCreateShader 函数创建一个指定类型的着色器对象，并返回其标识符。
+     * 这个对象将用于存储和编译 GLSL 代码。
+    */
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+    /*
+     * glShaderSource 函数将 GLSL 着色器源码上传到指定的着色器对象中。这些源码将在后续步骤中被编译成可执行的着色器程序。
+
+     * 函数原型：void glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint *length);
+     *  shader：着色器对象的标识符，由 glCreateShader 函数返回。
+     *  count：字符串数组中的字符串数量。
+     *  string：指向着色器源码字符串数组的指针。
+     *  length：每个字符串的长度。如果是 NULL，则认为每个字符串都以 ‘\0’ 结尾。
+    */
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+
+    /*
+     * glCompileShader 函数编译之前通过 glShaderSource 上传的着色器源码。如果源码有错误，编译将失败，可以通过查询编译状态来获取错误信息。
+
+     * 函数原型：void glCompileShader(GLuint shader);
+     *  shader：着色器对象的标识符，由 glCreateShader 函数返回。
+    */
     glCompileShader(vertexShader);
 
     // check for shader compile errors
@@ -207,7 +228,7 @@ int create_shader_program(GLuint *pShader)
     }
 
     // fragment shader
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
 
@@ -220,6 +241,14 @@ int create_shader_program(GLuint *pShader)
     }
 
     // link shaders
+    /*
+     * 在 OpenGL 中，glCreateProgram、glAttachShader 和 glLinkProgram 是用于创建、附加和链接着色器程序的关键函数。
+     * 它们共同作用，使得各种类型的着色器（如顶点着色器和片段着色器）能够组合成一个完整的可执行的着色器程序。
+
+     * glCreateProgram 函数创建一个空的程序对象，并返回一个唯一的程序对象标识符。这个程序对象将用来附加、链接各种着色器，并最终被用于渲染。
+     * glAttachShader 函数将一个已编译的着色器对象附加到一个程序对象。一个程序对象可以附加多个着色器对象（通常是一个顶点着色器和一个片段着色器）。
+     * glLinkProgram 函数链接一个程序对象中所有附加的着色器对象。链接过程将把多个着色器的代码组合成一个可执行的着色器程序。如果链接成功，程序对象将可以在渲染时被使用。
+    */
     *pShader = glCreateProgram();
     GLuint shaderProgram = *pShader;
     glAttachShader(shaderProgram, vertexShader);
