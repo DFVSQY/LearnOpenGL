@@ -4,10 +4,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include "Shader.h"
 
 GLFWwindow *window = nullptr;
-GLuint shaderProgram;
+// GLuint shaderProgram;
 GLuint VAO, VBO;
+
+Shader shader;
 
 void setup_window_hint();
 
@@ -16,12 +19,6 @@ void glfw_error_callback(int error, const char *description);
 void glfw_key_callback(GLFWwindow *win, int key, int scancode, int action, int mods);
 
 void framebuffer_size_callback(GLFWwindow *win, int width, int height);
-
-const char *read_shader_content(const char *path);
-
-void free_shader_content(const char *shader_source);
-
-int create_shader_program(GLuint *shaderProgram);
 
 void setup_vertex_data(GLuint *VAO, GLuint *VBO);
 
@@ -64,7 +61,8 @@ int main()
         return -1;
     }
 
-    if (create_shader_program(&shaderProgram) != 0)
+    GLuint shader_program = shader.Init("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
+    if (shader_program == 0)
     {
         glfwDestroyWindow(window);
         glfwTerminate();
@@ -125,151 +123,6 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 
     draw_content();
-}
-
-// 读取Shader文件内容
-const char *read_shader_content(const char *filePath)
-{
-    FILE *file = nullptr;
-    errno_t err = fopen_s(&file, filePath, "rb");
-    if (err != 0 || !file)
-    {
-        std::cerr << "Failed to open shader file: " << filePath << std::endl;
-        return nullptr;
-    }
-
-    // 移动文件指针到文件末尾
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    // 分配内存保存文件内容
-    char *buffer = (char *)malloc(fileSize + 1);
-    if (!buffer)
-    {
-        std::cerr << "Failed to allocate memory." << std::endl;
-        fclose(file);
-        return nullptr;
-    }
-
-    // 读取文件内容到缓冲区
-    size_t bytesRead = fread(buffer, 1, fileSize, file);
-    if (bytesRead != fileSize)
-    {
-        std::cerr << "Failed to read file content." << std::endl;
-        free(buffer);
-        fclose(file);
-        return nullptr;
-    }
-
-    // 添加字符串终止符
-    buffer[fileSize] = '\0';
-
-    fclose(file);
-    return buffer;
-}
-
-void free_shader_content(const char *shaderContent)
-{
-    free((void *)shaderContent);
-}
-
-// 创建Shader程序
-int create_shader_program(GLuint *pShader)
-{
-    const char *vertexShaderSource = read_shader_content("../shaders/vertex_01.glsl");
-    if (!vertexShaderSource)
-    {
-        std::cerr << "Failed to read vertex shader file." << std::endl;
-        return -1;
-    }
-
-    const char *fragmentShaderSource = read_shader_content("../shaders/fragment_01.glsl");
-    if (!fragmentShaderSource)
-    {
-        std::cerr << "Failed to read fragment shader file." << std::endl;
-        return -1;
-    }
-
-    // vertex shader
-    /*
-     * glCreateShader 函数创建一个指定类型的着色器对象，并返回其标识符。
-     * 这个对象将用于存储和编译 GLSL 代码。
-    */
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-    /*
-     * glShaderSource 函数将 GLSL 着色器源码上传到指定的着色器对象中。这些源码将在后续步骤中被编译成可执行的着色器程序。
-
-     * 函数原型：void glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint *length);
-     *  shader：着色器对象的标识符，由 glCreateShader 函数返回。
-     *  count：字符串数组中的字符串数量。
-     *  string：指向着色器源码字符串数组的指针。
-     *  length：每个字符串的长度。如果是 NULL，则认为每个字符串都以 ‘\0’ 结尾。
-    */
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-
-    /*
-     * glCompileShader 函数编译之前通过 glShaderSource 上传的着色器源码。如果源码有错误，编译将失败，可以通过查询编译状态来获取错误信息。
-
-     * 函数原型：void glCompileShader(GLuint shader);
-     *  shader：着色器对象的标识符，由 glCreateShader 函数返回。
-    */
-    glCompileShader(vertexShader);
-
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // link shaders
-    /*
-     * 在 OpenGL 中，glCreateProgram、glAttachShader 和 glLinkProgram 是用于创建、附加和链接着色器程序的关键函数。
-     * 它们共同作用，使得各种类型的着色器（如顶点着色器和片段着色器）能够组合成一个完整的可执行的着色器程序。
-
-     * glCreateProgram 函数创建一个空的程序对象，并返回一个唯一的程序对象标识符。这个程序对象将用来附加、链接各种着色器，并最终被用于渲染。
-     * glAttachShader 函数将一个已编译的着色器对象附加到一个程序对象。一个程序对象可以附加多个着色器对象（通常是一个顶点着色器和一个片段着色器）。
-     * glLinkProgram 函数链接一个程序对象中所有附加的着色器对象。链接过程将把多个着色器的代码组合成一个可执行的着色器程序。如果链接成功，程序对象将可以在渲染时被使用。
-    */
-    *pShader = glCreateProgram();
-    GLuint shaderProgram = *pShader;
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    free_shader_content(vertexShaderSource);
-    free_shader_content(fragmentShaderSource);
-
-    return 0;
 }
 
 void setup_vertex_data(GLuint *pVAO, GLuint *pVBO)
@@ -384,7 +237,8 @@ void draw_content()
     glClear(GL_COLOR_BUFFER_BIT);         // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色
 
     // draw our first triangle
-    glUseProgram(shaderProgram);
+    GLuint shader_program = shader.GetShaderProgram();
+    glUseProgram(shader_program);
     glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll
                             // do so to keep things a bit more organized
 
