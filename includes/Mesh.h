@@ -5,7 +5,7 @@
 
 class Mesh
 {
-  protected:
+  private:
     GLuint vao;
     GLuint vbo;
     const Shader *shader;

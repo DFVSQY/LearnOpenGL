@@ -4,7 +4,7 @@
 
 class Shader
 {
-  protected:
+  private:
     GLuint shader_program;
 
     const char *vertex_file_path;
