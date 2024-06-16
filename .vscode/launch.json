@@ -10,7 +10,10 @@
 			"name": "Debug",
 			"program": "${workspaceFolder}/build/main.exe",
 			"args": [],
-			"cwd": "${workspaceFolder}/build"
+			"cwd": "${workspaceFolder}/build",
+			"osx": {
+				"program": "${workspaceFolder}/build/main"
+			}
 		}
 	]
 }
