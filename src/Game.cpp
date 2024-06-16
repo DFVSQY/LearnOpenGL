@@ -8,6 +8,17 @@
 
 Game::Game() : window(nullptr), scene(){};
 
+Game::~Game()
+{
+    if (!window)
+    {
+        glfwDestroyWindow(window);
+        window = nullptr;
+
+        glfwTerminate();
+    }
+}
+
 Game &Game::getInstance()
 {
     static Game instance; // Guaranteed to be destroyed.
