@@ -1,4 +1,5 @@
 #pragma once
+#include "Scene.h"
 #include "GLFW/glfw3.h"
 
 class Game
@@ -7,6 +8,8 @@ class Game
     Game();
 
     GLFWwindow *window;
+
+    Scene scene;
 
     void SetupWindowHint();
 

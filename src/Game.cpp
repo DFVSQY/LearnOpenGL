@@ -1,10 +1,12 @@
+#include "Scene.h"
+#include "Shader.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "GLFWCallback.h"
 #include "Game.h"
 #include <iostream>
 
-Game::Game() : window(nullptr){};
+Game::Game() : window(nullptr), scene(){};
 
 Game &Game::getInstance()
 {
@@ -21,6 +23,8 @@ bool Game::Init(const char *title, int width, int height)
     // 初始化GLFW
     if (!glfwInit())
         return false;
+
+    SetupWindowHint();
 
     window = glfwCreateWindow(width, height, title, NULL, NULL);
     if (!window)
@@ -56,6 +60,8 @@ bool Game::Init(const char *title, int width, int height)
     glViewport(0, 0, win_width, win_height);
 #endif
 
+    scene.Init();
+
     return true;
 }
 
@@ -88,6 +94,8 @@ void Game::Draw()
     // 清理缓冲区并设置为指定的颜色
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // 状态值设置，用于指定颜色值
     glClear(GL_COLOR_BUFFER_BIT);         // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色
+
+    scene.Render();
 
     // 交换缓冲区，将渲染结果显示到窗口中
     glfwSwapBuffers(window);
