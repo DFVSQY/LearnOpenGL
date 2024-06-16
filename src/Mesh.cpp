@@ -2,7 +2,7 @@
 #include "Shader.h"
 #include "Mesh.h"
 
-Mesh::Mesh() : vao(0), vbo(0), shader(nullptr)
+Mesh::Mesh() : vao(0), vbo(0), shader_program(0)
 {
 }
 
@@ -10,7 +10,7 @@ Mesh::~Mesh()
 {
 }
 
-bool Mesh::Init(const float *vertices, const int vertexNum, const Shader *shader)
+bool Mesh::Init(const float *vertices, const int vertexNum, const GLuint shaderProgram)
 {
     if (vertices == nullptr || sizeof(vertices) == 0)
     {
@@ -18,9 +18,9 @@ bool Mesh::Init(const float *vertices, const int vertexNum, const Shader *shader
         return false;
     }
 
-    if (shader == nullptr)
+    if (shaderProgram <= 0)
     {
-        std::cerr << "Mesh::Init() failed: shader is null." << std::endl;
+        std::cerr << "Mesh::Init() failed: shader is unvalid." << std::endl;
         return false;
     }
 
@@ -31,18 +31,17 @@ bool Mesh::Init(const float *vertices, const int vertexNum, const Shader *shader
         return false;
     }
 
-    this->shader = shader;
+    this->shader_program = shaderProgram;
 
     return true;
 }
 
 void Mesh::Draw() const
 {
-    if (vao == 0 || shader == nullptr)
+    if (vao == 0 || shader_program == 0)
         return;
 
     // draw mesh content
-    GLuint shader_program = shader->GetShaderProgram();
     glUseProgram(shader_program);
     glBindVertexArray(vao);
 
@@ -169,8 +168,6 @@ void Mesh::SetupVAO(const GLfloat *vertices, int vertexNum)
      * Modifying other VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     */
     glBindVertexArray(0);
-
-    // return tmp_vao;
 
     vao = tmp_vao;
     vbo = tmp_vbo;

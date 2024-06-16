@@ -8,7 +8,8 @@ class Mesh
   private:
     GLuint vao;
     GLuint vbo;
-    const Shader *shader;
+
+    GLuint shader_program;
 
     void SetupVAO(const float *vertices, const int vertexNum);
 
@@ -16,7 +17,7 @@ class Mesh
     Mesh();
     ~Mesh();
 
-    bool Init(const float *vertices, const int vertexNum, const Shader *shader);
+    bool Init(const float *vertices, const int vertexNum, const GLuint shader_program);
 
     void Draw() const;
 };
