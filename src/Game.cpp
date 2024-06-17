@@ -1,12 +1,11 @@
 #include "Scene.h"
-#include "Shader.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "GLFWCallback.h"
 #include "Game.h"
 #include <iostream>
 
-Game::Game() : window(nullptr), scene(){};
+Game::Game() : window(nullptr), scene() {};
 
 Game::~Game()
 {
@@ -68,7 +67,7 @@ bool Game::Init(const char *title, int width, int height)
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
     glViewport(0, 0, fb_width, fb_height);
 #else
-    glViewport(0, 0, win_width, win_height);
+    glViewport(0, 0, width, height);
 #endif
 
     scene.Init();

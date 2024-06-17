@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Scene.h"
 #include "GLFW/glfw3.h"
 
