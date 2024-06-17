@@ -23,14 +23,30 @@ void Scene::Init()
         return;
     }
 
-    // 顶点数据
-    float vertices[] = {
+    /*
+    GLfloat vertices[] = {
+        // 顶点数据
         -0.5f, -0.5f, 0.0f, // left  bottom
         0.5f,  -0.5f, 0.0f, // right bottom
         0.0f,  0.5f,  0.0f  // center top
     };
     Mesh *mesh = new Mesh();
     bool mesh_succ = mesh->Init(vertices, 9, shader_program);
+    */
+
+    GLfloat vertices[] = {
+        0.5f,  0.5f,  0.0f, // top right
+        0.5f,  -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f,  0.0f  // top left
+    };
+    GLuint indices[] = {
+        0, 1, 3, // first Triangle
+        1, 2, 3  // second Triangle
+    };
+    Mesh *mesh = new Mesh();
+    bool mesh_succ = mesh->Init_Elements(vertices, indices, 12, 6, shader_program);
+
     if (!mesh_succ)
     {
         return;
