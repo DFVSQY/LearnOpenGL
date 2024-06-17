@@ -377,6 +377,10 @@ void Mesh::SetupVAO_Elements(const GLfloat *vertices, const int vertexNum, const
      * 因此，如果我们试图在解绑VAO之前解绑GL_ELEMENT_ARRAY_BUFFER，OpenGL将无法找到正确的索引缓冲区，从而无法正确渲染图形。
 
      * 总的来说，GL_ARRAY_BUFFER和GL_ELEMENT_ARRAY_BUFFER在VAO中的行为差异主要是由于OpenGL的历史原因和设计决策。
+
+     * A VAO stores the glBindBuffer calls when the target is GL_ELEMENT_ARRAY_BUFFER. 
+     * This also means it stores its unbind calls so make sure you don't unbind the element array buffer before unbinding your VAO, 
+     * otherwise it doesn't have an EBO configured.
     */
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
