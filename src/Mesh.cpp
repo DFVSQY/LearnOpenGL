@@ -1,5 +1,4 @@
 #include <iostream>
-#include "Shader.h"
 #include "Mesh.h"
 
 Mesh::Mesh() : vao(0), vbo(0), ebo(0), index_num(0)

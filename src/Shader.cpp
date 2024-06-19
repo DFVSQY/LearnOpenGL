@@ -1,11 +1,7 @@
-#include <cstddef>
-#include <cstdlib>
-#include <cstdio>
 #include <iostream>
 #include "Shader.h"
 #include <fstream>
 #include <sstream>
-#include <string>
 
 Shader::Shader() : shader_program(0)
 {
