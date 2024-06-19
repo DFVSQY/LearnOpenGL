@@ -14,9 +14,25 @@ out vec4 FragColor;
 */
 in vec4 vertexColor;
 
+/*
+ * 在GLSL（OpenGL Shading Language）中，uniform是一种限定符（qualifier），它用于声明全局变量，
+ * 这些变量在着色器的多次执行过程中保持不变，直到从外部程序（如CPU端的OpenGL应用）进行更新。
+ * uniform变量通常用来传递在渲染过程中不会改变的值，如变换矩阵、光源参数、纹理采样器等。
+ * 特点：
+ *  数据传递：uniform变量用于在应用程序和着色器之间传递数据。由于uniform变量在渲染过程中保持不变，它们非常适合用于传递那些不需要频繁更改的数据。
+ *  全局访问：uniform变量在同一个着色器程序的不同着色器阶段（如顶点着色器和片段着色器）之间共享，使得它们能够被不同的着色器阶段访问和使用。
+ *  效率：由于uniform变量在每次绘制调用中保持不变，使用uniform变量可以减少数据传输的频率，进而提高渲染效率。
+
+ * 不同的着色器程序（ShaderProgram）之间不能直接共享uniform变量的数据。
+ * 每个着色器程序都有自己独立的uniform变量集合，它们在各自的着色器程序中是独立的。
+*/
+uniform vec4 userColor;
+
 void main()
 {
     // FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
 
-    FragColor = vertexColor;
+    // FragColor = vertexColor;
+
+    FragColor = userColor;
 }
