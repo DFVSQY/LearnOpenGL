@@ -26,13 +26,13 @@ in vec4 vertexColor;
  * 不同的着色器程序（ShaderProgram）之间不能直接共享uniform变量的数据。
  * 每个着色器程序都有自己独立的uniform变量集合，它们在各自的着色器程序中是独立的。
 */
-uniform vec4 userColor;
+// uniform vec4 userColor;
 
 void main()
 {
     // FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
 
-    FragColor = userColor;
+    // FragColor = userColor;
 
     FragColor = vertexColor;
 }

@@ -1,9 +1,8 @@
 #include <iostream>
 #include "Shader.h"
 #include "Mesh.h"
-#include "GLFW/glfw3.h"
 
-Mesh::Mesh() : vao(0), vbo(0), ebo(0), shader_program(0), index_num(0)
+Mesh::Mesh() : vao(0), vbo(0), ebo(0), index_num(0)
 {
 }
 
@@ -11,17 +10,11 @@ Mesh::~Mesh()
 {
 }
 
-bool Mesh::Init(const GLfloat *vertices, const int vertexNum, const GLuint shaderProgram)
+bool Mesh::Init(const GLfloat *vertices, const int vertexNum)
 {
     if (vertices == nullptr || vertexNum <= 0)
     {
         std::cerr << "Mesh::Init() failed: vertices is null or empty." << std::endl;
-        return false;
-    }
-
-    if (shaderProgram <= 0)
-    {
-        std::cerr << "Mesh::Init() failed: shader is unvalid." << std::endl;
         return false;
     }
 
@@ -32,15 +25,12 @@ bool Mesh::Init(const GLfloat *vertices, const int vertexNum, const GLuint shade
         return false;
     }
 
-    this->shader_program = shaderProgram;
-
     index_num = 0;
 
     return true;
 }
 
-bool Mesh::Init_Elements(const GLfloat *vertices, const GLuint *indices, const int vertexNum, const int indexNum,
-                         const GLuint shader_program)
+bool Mesh::Init_Elements(const GLfloat *vertices, const GLuint *indices, const int vertexNum, const int indexNum)
 {
     if (vertices == nullptr || vertexNum <= 0)
     {
@@ -61,8 +51,6 @@ bool Mesh::Init_Elements(const GLfloat *vertices, const GLuint *indices, const i
         return false;
     }
 
-    this->shader_program = shader_program;
-
     index_num = vertexNum;
 
     return true;
@@ -70,36 +58,8 @@ bool Mesh::Init_Elements(const GLfloat *vertices, const GLuint *indices, const i
 
 void Mesh::Draw() const
 {
-    if (vao == 0 || shader_program == 0)
+    if (vao == 0)
         return;
-
-    float timeValue = glfwGetTime();
-    float color_value = (sin(timeValue) / 2.0f) + 0.5f;
-
-    /*
-     * glGetUniformLocation函数用于查询特定uniform变量在给定着色器程序中的位置（位置索引）。
-     * 每个uniform变量在编译和链接着色器程序后都会被分配一个位置，但这个位置不是由开发者指定的，而是由OpenGL决定的。
-     * 为了设置一个uniform变量的值，你需要先知道这个变量在着色器程序中的位置。
-
-     * 函数原型：GLint glGetUniformLocation(GLuint program, const GLchar *name);
-     *  program：已链接的着色器程序的ID。
-     *  name：你想要查询位置的uniform变量的名称，这个名称应与着色器代码中声明的名称匹配。
-     *  返回值：如果查询成功，返回uniform变量的位置索引；如果查询失败（例如，如果变量不存在或者没有被着色器程序使用），返回-1。
-    */
-    GLint vertexColorLocation = glGetUniformLocation(shader_program, "userColor");
-
-    // use shader program
-    glUseProgram(shader_program);
-
-    /*
-     * glUniform4f函数用于设置uniform变量的值，特别是那些类型为四元素浮点向量（vec4）的uniform变量。
-     * 需要先调用glUseProgram，因为它会在当前活动的着色器程序上设置统一变量。
-
-     * 函数原型：GLint glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
-     *  location：uniform变量的位置索引，这个位置是通过glGetUniformLocation函数获取的。
-     *  v0到v3：分别是四元素向量的x、y、z和w分量的值。
-    */
-    glUniform4f(vertexColorLocation, color_value / 2.0f, color_value, color_value / 3.0f, 1.0f);
 
     // draw mesh content
     glBindVertexArray(vao);

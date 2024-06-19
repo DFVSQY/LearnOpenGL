@@ -3,40 +3,34 @@
 #include <cstdio>
 #include <iostream>
 #include "Shader.h"
+#include <fstream>
+#include <sstream>
+#include <string>
 
-Shader::Shader() : shader_program(0), vertex_file_path(nullptr), fragment_file_path(nullptr)
+Shader::Shader() : shader_program(0)
 {
 }
 
-GLuint Shader::Init(const char *vertexFilePath, const char *fragmentFilePath)
+bool Shader::Init(const char *vertexPath, const char *fragmentPath)
 {
-    vertex_file_path = vertexFilePath;
-    fragment_file_path = fragmentFilePath;
+    std::string vertex_str = ReadShaderFile(vertexPath);
+    std::string fragment_str = ReadShaderFile(fragmentPath);
 
-    if (vertex_file_path == nullptr || vertex_file_path[0] == '\0')
-    {
-        std::cerr << "Shader vertex file path is null or empty!" << std::endl;
-        return 0;
-    }
+    const char *vertex_content = vertex_str.c_str();
+    const char *fragment_content = fragment_str.c_str();
 
-    if (fragment_file_path == nullptr || fragment_file_path[0] == '\0')
-    {
-        std::cerr << "Shader fragment file path is null or empty!" << std::endl;
-        return 0;
-    }
-
-    GLuint vertex_shader = Compile(GL_VERTEX_SHADER);
+    GLuint vertex_shader = Compile(GL_VERTEX_SHADER, vertex_content);
     if (vertex_shader == 0)
     {
         std::cerr << "Shader Init failed, vertex shader compile failed!" << std::endl;
-        return 0;
+        return false;
     }
 
-    GLuint fragment_shader = Compile(GL_FRAGMENT_SHADER);
+    GLuint fragment_shader = Compile(GL_FRAGMENT_SHADER, fragment_content);
     if (fragment_shader == 0)
     {
         std::cerr << "Shader Init failed, fragment shader compile failed!" << std::endl;
-        return 0;
+        return false;
     }
 
     shader_program = Link(vertex_shader, fragment_shader);
@@ -44,40 +38,77 @@ GLuint Shader::Init(const char *vertexFilePath, const char *fragmentFilePath)
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
 
-    return shader_program;
+    return true;
 }
 
-GLuint Shader::GetShaderProgram() const
+void Shader::Use()
 {
-    return shader_program;
+    glUseProgram(shader_program);
 }
 
-GLuint Shader::Compile(GLenum shaderType)
+// 向shader传递bool值
+void Shader::SetBool(const std::string &name, bool value) const
+{
+    GLint localtion = GetUniformLocation(name);
+    glUniform1i(localtion, (GLint)value);
+}
+
+// 向shader传递int值
+void Shader::SetInt(const std::string &name, GLint value) const
+{
+    GLint localtion = GetUniformLocation(name);
+    glUniform1i(localtion, value);
+}
+
+// 向shader传递float值
+void Shader::SetFloat(const std::string &name, GLfloat value) const
+{
+    GLint localtion = GetUniformLocation(name);
+
+    glUniform1f(localtion, value);
+}
+
+// 向shader传递浮点型vec4值
+void Shader::SetFloat4(const std::string &name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) const
+{
+    GLint localtion = GetUniformLocation(name);
+
+    /*
+     * glUniform4f函数用于设置uniform变量的值，特别是那些类型为四元素浮点向量（vec4）的uniform变量。
+     * 需要先调用glUseProgram，因为它会在当前活动的着色器程序上设置统一变量。
+
+     * 函数原型：GLint glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+     *  location：uniform变量的位置索引，这个位置是通过glGetUniformLocation函数获取的。
+     *  v0到v3：分别是四元素向量的x、y、z和w分量的值。
+    */
+    glUniform4f(localtion, v0, v1, v2, v3);
+}
+
+// 获取uniform变量位置
+GLint Shader::GetUniformLocation(const std::string &name) const
+{
+    /*
+     * glGetUniformLocation函数用于查询特定uniform变量在给定着色器程序中的位置（位置索引）。
+     * 每个uniform变量在编译和链接着色器程序后都会被分配一个位置，但这个位置不是由开发者指定的，而是由OpenGL决定的。
+     * 为了设置一个uniform变量的值，你需要先知道这个变量在着色器程序中的位置。
+
+     * 函数原型：GLint glGetUniformLocation(GLuint program, const GLchar *name);
+     *  program：已链接的着色器程序的ID。
+     *  name：你想要查询位置的uniform变量的名称，这个名称应与着色器代码中声明的名称匹配。
+     *  返回值：如果查询成功，返回uniform变量的位置索引；如果查询失败（例如，如果变量不存在或者没有被着色器程序使用），返回-1。
+    */
+    GLint location = glGetUniformLocation(shader_program, name.c_str());
+    if (location == -1)
+    {
+        std::cerr << "Uniform variable '" << name << "' doesn't exist!" << std::endl;
+    }
+    return location;
+}
+
+GLuint Shader::Compile(GLenum shaderType, const char *fileContent)
 {
     GLenum shader_type = shaderType;
-
-    const char *file_path = nullptr;
-    if (shader_type == GL_VERTEX_SHADER)
-    {
-        file_path = vertex_file_path;
-    }
-    else if (shader_type == GL_FRAGMENT_SHADER)
-    {
-        file_path = fragment_file_path;
-    }
-
-    if (file_path == nullptr || file_path[0] == '\0')
-    {
-        std::cerr << "file path is null!" << std::endl;
-        return 0;
-    }
-
-    const char *file_content = ReadShaderContent(file_path);
-    if (file_content == nullptr || file_content[0] == '\0')
-    {
-        std::cerr << "file content is null!" << std::endl;
-        return 0;
-    }
+    const char *file_content = fileContent;
 
     /*
      * glCreateShader 函数创建一个指定类型的着色器对象，并返回其标识符。
@@ -104,19 +135,14 @@ GLuint Shader::Compile(GLenum shaderType)
     */
     glCompileShader(shader);
 
-    // 释放文件内容存储
-    free((void *)file_content);
-
     // check for shader compile errors
     GLint success;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        char infoLog[512];
+        char infoLog[1024];
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        std::cout << "error, shader compilation is failed:\n"
-                  << infoLog << "\n"
-                  << "file path:" << file_path << std::endl;
+        std::cout << "error, shader compilation is failed:\n" << infoLog << "\n" << std::endl;
     }
 
     return shader;
@@ -134,71 +160,45 @@ GLuint Shader::Link(GLuint vertexShader, GLuint fragmentShader)
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success)
     {
-        char infoLog[512];
+        char infoLog[1024];
         glGetProgramInfoLog(program, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        std::cout << "error, link shader program failed\n" << infoLog << std::endl;
     }
 
     return program;
 }
 
-const char *Shader::ReadShaderContent(const char *filePath)
+std::string Shader::ReadShaderFile(const char *filePath)
 {
-    const char *file_path = filePath;
+    std::string str_content;
+    std::ifstream shader_file;
 
-    if (file_path == nullptr)
+    shader_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    try
     {
-        std::cerr << "file path is null!" << std::endl;
-        return nullptr;
+        shader_file.open(filePath);
+        if (!shader_file.is_open())
+        {
+            throw std::ios_base::failure("Failed to open the file.");
+        }
+
+        std::stringstream shader_stream;
+        shader_stream << shader_file.rdbuf();
+        shader_file.close();
+
+        str_content = shader_stream.str();
+    }
+    catch (const std::ifstream::failure &e)
+    {
+        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "ERROR::SHADER::GENERAL_EXCEPTION: " << e.what() << std::endl;
     }
 
-    FILE *file = nullptr;
-
-#ifdef _WIN32
-    errno_t err = fopen_s(&file, file_path, "rb");
-    if (err != 0 || !file)
-    {
-        std::cerr << "Failed to open shader file: " << file_path << std::endl;
-        return nullptr;
-    }
-#else
-    file = fopen(file_path, "rb");
-    if (!file)
-    {
-        std::cerr << "Failed to open shader file: " << file_path << std::endl;
-        return nullptr;
-    }
-#endif
-
-    // 移动文件指针到文件末尾
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    // 分配内存保存文件内容
-    char *buffer = (char *)malloc(fileSize + 1);
-    if (!buffer)
-    {
-        std::cerr << "Failed to allocate memory." << std::endl;
-        fclose(file);
-        return nullptr;
-    }
-
-    // 读取文件内容到缓冲区
-    size_t bytesRead = fread(buffer, 1, fileSize, file);
-    if (bytesRead != fileSize)
-    {
-        std::cerr << "Failed to read file content." << std::endl;
-        free(buffer);
-        fclose(file);
-        return nullptr;
-    }
-
-    // 添加字符串终止符
-    buffer[fileSize] = '\0';
-
-    fclose(file);
-    return buffer;
+    return str_content;
 }
 
 Shader::~Shader()

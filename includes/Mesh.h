@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Shader.h"
 #include "glad/glad.h"
 
 class Mesh
@@ -9,8 +8,6 @@ class Mesh
     GLuint vao;
     GLuint vbo;
     GLuint ebo;
-
-    GLuint shader_program;
 
     GLsizei index_num; // 索引缓冲区中索引的数量
 
@@ -21,11 +18,9 @@ class Mesh
   public:
     Mesh();
     ~Mesh();
+    bool Init(const GLfloat *vertices, const int vertexNum);
 
-    bool Init(const GLfloat *vertices, const int vertexNum, const GLuint shader_program);
-
-    bool Init_Elements(const GLfloat *vertices, const GLuint *indices, const int vertexNum, const int indexNum,
-                       const GLuint shader_program);
+    bool Init_Elements(const GLfloat *vertices, const GLuint *indices, const int vertexNum, const int indexNum);
 
     void Draw() const;
 };

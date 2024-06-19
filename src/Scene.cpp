@@ -2,7 +2,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 
-Scene::Scene() : m_meshes()
+Scene::Scene() : m_meshes(), m_shaders()
 {
 }
 
@@ -12,16 +12,22 @@ Scene::~Scene()
     {
         delete mesh;
     }
+
+    for (auto shader : m_shaders)
+    {
+        delete shader;
+    }
 }
 
 void Scene::Init()
 {
-    Shader shader;
-    GLuint shader_program = shader.Init("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
-    if (shader_program == 0)
+    Shader *shader = new Shader();
+    bool shader_succ = shader->Init("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
+    if (!shader_succ)
     {
         return;
     }
+    AddShader(shader);
 
     /*
     GLfloat vertices[] = {
@@ -31,7 +37,7 @@ void Scene::Init()
         0.0f,  0.5f,  0.0f  // center top
     };
     Mesh *mesh = new Mesh();
-    bool mesh_succ = mesh->Init(vertices, 9, shader_program);
+    bool mesh_succ = mesh->Init(vertices, 9);
     */
 
     GLfloat vertices[] = {
@@ -46,8 +52,7 @@ void Scene::Init()
         1, 2, 3  // second Triangle
     };
     Mesh *mesh = new Mesh();
-    bool mesh_succ = mesh->Init_Elements(vertices, indices, 24, 6, shader_program);
-
+    bool mesh_succ = mesh->Init_Elements(vertices, indices, 24, 6);
     if (!mesh_succ)
     {
         return;
@@ -61,10 +66,28 @@ void Scene::AddMesh(Mesh *mesh)
     m_meshes.push_back(mesh);
 }
 
+void Scene::AddShader(Shader *shader)
+{
+    m_shaders.push_back(shader);
+}
+
 void Scene::Render()
 {
-    for (auto mesh : m_meshes)
+    for (size_t i = 0; i < m_meshes.size(); ++i)
     {
+        Shader *shader = m_shaders[i];
+        shader->Use();
+
+        /* 测试传递uniform值
+        if (i == 0)
+        {
+            float timeValue = glfwGetTime();
+            float color_value = (sin(timeValue) / 2.0f) + 0.5f;
+            shader->SetFloat4("userColor", color_value / 2.0f, color_value, color_value / 3.0f, 1.0f);
+        }
+        */
+
+        Mesh *mesh = m_meshes[i];
         mesh->Draw();
     }
 }
