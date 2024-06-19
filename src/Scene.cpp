@@ -35,17 +35,18 @@ void Scene::Init()
     */
 
     GLfloat vertices[] = {
-        0.5f,  0.5f,  0.0f, // top right
-        0.5f,  -0.5f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f, 0.5f,  0.0f  // top left
+        // postion          // color
+        0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, // top right
+        0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
+        -0.5f, 0.5f,  0.0f, 0.2f, 0.8f, 0.5f, // top left
     };
     GLuint indices[] = {
         0, 1, 3, // first Triangle
         1, 2, 3  // second Triangle
     };
     Mesh *mesh = new Mesh();
-    bool mesh_succ = mesh->Init_Elements(vertices, indices, 12, 6, shader_program);
+    bool mesh_succ = mesh->Init_Elements(vertices, indices, 24, 6, shader_program);
 
     if (!mesh_succ)
     {

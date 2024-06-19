@@ -376,7 +376,7 @@ void Mesh::SetupVAO_Elements(const GLfloat *vertices, const int vertexNum, const
      *  stride：指定连续顶点属性之间的字节偏移量。如果为 0，则表示顶点属性是紧密排列的（即无间隔）。这个参数用于在顶点缓冲对象中正确定位每个顶点的属性。
      *  pointer：指定顶点属性数组中第一个组件的字节偏移量。这个指针是从缓冲对象数据的起始位置开始计算的。
     */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
 
     /*
      * 在现代 OpenGL 中，顶点数据通常通过顶点缓冲对象 (VBO) 传递到 GPU，而这些数据可以包含多个不同的属性（如位置、颜色、法线、纹理坐标等）。
@@ -387,6 +387,10 @@ void Mesh::SetupVAO_Elements(const GLfloat *vertices, const int vertexNum, const
      * 需要注意的是,在设置完顶点属性指针后,默认情况下所有顶点属性数组都是禁用的,必须手动调用glEnableVertexAttribArray来启用需要使用的属性。
     */
     glEnableVertexAttribArray(0);
+
+    // 设置并启用顶点的颜色属性
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
 
     /*
      * 此处不要解绑ebo！

@@ -26,6 +26,8 @@
 */
 layout(location = 0) in vec3 aPos;
 
+layout(location = 1) in vec3 aColor;
+
 /*
  * 如果想要从一个着色器向另一个着色器发送数据，我们必须在发送着色器中声明一个输出，并在接收着色器中声明一个类似的输入。
  * 当两边的类型和名称相同时，OpenGL会将这两个变量连接起来，然后就可以在着色器之间发送数据（这是在链接程序对象时完成的）。
@@ -43,5 +45,7 @@ void main()
     // * 第四个分量设置为 1.0，因为在齐次坐标系中，w 分量为 1 表示位置坐标（而不是方向向量）。
     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 
-    vertexColor = vec4(0.8, 0.8, 1.0, 1.0);
+    // vertexColor = vec4(0.8, 0.8, 1.0, 1.0);
+
+    vertexColor = vec4(aColor, 1.0);
 }
