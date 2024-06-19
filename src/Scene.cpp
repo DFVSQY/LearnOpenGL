@@ -25,6 +25,7 @@ void Scene::Init()
     bool shader_succ = shader->Init("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
     if (!shader_succ)
     {
+        delete shader;
         return;
     }
     AddShader(shader);
@@ -55,6 +56,7 @@ void Scene::Init()
     bool mesh_succ = mesh->Init_Elements(vertices, indices, 24, 6);
     if (!mesh_succ)
     {
+        delete mesh;
         return;
     }
 
