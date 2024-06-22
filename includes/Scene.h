@@ -16,6 +16,10 @@ class Scene
     Scene();
     ~Scene();
 
+    // 删除复制构造函数和赋值操作符
+    Scene(const Scene &) = delete;
+    Scene &operator=(const Scene &) = delete;
+
     void Init();
 
     void AddMesh(Mesh *mesh);
