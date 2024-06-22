@@ -12,6 +12,21 @@ Texture::~Texture()
 
 bool Texture::Init(const char *filePath, GLenum format)
 {
+    /*
+     * 该函数用于在加载纹理时上下翻转图像。
+
+     * 在OpenGL中，进行纹理映射后渲染出来的图像出现上下颠倒的情况是很常见的。这主要是因为OpenGL和大多数图像文件格式在坐标系统上存在差异。
+
+     * 详细解释：
+     *  坐标系统差异：
+     *    OpenGL纹理坐标系：原点(0,0)在左下角，y轴向上。
+     *    大多数图像文件格式：原点(0,0)在左上角，y轴向下。
+
+     * 加载图像时的影响：
+     *    当你加载一个图像作为纹理时，通常图像数据是从顶部到底部存储的。但是当你在OpenGL中使用这些数据时，它会从底部开始渲染，导致图像看起来是上下颠倒的。
+    */
+    stbi_set_flip_vertically_on_load(true);
+
     unsigned char *data = stbi_load(filePath, &width, &height, &channel_num, 0);
     if (!data)
     {
@@ -105,7 +120,7 @@ bool Texture::Init(const char *filePath, GLenum format)
      *  使用glGetError检查可能的错误。
      *  在调用此函数之前，确保正确的纹理已被绑定。
     */
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
     /*
      * 该函数用于为当前绑定的纹理自动生成完整的mipmap链。
@@ -146,7 +161,34 @@ GLsizei Texture::GetHeight() const
     return height;
 }
 
-void Texture::Use()
+void Texture::Use(int idx)
 {
+    /*
+     * 函数原型：void glActiveTexture(GLenum texture);
+     *  texture: 指定纹理单元， GL_TEXTURE0 到 GL_TEXTURE31 之间的值，可使用 GL_TEXTURE0 + idx 形式指定。
+
+     * 激活纹理单元：
+     *  OpenGL 支持多个纹理单元，glActiveTexture 用于选择当前活动的纹理单元。
+     *  纹理单元是 GPU 中用于存储和应用纹理的硬件资源。
+
+     * 纹理单元数量：
+     *  OpenGL 保证至少支持 16 个纹理单元，但许多现代 GPU 支持 32 个或更多。
+
+     * 默认状态：
+     *  如果从未调用 glActiveTexture，默认激活的是 GL_TEXTURE0。
+
+     * 与 glBindTexture 的关系：
+     *  glActiveTexture 选择当前活动的纹理单元。
+     *  随后的 glBindTexture 调用会将纹理绑定到这个活动的纹理单元。
+
+     * 在着色器中的使用：
+     *  着色器中的采样器变量对应于纹理单元，通常采样器变量对应的纹理单元可通过OpenGL程序的 glUniform1i 函数指定。
+
+     * 多重纹理：
+     *  允许在一个绘制调用中使用多个纹理。
+     *  每个纹理可以绑定到不同的纹理单元。
+    */
+    glActiveTexture(GL_TEXTURE0 + idx);
+
     glBindTexture(GL_TEXTURE_2D, texture_id);
 }

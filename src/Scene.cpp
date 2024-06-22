@@ -42,6 +42,16 @@ void Scene::Init()
     }
     AddTexture(texture);
 
+    // 第二张纹理
+    Texture *texture2 = new Texture();
+    bool texture_succ2 = texture2->Init("../textures/awesomeface.png", GL_RGBA);
+    if (!texture_succ2)
+    {
+        delete texture2;
+        return;
+    }
+    AddTexture(texture2);
+
     // 网格
     GLfloat vertices[] = {
         // postion          // color
@@ -84,10 +94,15 @@ void Scene::Render()
     for (size_t i = 0; i < m_meshes.size(); ++i)
     {
         Texture *texture = m_textures[i];
-        texture->Use();
+        texture->Use(0);
+
+        Texture *texture2 = m_textures[i + 1];
+        texture2->Use(1);
 
         Shader *shader = m_shaders[i];
         shader->Use();
+        shader->SetInt("texture0", 0);
+        shader->SetInt("texture1", 1);
 
         /* 测试传递uniform值
         if (i == 0)

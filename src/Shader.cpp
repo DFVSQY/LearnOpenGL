@@ -39,6 +39,22 @@ bool Shader::Init(const char *vertexPath, const char *fragmentPath)
 
 void Shader::Use()
 {
+    /*
+     * 主要作用:
+     *  激活指定的着色器程序,使其成为当前使用的程序。
+     *  后续的渲染调用将使用这个程序来处理顶点和片段。
+
+     * 状态改变:
+     *  调用 glUseProgram 会改变 OpenGL 的状态机,将指定的程序设置为当前活动程序。
+     *  这个状态会一直保持,直到调用 glUseProgram 使用另一个程序或传入 0 来禁用着色器程序。
+
+     * 使用时机:
+     *  通常在渲染循环中,在绘制需要使用特定着色器的对象之前调用。
+     *  可以根据需要多次切换不同的程序。
+
+     * 与 uniform 变量的关系:
+     *  只有在程序被激活后,才能设置其 uniform 变量的值。
+    */
     glUseProgram(shader_program);
 }
 

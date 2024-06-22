@@ -41,7 +41,7 @@ in vec2 texCoord;
  *  sampler2D 实际上是一个不透明的引用，指向一个2D纹理。
  *  它允许着色器访问和采样纹理数据。
 
- * textureSampler 名称：
+ * texture0 变量名称：
  *  这是给这个纹理采样器取的名字。
  *  在着色器中可以使用这个名字来引用和使用这个纹理。
 
@@ -51,7 +51,10 @@ in vec2 texCoord;
  * OpenGL默认激活GL_TEXTURE0纹理单元。
  * 如果你只使用了一个纹理，并且在着色器中使用了默认的纹理单元（通常是0），那么可能不需要显式绑定。
 */
-uniform sampler2D textureSampler;
+uniform sampler2D texture0;
+
+// 使用的第二张纹理
+uniform sampler2D texture1;
 
 void main()
 {
@@ -61,7 +64,11 @@ void main()
 
     // FragColor = vertexColor;
 
-    // FragColor = texture(textureSampler, texCoord);
+    // FragColor = texture(texture0, texCoord);
 
-    FragColor = texture(textureSampler, texCoord) * vertexColor;
+    // mix 函数原型：
+    //  genType mix(genType x, genType y, genType a)
+    //  genType mix(genType x, genType y, float a)
+    // mix函数返回x和y的线性混合，即 result = x * (1.0 - a) + y * a。
+    FragColor = mix(texture(texture0, texCoord), texture(texture1, texCoord), 0.2f);
 }
