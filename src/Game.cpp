@@ -6,7 +6,7 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game() : window(nullptr), scene() {};
+Game::Game() : window(nullptr), scene(){};
 
 Game::~Game()
 {
@@ -88,7 +88,13 @@ void Game::SetupWindowHint() const
 {
     // 创建窗口前设置一些窗口选项值（使用OpenGL3.3版本，并且使用核心配置模式）
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+
+#if __APPLE__
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // MacOS也只能支持到OpenGL4.1了
+#else
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+#endif
+
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #if __APPLE__
@@ -98,6 +104,7 @@ void Game::SetupWindowHint() const
     /*
      * 启用OpenGL的调试上下文，在调试上下文中使用OpenGL可能会比非调试上下文显著变慢，
      * 因此在进行优化或发布应用程序时，需要移除GLFW的调试请求提示。
+     * OpenGL4.3及以上版本支持。
     */
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 }
@@ -106,7 +113,6 @@ void Game::SetupGLDebugContext() const
 {
     int flags;
     glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-    Util::getInstance().CheckOpenGLError();
     int result = flags & GL_CONTEXT_FLAG_DEBUG_BIT;
     if (!result)
     {
