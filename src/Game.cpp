@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Util.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "GLFWCallback.h"
@@ -55,36 +56,90 @@ bool Game::Init(const char *title, int width, int height)
         return false;
     }
 
+    // 需要确保OpenGL上下文已经被正确创建并绑定到当前线程。
+    SetupGLDebugContext();
+
     // 设置键盘输入回调函数
     glfwSetKeyCallback(window, glfw_key_callback);
 
     // 当窗口改变时，在回调函数里面重新设置视口大小
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-// 定义视口的宽高，铺满整个窗口
-#ifdef __APPLE__
+    // 定义视口的宽高，铺满整个窗口
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
     glViewport(0, 0, fb_width, fb_height);
-#else
-    glViewport(0, 0, width, height);
-#endif
 
     scene.Init();
 
     return true;
 }
 
-void Game::SetupWindowHint()
+void Game::PrintOpenGLVersion() const
+{
+    // 获取 OpenGL 版本（在核心模式下有效）
+    GLint majorVersion, minorVersion;
+    glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+    glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
+    std::cout << "OpenGL Version: " << majorVersion << "." << minorVersion << std::endl;
+}
+
+void Game::SetupWindowHint() const
 {
     // 创建窗口前设置一些窗口选项值（使用OpenGL3.3版本，并且使用核心配置模式）
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #if __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+
+    /*
+     * 启用OpenGL的调试上下文，在调试上下文中使用OpenGL可能会比非调试上下文显著变慢，
+     * 因此在进行优化或发布应用程序时，需要移除GLFW的调试请求提示。
+    */
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+}
+
+void Game::SetupGLDebugContext() const
+{
+    int flags;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    Util::getInstance().CheckOpenGLError();
+    int result = flags & GL_CONTEXT_FLAG_DEBUG_BIT;
+    if (!result)
+    {
+        std::cerr << "Failed to enable OpenGL debug context" << std::endl;
+    }
+    else
+    {
+        /*
+         * 启用OpenGL的调试输出功能。
+         * 这允许OpenGL生成调试消息，这些消息可以帮助开发者识别错误、性能问题和其他重要信息。
+        */
+        glEnable(GL_DEBUG_OUTPUT);
+
+        /*
+         * 启用同步调试输出。
+         * 当启用时，调试消息会在导致该消息的OpenGL命令执行完毕后立即生成。
+         * 这对于调试非常有用，因为它可以确保调试消息与导致它的OpenGL调用直接关联。
+        */
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+        /*
+         * 设置调试消息回调函数。
+         * 第一个参数 是一个用户定义的函数，它会在OpenGL生成调试消息时被调用。
+         * 第二个参数 是一个可选的用户指定数据指针，可以传递给回调函数。
+        */
+        glDebugMessageCallback(glfw_debug_output, nullptr);
+
+        /*
+         * 控制哪些类型的调试消息应该被生成。
+         * 配置系统接收所有类型的调试消息，不进行任何过滤。
+        */
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    }
 }
 
 void Game::Run()

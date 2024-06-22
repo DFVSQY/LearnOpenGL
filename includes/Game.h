@@ -12,7 +12,11 @@ class Game
 
     Scene scene;
 
-    void SetupWindowHint();
+    void SetupWindowHint() const;
+
+    void SetupGLDebugContext() const;
+
+    void PrintOpenGLVersion() const;
 
   public:
     // 删除复制构造函数和赋值操作符

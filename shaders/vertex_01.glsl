@@ -28,11 +28,16 @@ layout(location = 0) in vec3 aPos;
 
 layout(location = 1) in vec3 aColor;
 
+layout(location = 2) in vec2 aTexCoord;
+
 /*
  * 如果想要从一个着色器向另一个着色器发送数据，我们必须在发送着色器中声明一个输出，并在接收着色器中声明一个类似的输入。
  * 当两边的类型和名称相同时，OpenGL会将这两个变量连接起来，然后就可以在着色器之间发送数据（这是在链接程序对象时完成的）。
 */
 out vec4 vertexColor;
+
+// 传递纹理坐标
+out vec2 texCoord;
 
 /*
  * 每个着色器程序都必须包含的主函数，作为程序的入口点。
@@ -48,4 +53,6 @@ void main()
     // vertexColor = vec4(0.8, 0.8, 1.0, 1.0);
 
     vertexColor = vec4(aColor, 1.0);
+
+    texCoord = aTexCoord;
 }
