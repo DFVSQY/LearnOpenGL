@@ -27,7 +27,7 @@ add_executable(main ${SRC})
 # 指定头文件搜索目录
 target_include_directories(main PRIVATE "includes")
 
-# 链接 glfw, glad 库
+# 链接引入的依赖库（glfw，glad，...）
 target_link_libraries(main PRIVATE glfw glad stb)
 
 if(WIN32)
