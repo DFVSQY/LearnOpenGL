@@ -28,7 +28,7 @@ add_executable(main ${SRC})
 target_include_directories(main PRIVATE "includes")
 
 # 链接 glfw, glad 库
-target_link_libraries(main PRIVATE glfw glad)
+target_link_libraries(main PRIVATE glfw glad stb)
 
 if(WIN32)
     target_link_libraries(main PRIVATE opengl32)
