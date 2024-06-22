@@ -19,20 +19,116 @@ bool Texture::Init(const char *filePath, GLenum format)
         return false;
     }
 
+    /*
+     * glGenTextures是OpenGL中用于生成纹理对象名称的函数。
+     * 这个函数的主要目的是创建一个或多个唯一的纹理对象标识符,这些标识符可以在后续的纹理操作中使用。
+    */
     glGenTextures(1, &texture_id);
 
+    /*
+     * glBindTexture函数的作用:
+     *  1. 激活纹理对象: 它将一个纹理对象绑定到当前的OpenGL上下文中的活动纹理单元。
+     *  2. 设置当前纹理: 绑定后,所有后续的纹理操作都会作用于这个被绑定的纹理对象。
+     *  3. 创建新纹理: 如果指定的纹理名称之前没有被使用过,glBindTexture会创建一个新的纹理对象。
+
+     * 函数原型：void glBindTexture(GLenum target, GLuint texture);
+     * 参数：
+     *  target: 指定纹理的类型,如GL_TEXTURE_2D, GL_TEXTURE_3D等。
+     *  texture: 要绑定的纹理对象的名称(unsigned int)。
+    */
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
+    /*
+     * 设置水平方向（S轴）和垂直方向（T轴）的纹理wrapping方式，此处为重复纹理。
+
+     * 在OpenGL中，纹理坐标通常被归一化为0.0到1.0之间。
+     * 当纹理坐标超出0.0到1.0的范围时，纹理wrapping决定了如何处理这些坐标。
+     * GL_REPEAT 通常是最高效的包裹模式，因为它可以利用硬件的纹理寻址能力。
+
+     * glTexParameteri 的作用是设置纹理参数。
+     * 函数原型：void glTexParameteri(GLenum target, GLenum pname, GLint param);
+     * 参数：
+     *  target: 指定纹理目标，如GL_TEXTURE_2D, GL_TEXTURE_3D等。
+     *  pname: 指定要设置的参数名称。
+     *  param: 指定参数值。
+
+     * 这些设置应该在绑定纹理后、加载纹理数据之前进行。
+     * 对于每个新的纹理对象，都需要单独设置这些参数。
+    */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+    /*
+     * 设置2D纹理的过滤参数，控制纹理在缩小和放大时的采样方式。
+
+     * 纹理缩小过滤（GL_TEXTURE_MIN_FILTER）：
+     *  设置为 GL_LINEAR_MIPMAP_LINEAR，这是一种高质量的三线性过滤方式。
+     *  它在两个最接近的 mipmap 级别之间进行线性插值，然后在插值结果上再次进行线性插值，提供了最平滑的缩小效果，但也是计算量最大的。
+     *  使用 mipmap 需要生成 mipmap 级别（通常通过 glGenerateMipmap 函数）。
+
+     * 纹理放大过滤（GL_TEXTURE_MAG_FILTER）：
+     *  设置为 GL_LINEAR，这种方式使用临近的4个纹素进行双线性插值，提供比 GL_NEAREST 更平滑的放大效果。
+
+     * 为什么缩小和放大使用不同的过滤方式：
+     *  缩小时通常需要更复杂的过滤来避免混叠。
+     *  放大时通常不需要 mipmap，线性过滤就足够了。
+
+     * 这些设置应在绑定纹理后、加载纹理数据之前进行。
+    */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    /*
+     * 该函数用于定义二维纹理图像的数据。
+     * 将图像数据从CPU内存传输到GPU内存。
+     * 可能在传输过程中进行格式转换（如从RGB到RGBA）。
+     * 在GPU上分配存储空间来存储纹理数据。
+     * 这是一个相对昂贵的操作，特别是对于大纹理。
+
+     * 函数原型：void glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *data);
+     * 参数：
+     *  target: 指定纹理目标，如GL_TEXTURE_2D, GL_TEXTURE_3D等。
+     *  level: 指定纹理的mipmap级别，0是基本级别，大于0的值用于mipmap级别（也可以手动为minmap指定纹理数据）。
+     *  internalformat: 指定纹理在GPU中的存储格式，常见值包括GL_RGB, GL_RGBA, GL_RGB8, GL_RGBA8等，更高精度的格式如GL_RGB16F用于HDR纹理。
+     *  width: 指定纹理图像的宽度（以像素为单位）。
+     *  height: 指定纹理图像的高度（以像素为单位）。
+     *  border: 历史遗留参数，必须设为0。
+     *  format: 指定提供的像素数据的格式，常见值有GL_RGB, GL_RGBA, GL_RED等。
+     *  type: 指定提供的像素数据的数据类型，常见值有GL_UNSIGNED_BYTE, GL_FLOAT等。
+     *  data: 指向包含纹理图像数据的内存缓冲区的指针，如果为NULL，则分配存储空间但不初始化它。
+
+     * 注意事项：
+     *  调用后，OpenGL会复制数据，因此可以释放原始数据。
+     *  某些硬件可能要求纹理尺寸是2的幂（如256x256, 512x512等）。
+     *  internalFormat, format, 和 type 需要相互兼容。
+     *  对于频繁更新的纹理，考虑使用glTexSubImage2D。
+     *  使用glGetError检查可能的错误。
+     *  在调用此函数之前，确保正确的纹理已被绑定。
+    */
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
+    /*
+     * 该函数用于为当前绑定的纹理自动生成完整的mipmap链。
+
+     * Mipmap 是纹理的一系列预计算的缩小版本，用于提高渲染速度和减少混叠（aliasing）效果，通常只在纹理缩小时使用，放大不使用 mipmap。
+     * 每个级别的尺寸是上一级的一半，直到1x1像素，从原始纹理开始，逐步创建更小的版本，使用高质量的缩小算法（通常是线性过滤）。
+     * 生成mipmap需要一定的计算时间，但通常比在渲染时动态缩小纹理更高效，增加了约33%的纹理内存使用，额外内存用于存储所有mipmap级别。
+
+     * 函数原型：void glGenerateMipmap(GLenum target);
+     *  target: 指定纹理目标，如GL_TEXTURE_2D, GL_TEXTURE_3D等。
+
+     * 注意事项：
+     *  在调用glGenerateMipmap之前，必须已经为基本级别（level 0）定义了纹理数据。
+     *  确保在调用时正确的纹理已被绑定。
+     *  对于非2的幂大小的纹理，某些OpenGL实现可能不支持mipmap生成。
+     *  要使用生成的mipmap，需要设置适当的纹理过滤模式（如GL_LINEAR_MIPMAP_LINEAR）。
+     *  如果需要更精细的控制，可以手动为每个mipmap级别调用glTexImage2D。
+     *  对于频繁更新的纹理，重复调用此函数可能影响性能。
+     *  对于某些压缩纹理格式，可能需要手动提供所有mipmap级别。
+    */
     glGenerateMipmap(GL_TEXTURE_2D);
 
+    // 解除绑定纹理
     glBindTexture(GL_TEXTURE_2D, 0);
 
     stbi_image_free(data);

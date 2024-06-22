@@ -30,6 +30,27 @@ in vec4 vertexColor;
 
 in vec2 texCoord;
 
+/*
+ * uniform 关键字：
+ *  表示这是一个uniform变量。
+ *  uniform变量是从CPU端程序传递到GPU着色器的全局变量。
+ *  对于一次绘制调用中的所有顶点和片段，uniform变量保持不变。
+
+ * sampler2D 类型：
+ *  这是一个特殊的数据类型，用于表示2D纹理。
+ *  sampler2D 实际上是一个不透明的引用，指向一个2D纹理。
+ *  它允许着色器访问和采样纹理数据。
+
+ * textureSampler 名称：
+ *  这是给这个纹理采样器取的名字。
+ *  在着色器中可以使用这个名字来引用和使用这个纹理。
+
+ * 通常与 texture 函数一起使用来采样纹理颜色。
+ * 在OpenGL程序中，你可以将一个纹理绑定到这个采样器。
+
+ * OpenGL默认激活GL_TEXTURE0纹理单元。
+ * 如果你只使用了一个纹理，并且在着色器中使用了默认的纹理单元（通常是0），那么可能不需要显式绑定。
+*/
 uniform sampler2D textureSampler;
 
 void main()
