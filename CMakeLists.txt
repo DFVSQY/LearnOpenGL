@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 20)
 # 要求必须使用这个版本的标准
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_options(-Wall)
+add_compile_options(-Wall -Wextra -Wreturn-type -Werror=return-type)
 
 add_subdirectory(lib/glfw)
 add_subdirectory(lib/glad)
