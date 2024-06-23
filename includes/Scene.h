@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Material.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -11,6 +12,12 @@ class Scene
     std::vector<Mesh *> m_meshes;
     std::vector<Shader *> m_shaders;
     std::vector<Texture *> m_textures;
+    std::vector<Material *> m_materials;
+
+    void AddMesh(Mesh *mesh);
+    void AddShader(Shader *shader);
+    void AddTexture(Texture *texture);
+    void AddMaterial(Material *material);
 
   public:
     Scene();
@@ -22,9 +29,10 @@ class Scene
 
     void Init();
 
-    void AddMesh(Mesh *mesh);
-    void AddShader(Shader *shader);
-    void AddTexture(Texture *texture);
+    Shader *LoadShader(const char *vertextPath, const char *fragmentPath);
+    Texture *LoadTexture(const char *texturePath, GLenum format);
+
+    Material *GenMaterial(Shader *shader);
 
     void Render();
 };

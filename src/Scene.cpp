@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Material.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -24,48 +25,39 @@ Scene::~Scene()
     {
         delete texture;
     }
+
+    for (auto material : m_materials)
+    {
+        delete material;
+    }
 }
 
 void Scene::Init()
 {
     // Shader
-    Shader *shader = new Shader();
-    bool shader_succ = shader->Init("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
-    if (!shader_succ)
-    {
-        delete shader;
+    Shader *shader = LoadShader("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
+    if (!shader)
         return;
-    }
-    AddShader(shader);
 
-    shader->Use();
-    shader->SetInt("texture0", 0);
-    shader->SetInt("texture1", 1);
+    // 纹理
+    Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
+    if (!texture)
+        return;
+
+    // 第二张纹理
+    Texture *texture2 = LoadTexture("../textures/awesomeface.png", GL_RGBA);
+    if (!texture2)
+        return;
+
+    Material *material = GenMaterial(shader);
 
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::rotate(trans, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     trans = glm::scale(trans, glm::vec3(0.5f));
-    shader->SetMat4f("trans", trans);
+    material->SetMat4f("trans", trans);
 
-    // 纹理
-    Texture *texture = new Texture();
-    bool texture_succ = texture->Init("../textures/wall.jpg", GL_RGB);
-    if (!texture_succ)
-    {
-        delete texture;
-        return;
-    }
-    AddTexture(texture);
-
-    // 第二张纹理
-    Texture *texture2 = new Texture();
-    bool texture_succ2 = texture2->Init("../textures/awesomeface.png", GL_RGBA);
-    if (!texture_succ2)
-    {
-        delete texture2;
-        return;
-    }
-    AddTexture(texture2);
+    material->SetTexture("texture0", texture);
+    material->SetTexture("texture1", texture2);
 
     // 网格
     GLfloat vertices[] = {
@@ -80,13 +72,46 @@ void Scene::Init()
         1, 2, 3  // second Triangle
     };
     Mesh *mesh = new Mesh();
-    bool mesh_succ = mesh->Init_Elements(vertices, indices, 32, 6);
+    bool mesh_succ = mesh->Init_Elements(vertices, indices, 32, 6, material);
     if (!mesh_succ)
     {
         delete mesh;
         return;
     }
     AddMesh(mesh);
+}
+
+Shader *Scene::LoadShader(const char *vertexFilePath, const char *fragmentFilePath)
+{
+    Shader *shader = new Shader();
+    bool shader_succ = shader->Init(vertexFilePath, fragmentFilePath);
+    if (!shader_succ)
+    {
+        delete shader;
+        return nullptr;
+    }
+    AddShader(shader);
+    return shader;
+}
+
+Texture *Scene::LoadTexture(const char *filePath, GLenum format)
+{
+    Texture *texture = new Texture();
+    bool texture_succ = texture->Init(filePath, format);
+    if (!texture_succ)
+    {
+        delete texture;
+        return nullptr;
+    }
+    AddTexture(texture);
+    return texture;
+}
+
+Material *Scene::GenMaterial(Shader *shader)
+{
+    Material *material = new Material();
+    material->Init(shader);
+    return material;
 }
 
 void Scene::AddMesh(Mesh *mesh)
@@ -108,15 +133,6 @@ void Scene::Render()
 {
     for (size_t i = 0; i < m_meshes.size(); ++i)
     {
-        Texture *texture = m_textures[i];
-        texture->Use(0);
-
-        Texture *texture2 = m_textures[i + 1];
-        texture2->Use(1);
-
-        Shader *shader = m_shaders[i];
-        shader->Use();
-
         Mesh *mesh = m_meshes[i];
         mesh->Draw();
     }

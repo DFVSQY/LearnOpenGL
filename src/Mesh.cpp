@@ -1,7 +1,8 @@
 #include <iostream>
 #include "Mesh.h"
+#include "Material.h"
 
-Mesh::Mesh() : vao(0), vbo(0), ebo(0), index_num(0)
+Mesh::Mesh() : vao(0), vbo(0), ebo(0), index_num(0), material(nullptr)
 {
 }
 
@@ -29,7 +30,8 @@ bool Mesh::Init(const GLfloat *vertices, const int vertexNum)
     return true;
 }
 
-bool Mesh::Init_Elements(const GLfloat *vertices, const GLuint *indices, const int vertexNum, const int indexNum)
+bool Mesh::Init_Elements(const GLfloat *vertices, const GLuint *indices, const int vertexNum, const int indexNum,
+                         Material *material)
 {
     if (vertices == nullptr || vertexNum <= 0)
     {
@@ -43,6 +45,12 @@ bool Mesh::Init_Elements(const GLfloat *vertices, const GLuint *indices, const i
         return false;
     }
 
+    if (material == nullptr)
+    {
+        std::cerr << "Mesh::Init_Elements() failed: material is null." << std::endl;
+        return false;
+    }
+
     SetupVAO_Elements(vertices, vertexNum, indices, indexNum);
     if (vao == 0 || vbo == 0 || ebo == 0)
     {
@@ -51,6 +59,7 @@ bool Mesh::Init_Elements(const GLfloat *vertices, const GLuint *indices, const i
     }
 
     index_num = vertexNum;
+    this->material = material;
 
     return true;
 }
@@ -60,11 +69,16 @@ void Mesh::Draw() const
     if (vao == 0)
         return;
 
+    if (material != nullptr)
+        material->Use();
+
     // draw mesh content
     glBindVertexArray(vao);
 
     if (index_num > 0)
     {
+        // 准备好渲染所需要的材质
+
         /*
          * glDrawElements是OpenGL中用于根据索引数据绘制图元的函数。它使用存储在元素数组缓冲区（Element Array Buffer）中的索引来指定绘制哪些顶点。
 
