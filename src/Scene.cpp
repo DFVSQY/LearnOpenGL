@@ -2,8 +2,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 Scene::Scene() : m_meshes(), m_shaders(), m_textures()
 {
