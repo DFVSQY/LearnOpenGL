@@ -19,6 +19,10 @@ class Scene
     void AddTexture(Texture *texture);
     void AddMaterial(Material *material);
 
+    Shader *LoadShader(const char *vertextPath, const char *fragmentPath);
+    Texture *LoadTexture(const char *texturePath, GLenum format);
+    Material *GenMaterial(Shader *shader);
+
   public:
     Scene();
     ~Scene();
@@ -29,10 +33,8 @@ class Scene
 
     void Init();
 
-    Shader *LoadShader(const char *vertextPath, const char *fragmentPath);
-    Texture *LoadTexture(const char *texturePath, GLenum format);
-
-    Material *GenMaterial(Shader *shader);
+    Material *SetupMat_1();
+    Mesh *SetupMesh_1(Material *material);
 
     void Render();
 };

@@ -34,20 +34,34 @@ Scene::~Scene()
 
 void Scene::Init()
 {
+    Material *material = SetupMat_1();
+    if (!material)
+        return;
+
+    SetupMesh_1(material);
+}
+
+////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
+
+/*
+ * 配置渲染用的材质1
+*/
+Material *Scene::SetupMat_1()
+{
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
     if (!shader)
-        return;
+        return nullptr;
 
     // 纹理
     Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
     if (!texture)
-        return;
+        return nullptr;
 
     // 第二张纹理
     Texture *texture2 = LoadTexture("../textures/awesomeface.png", GL_RGBA);
     if (!texture2)
-        return;
+        return nullptr;
 
     Material *material = GenMaterial(shader);
 
@@ -59,6 +73,16 @@ void Scene::Init()
     material->SetTexture("texture0", texture);
     material->SetTexture("texture1", texture2);
 
+    AddMaterial(material);
+
+    return material;
+}
+
+/*
+ * 配置渲染用的网格1
+*/
+Mesh *Scene::SetupMesh_1(Material *material)
+{
     // 网格
     GLfloat vertices[] = {
         // postion          // color
@@ -76,10 +100,15 @@ void Scene::Init()
     if (!mesh_succ)
     {
         delete mesh;
-        return;
+        return nullptr;
     }
+
     AddMesh(mesh);
+
+    return mesh;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Shader *Scene::LoadShader(const char *vertexFilePath, const char *fragmentFilePath)
 {
@@ -127,6 +156,11 @@ void Scene::AddShader(Shader *shader)
 void Scene::AddTexture(Texture *texture)
 {
     m_textures.push_back(texture);
+}
+
+void Scene::AddMaterial(Material *material)
+{
+    m_materials.push_back(material);
 }
 
 void Scene::Render()
