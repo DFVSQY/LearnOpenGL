@@ -2,6 +2,7 @@
 #include "Shader.h"
 #include <fstream>
 #include <sstream>
+#include "glm/gtc/type_ptr.hpp"
 
 Shader::Shader() : shader_program(0)
 {
@@ -61,29 +62,29 @@ void Shader::Use()
 // 向shader传递bool值
 void Shader::SetBool(const std::string &name, bool value) const
 {
-    GLint localtion = GetUniformLocation(name);
-    glUniform1i(localtion, (GLint)value);
+    GLint location = GetUniformLocation(name);
+    glUniform1i(location, (GLint)value);
 }
 
 // 向shader传递int值
 void Shader::SetInt(const std::string &name, GLint value) const
 {
-    GLint localtion = GetUniformLocation(name);
-    glUniform1i(localtion, value);
+    GLint location = GetUniformLocation(name);
+    glUniform1i(location, value);
 }
 
 // 向shader传递float值
 void Shader::SetFloat(const std::string &name, GLfloat value) const
 {
-    GLint localtion = GetUniformLocation(name);
+    GLint location = GetUniformLocation(name);
 
-    glUniform1f(localtion, value);
+    glUniform1f(location, value);
 }
 
 // 向shader传递浮点型vec4值
 void Shader::SetFloat4(const std::string &name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) const
 {
-    GLint localtion = GetUniformLocation(name);
+    GLint location = GetUniformLocation(name);
 
     /*
      * glUniform4f函数用于设置uniform变量的值，特别是那些类型为四元素浮点向量（vec4）的uniform变量。
@@ -93,7 +94,24 @@ void Shader::SetFloat4(const std::string &name, GLfloat v0, GLfloat v1, GLfloat 
      *  location：uniform变量的位置索引，这个位置是通过glGetUniformLocation函数获取的。
      *  v0到v3：分别是四元素向量的x、y、z和w分量的值。
     */
-    glUniform4f(localtion, v0, v1, v2, v3);
+    glUniform4f(location, v0, v1, v2, v3);
+}
+
+void Shader::SetMat4f(const std::string &name, const glm::mat4 &matrix) const
+{
+    GLuint location = GetUniformLocation(name);
+
+    /*
+     * glUniformMatrix4fv 是 OpenGL 中用于设置着色器程序中的 uniform 矩阵变量的函数。
+     * 具体来说，它将 4x4 浮点矩阵数组传递给当前激活的着色器程序中的指定 uniform 变量。
+
+     * 函数原型：void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+     *  location：指定 uniform 变量的位置。这个位置值通常通过调用 glGetUniformLocation 函数获取。
+     *  count：指定要传递的矩阵数量。对于单个 4x4 矩阵，这个值通常是 1。如果你需要传递多个矩阵，可以设置为相应的数量。
+     *  transpose：指定是否要转置矩阵传递给着色器。GL_FALSE 表示矩阵是按列主序存储的（即不转置），GL_TRUE 表示矩阵是按行主序存储的（即需要转置）。大多数情况下，这个值设为 GL_FALSE，因为 OpenGL 使用列主序矩阵。
+     *  value：指向包含矩阵数据的数组的指针。矩阵数据应按照列主序存储，即矩阵的第一个列的元素在数组的前四个位置。
+    */
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 // 获取uniform变量位置

@@ -39,6 +39,8 @@ out vec4 vertexColor;
 // 传递纹理坐标
 out vec2 texCoord;
 
+uniform mat4 trans;
+
 /*
  * 每个着色器程序都必须包含的主函数，作为程序的入口点。
 */
@@ -46,9 +48,9 @@ void main()
 {
     // * gl_Position：这是一个内置的输出变量，表示顶点的最终位置。它是一个四维向量 (vec4)，表示裁剪坐标系中的顶点位置。
     // * 这个值会被传递给下一阶段的图形管线（如几何着色器或光栅化过程）。
-    // * vec4(aPos.x, aPos.y, aPos.z, 1.0)：将三维顶点位置 aPos 转换为四维向量。
+    // * vec4(aPos, 1.0)：将三维顶点位置 aPos 转换为四维向量。
     // * 第四个分量设置为 1.0，因为在齐次坐标系中，w 分量为 1 表示位置坐标（而不是方向向量）。
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    gl_Position = trans * vec4(aPos, 1.0);
 
     // vertexColor = vec4(0.8, 0.8, 1.0, 1.0);
 

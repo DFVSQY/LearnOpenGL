@@ -2,6 +2,8 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 Scene::Scene() : m_meshes(), m_shaders(), m_textures()
 {
@@ -36,6 +38,15 @@ void Scene::Init()
         return;
     }
     AddShader(shader);
+
+    shader->Use();
+    shader->SetInt("texture0", 0);
+    shader->SetInt("texture1", 1);
+
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    trans = glm::scale(trans, glm::vec3(0.5f));
+    shader->SetMat4f("trans", trans);
 
     // 纹理
     Texture *texture = new Texture();
@@ -106,17 +117,6 @@ void Scene::Render()
 
         Shader *shader = m_shaders[i];
         shader->Use();
-        shader->SetInt("texture0", 0);
-        shader->SetInt("texture1", 1);
-
-        /* 测试传递uniform值
-        if (i == 0)
-        {
-            float timeValue = glfwGetTime();
-            float color_value = (sin(timeValue) / 2.0f) + 0.5f;
-            shader->SetFloat4("userColor", color_value / 2.0f, color_value, color_value / 3.0f, 1.0f);
-        }
-        */
 
         Mesh *mesh = m_meshes[i];
         mesh->Draw();

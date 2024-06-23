@@ -2,6 +2,7 @@
 
 #include <string>
 #include "glad/glad.h"
+#include "glm/glm.hpp"
 
 class Shader
 {
@@ -26,5 +27,6 @@ class Shader
     void SetInt(const std::string &name, GLint value) const;
     void SetFloat(const std::string &name, GLfloat value) const;
     void SetFloat4(const std::string &name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) const;
+    void SetMat4f(const std::string &name, const glm::mat4 &matrix) const;
     void Use();
 };
