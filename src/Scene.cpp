@@ -18,6 +18,11 @@ Scene::~Scene()
     {
         delete shader;
     }
+
+    for (auto texture : m_textures)
+    {
+        delete texture;
+    }
 }
 
 void Scene::Init()
