@@ -6,7 +6,7 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game() : window(nullptr), scene(){};
+Game::Game() : window(nullptr), scene() {};
 
 Game::~Game()
 {
@@ -69,6 +69,8 @@ bool Game::Init(const char *title, int width, int height)
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
     glViewport(0, 0, fb_width, fb_height);
+
+    glEnable(GL_DEPTH_TEST); // 开启深度测试
 
     scene.Init();
 
@@ -163,8 +165,8 @@ void Game::Run()
 void Game::Draw()
 {
     // 清理缓冲区并设置为指定的颜色
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // 状态值设置，用于指定颜色值
-    glClear(GL_COLOR_BUFFER_BIT);         // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);               // 状态值设置，用于指定颜色值
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区
 
     scene.Render();
 
