@@ -27,4 +27,6 @@ class Mesh
                        Material *material);
 
     void Draw() const;
+
+    Material *GetMaterial() const;
 };

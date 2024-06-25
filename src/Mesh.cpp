@@ -122,6 +122,11 @@ void Mesh::Draw() const
     }
 }
 
+Material *Mesh::GetMaterial() const
+{
+    return material;
+}
+
 void Mesh::SetupVAO(const GLfloat *vertices, int vertexNum)
 {
     if (vertices == nullptr || vertexNum <= 0)

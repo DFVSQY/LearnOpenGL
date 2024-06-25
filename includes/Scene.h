@@ -36,5 +36,9 @@ class Scene
     Material *SetupMat_1();
     Mesh *SetupMesh_1(Material *material);
 
+    Material *SetupMat_2();
+    Mesh *SetupMesh_2(Material *material);
+    void SetupMVP(Material *material);
+
     void Render();
 };

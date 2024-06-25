@@ -3,7 +3,9 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "GLFW/glfw3.h"
 
 Scene::Scene() : m_meshes(), m_shaders(), m_textures()
 {
@@ -34,11 +36,11 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-    Material *material = SetupMat_1();
+    Material *material = SetupMat_2();
     if (!material)
         return;
 
-    SetupMesh_1(material);
+    SetupMesh_2(material);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -108,6 +110,123 @@ Mesh *Scene::SetupMesh_1(Material *material)
     return mesh;
 }
 
+/*
+ * 配置渲染用的材质2
+*/
+Material *Scene::SetupMat_2()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/vertex_02.glsl", "../shaders/fragment_02.glsl");
+    if (!shader)
+        return nullptr;
+
+    // 纹理
+    Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
+    if (!texture)
+        return nullptr;
+
+    Material *material = GenMaterial(shader);
+
+    material->SetTexture("texture0", texture);
+
+    AddMaterial(material);
+
+    return material;
+}
+
+/*
+ * 配置渲染用的网格2
+*/
+Mesh *Scene::SetupMesh_2(Material *material)
+{
+    GLfloat vertices[] = {
+        // postion           // color           // 纹理坐标
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+        0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
+
+        0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+
+        -0.5f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
+
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+
+        -0.5f, 0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+        -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+        -0.5f, 0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+        0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+
+        0.5f,  -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+        0.5f,  -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
+        0.5f,  -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+
+        0.5f,  -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+        -0.5f, -0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+
+        -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, //
+        0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
+        -0.5f, 0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
+        -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  //
+    };
+
+    GLuint indices[] = {
+        0,  1,  2,  3,  4,  5,  // 前面
+        6,  7,  8,  9,  10, 11, // 后面
+        12, 13, 14, 15, 16, 17, // 左面
+        18, 19, 20, 21, 22, 23, // 右面
+        24, 25, 26, 27, 28, 29, // 底面
+        30, 31, 32, 33, 34, 35  // 顶面
+    };
+
+    Mesh *mesh = new Mesh();
+    bool mesh_succ = mesh->Init_Elements(vertices, indices, 36 * 8, 6 * 6, material);
+    if (!mesh_succ)
+    {
+        delete mesh;
+        return nullptr;
+    }
+
+    AddMesh(mesh);
+
+    return mesh;
+}
+
+void Scene::SetupMVP(Material *material)
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
+    model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
+
+    material->SetMat4f("model", model);
+    material->SetMat4f("view", view);
+    material->SetMat4f("projection", projection);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Shader *Scene::LoadShader(const char *vertexFilePath, const char *fragmentFilePath)
@@ -168,6 +287,10 @@ void Scene::Render()
     for (size_t i = 0; i < m_meshes.size(); ++i)
     {
         Mesh *mesh = m_meshes[i];
+
+        Material *mat = mesh->GetMaterial();
+        SetupMVP(mat);
+
         mesh->Draw();
     }
 }
