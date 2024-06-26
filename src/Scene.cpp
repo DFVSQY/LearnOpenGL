@@ -214,12 +214,32 @@ Mesh *Scene::SetupMesh_2(Material *material)
 
 void Scene::SetupMVP(Material *material)
 {
+    /* 
+     * MVP矩阵初始化为单位矩阵
+    */
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
 
+    /*
+     * 对模型矩阵应用旋转变换，旋转角度随时间变化（glfwGetTime()返回程序运行时间），
+     * 旋转轴为(0.5, 1.0, 0.0)，这是一个自定义的轴，使得旋转看起来更自然。
+    */
     model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    /*
+     * 这块比较难理解，首先应该明白视图矩阵的作用是将模型从世界坐标系变换到观察者坐标系，
+     * 通过在世界坐标系中移动相机得到的矩阵实际上是视图矩阵的逆矩阵，
+     * 所以此处需要求取逆矩阵才能得到正确的视图矩阵。
+    */
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
+    view = glm::inverse(view);
+
+    /*
+     * 设置投影矩阵为透视投影矩阵，参数分别为：
+     * 视野角度45度，宽高比800/600，近裁剪面0.1，远裁剪面100。
+     * 这定义了一个视锥体，只有在这个视锥体内的对象才会被渲染。
+    */
     projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
 
     material->SetMat4f("model", model);
