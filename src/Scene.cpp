@@ -7,8 +7,15 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
 
-Scene::Scene() : m_meshes(), m_shaders(), m_textures()
+Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials()
 {
+    m_camPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    m_camFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    m_camUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    m_camSpeed = 0.05f;
+    m_lastFrameTime = 0.0f;
+    m_deltaTime = 0.0f;
 }
 
 Scene::~Scene()
@@ -237,10 +244,6 @@ void Scene::SetupMVP(Material *material)
     // view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
     // view = glm::inverse(view);
 
-    float radius = 3.0f;
-    double time = glfwGetTime();
-    float camX = sin(time) * radius;
-    float camZ = cos(time) * radius;
     /*
      * 通过lookAt函数创建视图矩阵。
 
@@ -265,7 +268,7 @@ void Scene::SetupMVP(Material *material)
      *    );
      * }
     */
-    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0f));
+    view = glm::lookAt(m_camPos, m_camPos + m_camFront, m_camUp);
 
     /*
      * 设置投影矩阵为透视投影矩阵，参数分别为：
@@ -336,6 +339,13 @@ void Scene::AddMaterial(Material *material)
 
 void Scene::Render()
 {
+    float now_time = glfwGetTime();
+    if (m_lastFrameTime <= 0.0f)
+        m_lastFrameTime = now_time;
+
+    m_deltaTime = now_time - m_lastFrameTime;
+    m_lastFrameTime = now_time;
+
     for (size_t i = 0; i < m_meshes.size(); ++i)
     {
         Mesh *mesh = m_meshes[i];
@@ -345,22 +355,35 @@ void Scene::Render()
          * SetupMVP(mat);
         */
 
+        Material *mat = mesh->GetMaterial();
+        UpdateViewMatrix(mat);
+
         mesh->Draw();
     }
 }
 
+void Scene::UpdateViewMatrix(Material *material)
+{
+    glm::mat4 view = glm::lookAt(m_camPos, m_camPos + m_camFront, m_camUp);
+    material->SetMat4f("view", view);
+}
+
 void Scene::MoveCamForward()
 {
+    m_camPos += m_camFront * m_camSpeed;
 }
 
 void Scene::MoveCamBackward()
 {
+    m_camPos -= m_camFront * m_camSpeed;
 }
 
 void Scene::MoveCamLeft()
 {
+    m_camPos -= glm::normalize(glm::cross(m_camFront, m_camUp)) * m_camSpeed;
 }
 
 void Scene::MoveCamRight()
 {
+    m_camPos += glm::normalize(glm::cross(m_camFront, m_camUp)) * m_camSpeed;
 }

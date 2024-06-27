@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "glm/fwd.hpp"
 #include <vector>
 
 class Scene
@@ -14,6 +15,14 @@ class Scene
     std::vector<Texture *> m_textures;
     std::vector<Material *> m_materials;
 
+    glm::vec3 m_camPos;
+    glm::vec3 m_camFront;
+    glm::vec3 m_camUp;
+
+    float m_camSpeed;
+    float m_lastFrameTime;
+    float m_deltaTime;
+
     void AddMesh(Mesh *mesh);
     void AddShader(Shader *shader);
     void AddTexture(Texture *texture);
@@ -22,6 +31,10 @@ class Scene
     Shader *LoadShader(const char *vertextPath, const char *fragmentPath);
     Texture *LoadTexture(const char *texturePath, GLenum format);
     Material *GenMaterial(Shader *shader);
+
+    void SetupMVP(Material *material);
+
+    void UpdateViewMatrix(Material *material);
 
   public:
     Scene();
@@ -38,7 +51,6 @@ class Scene
 
     Material *SetupMat_2();
     Mesh *SetupMesh_2(Material *material);
-    void SetupMVP(Material *material);
 
     void Render();
 

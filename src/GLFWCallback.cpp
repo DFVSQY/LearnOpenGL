@@ -1,4 +1,5 @@
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "Game.h"
 #include "GLFWCallback.h"
 #include <iostream>
@@ -16,19 +17,19 @@ void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, in
     {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
-    else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT))
     {
         Game::getInstance().On_Key_W_Press();
     }
-    else if (key == GLFW_KEY_A && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT))
     {
         Game::getInstance().On_Key_A_Press();
     }
-    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT))
     {
         Game::getInstance().On_Key_S_Press();
     }
-    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT))
     {
         Game::getInstance().On_Key_D_Press();
     }
