@@ -225,15 +225,45 @@ void Scene::SetupMVP(Material *material)
      * 对模型矩阵应用旋转变换，旋转角度随时间变化（glfwGetTime()返回程序运行时间），
      * 旋转轴为(0.5, 1.0, 0.0)，这是一个自定义的轴，使得旋转看起来更自然。
     */
-    model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+    // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 
     /*
      * 这块比较难理解，首先应该明白视图矩阵的作用是将模型从世界坐标系变换到观察者坐标系，
      * 通过在世界坐标系中移动相机得到的矩阵实际上是视图矩阵的逆矩阵，
      * 所以此处需要求取逆矩阵才能得到正确的视图矩阵。
     */
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
-    view = glm::inverse(view);
+    // view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
+    // view = glm::inverse(view);
+
+    float radius = 3.0f;
+    double time = glfwGetTime();
+    float camX = sin(time) * radius;
+    float camZ = cos(time) * radius;
+    /*
+     * 通过lookAt函数创建视图矩阵。
+
+     * 函数原型：
+     *  glm::mat4 glm::lookAt(glm::vec3 const& eye, glm::vec3 const& center, glm::vec3 const& up);
+     * 函数参数：
+     *  glm::vec3 const& eye: 相机的位置
+     *  glm::vec3 const& center: 相机看向的目标点
+     *  glm::vec3 const& up: 世界空间中的上方向向量
+
+     * 基本实现原理：
+     * glm::mat4 myLookAt(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up)
+     * {
+     *    glm::vec3 F = glm::normalize(center - eye);
+     *    glm::vec3 R = glm::normalize(glm::cross(F, up));
+     *    glm::vec3 U = glm::cross(R, F);
+     *    return glm::mat4(
+     *        R.x, U.x, -F.x, 0,                                                    // 第一列
+     *        R.y, U.y, -F.y, 0,                                                    // 第二列
+     *        R.z, U.z, -F.z, 0,                                                    // 第三列
+     *        -glm::dot(R, eye), -glm::dot(U, eye), glm::dot(F, eye), 1             // 第四列
+     *    );
+     * }
+    */
+    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0f));
 
     /*
      * 设置投影矩阵为透视投影矩阵，参数分别为：
