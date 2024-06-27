@@ -32,4 +32,9 @@ class Game
     void Draw();
 
     void Run();
+
+    void On_Key_W_Press();
+    void On_Key_S_Press();
+    void On_Key_A_Press();
+    void On_Key_D_Press();
 };

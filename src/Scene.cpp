@@ -41,6 +41,8 @@ void Scene::Init()
         return;
 
     SetupMesh_2(material);
+
+    SetupMVP(material);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -338,9 +340,27 @@ void Scene::Render()
     {
         Mesh *mesh = m_meshes[i];
 
-        Material *mat = mesh->GetMaterial();
-        SetupMVP(mat);
+        /*
+         * Material *mat = mesh->GetMaterial();
+         * SetupMVP(mat);
+        */
 
         mesh->Draw();
     }
+}
+
+void Scene::MoveCamForward()
+{
+}
+
+void Scene::MoveCamBackward()
+{
+}
+
+void Scene::MoveCamLeft()
+{
+}
+
+void Scene::MoveCamRight()
+{
 }

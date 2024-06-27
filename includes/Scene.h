@@ -41,4 +41,9 @@ class Scene
     void SetupMVP(Material *material);
 
     void Render();
+
+    void MoveCamForward();
+    void MoveCamBackward();
+    void MoveCamLeft();
+    void MoveCamRight();
 };

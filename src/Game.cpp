@@ -164,11 +164,32 @@ void Game::Run()
 void Game::Draw()
 {
     // 清理缓冲区并设置为指定的颜色
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);               // 状态值设置，用于指定颜色值
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // 状态值设置，用于指定颜色值
+    glClear(GL_COLOR_BUFFER_BIT |
+            GL_DEPTH_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区
 
     scene.Render();
 
     // 交换缓冲区，将渲染结果显示到窗口中
     glfwSwapBuffers(window);
+}
+
+void Game::On_Key_W_Press()
+{
+    scene.MoveCamForward();
+}
+
+void Game::On_Key_S_Press()
+{
+    scene.MoveCamBackward();
+}
+
+void Game::On_Key_A_Press()
+{
+    scene.MoveCamLeft();
+}
+
+void Game::On_Key_D_Press()
+{
+    scene.MoveCamRight();
 }

@@ -16,6 +16,22 @@ void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, in
     {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
+    else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    {
+        Game::getInstance().On_Key_W_Press();
+    }
+    else if (key == GLFW_KEY_A && action == GLFW_PRESS)
+    {
+        Game::getInstance().On_Key_A_Press();
+    }
+    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    {
+        Game::getInstance().On_Key_S_Press();
+    }
+    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
+    {
+        Game::getInstance().On_Key_D_Press();
+    }
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -26,7 +42,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 }
 
 void APIENTRY glfw_debug_output(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length,
-                            const char *message, const void *userParam)
+                                const char *message, const void *userParam)
 {
     // ignore non-significant error/warning codes
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
