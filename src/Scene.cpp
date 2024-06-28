@@ -376,11 +376,20 @@ void Scene::Render()
         */
 
         Material *mat = mesh->GetMaterial();
+        UpdateModelMatrix(mat);
         UpdateViewMatrix(mat);
         UpdateProjectionMatrix(mat);
 
         mesh->Draw();
     }
+}
+
+void Scene::UpdateModelMatrix(Material *material)
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+
+    material->SetMat4f("model", model);
 }
 
 void Scene::UpdateViewMatrix(Material *material)

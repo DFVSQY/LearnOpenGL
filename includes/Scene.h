@@ -43,6 +43,7 @@ class Scene
 
     void SetupMVP(Material *material);
 
+    void UpdateModelMatrix(Material *material);
     void UpdateViewMatrix(Material *material);
     void UpdateProjectionMatrix(Material *material);
 
