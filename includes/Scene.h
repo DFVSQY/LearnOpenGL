@@ -30,6 +30,7 @@ class Scene
 
     double m_camYaw;
     double m_camPitch;
+    double m_camFov;
 
     void AddMesh(Mesh *mesh);
     void AddShader(Shader *shader);
@@ -43,6 +44,7 @@ class Scene
     void SetupMVP(Material *material);
 
     void UpdateViewMatrix(Material *material);
+    void UpdateProjectionMatrix(Material *material);
 
   public:
     Scene();
@@ -67,4 +69,5 @@ class Scene
     void MoveCamLeft();
     void MoveCamRight();
     void UpdateCamYawAndPitch(double xPos, double yPos);
+    void UpdateCamZoom(double yoffset);
 };

@@ -31,6 +31,8 @@ Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials()
     */
     m_camYaw = -90;
     m_camPitch = 0;
+
+    m_camFov = 45.0;
 }
 
 Scene::~Scene()
@@ -293,7 +295,7 @@ void Scene::SetupMVP(Material *material)
      * 视野角度45度，宽高比800/600，近裁剪面0.1，远裁剪面100。
      * 这定义了一个视锥体，只有在这个视锥体内的对象才会被渲染。
     */
-    projection = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(m_camFov), (double)800 / (double)600, 0.1, 100.0);
 
     material->SetMat4f("model", model);
     material->SetMat4f("view", view);
@@ -375,6 +377,7 @@ void Scene::Render()
 
         Material *mat = mesh->GetMaterial();
         UpdateViewMatrix(mat);
+        UpdateProjectionMatrix(mat);
 
         mesh->Draw();
     }
@@ -384,6 +387,12 @@ void Scene::UpdateViewMatrix(Material *material)
 {
     glm::mat4 view = glm::lookAt(m_camPos, m_camPos + m_camFront, m_camUp);
     material->SetMat4f("view", view);
+}
+
+void Scene::UpdateProjectionMatrix(Material *material)
+{
+    glm::mat4 projection = glm::perspective(glm::radians(m_camFov), (double)800 / (double)600, 0.1, 100.0);
+    material->SetMat4f("projection", projection);
 }
 
 void Scene::MoveCamForward()
@@ -432,4 +441,10 @@ void Scene::UpdateCamYawAndPitch(double xPos, double yPos)
     double vec_z = sin(glm::radians(m_camYaw)) * cos(glm::radians(m_camPitch));
 
     m_camFront = glm::normalize(glm::vec3(vec_x, vec_y, vec_z));
+}
+
+void Scene::UpdateCamZoom(double yOffset)
+{
+    m_camFov -= yOffset;
+    m_camFov = std::clamp(m_camFov, 1.0, 60.0);
 }

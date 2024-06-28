@@ -70,6 +70,9 @@ bool Game::Init(const char *title, int width, int height)
     // 设置鼠标移动回调
     glfwSetCursorPosCallback(window, mouse_callback);
 
+    // 设置鼠标滚轮回调
+    glfwSetScrollCallback(window, scroll_callback);
+
     // 定义视口的宽高，铺满整个窗口
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
@@ -203,4 +206,9 @@ void Game::On_Key_D_Press()
 void Game::On_Mouse_Move(double xpos, double ypos)
 {
     scene.UpdateCamYawAndPitch(xpos, ypos);
+}
+
+void Game::On_Mouse_Scroll(double xoffset, double yoffset)
+{
+    scene.UpdateCamZoom(yoffset);
 }
