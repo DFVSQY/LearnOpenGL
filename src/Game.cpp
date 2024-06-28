@@ -64,6 +64,12 @@ bool Game::Init(const char *title, int width, int height)
     // 当窗口改变时，在回调函数里面重新设置视口大小
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    // 隐藏光标
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // 设置鼠标移动回调
+    glfwSetCursorPosCallback(window, mouse_callback);
+
     // 定义视口的宽高，铺满整个窗口
     int fb_width, fb_height;
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
@@ -71,7 +77,7 @@ bool Game::Init(const char *title, int width, int height)
 
     glEnable(GL_DEPTH_TEST); // 开启深度测试
 
-    scene.Init();
+    scene.Init(fb_width, fb_height);
 
     return true;
 }
@@ -192,4 +198,9 @@ void Game::On_Key_A_Press()
 void Game::On_Key_D_Press()
 {
     scene.MoveCamRight();
+}
+
+void Game::On_Mouse_Move(double xpos, double ypos)
+{
+    scene.UpdateCamYawAndPitch(xpos, ypos);
 }

@@ -37,4 +37,5 @@ class Game
     void On_Key_S_Press();
     void On_Key_A_Press();
     void On_Key_D_Press();
+    void On_Mouse_Move(double xpos, double ypos);
 };

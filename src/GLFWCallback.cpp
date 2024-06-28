@@ -35,6 +35,11 @@ void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, in
     }
 }
 
+void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    Game::getInstance().On_Mouse_Move(xpos, ypos);
+}
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);

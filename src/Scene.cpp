@@ -6,6 +6,10 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
+#include "glm/fwd.hpp"
+#include "glm/trigonometric.hpp"
+#include <algorithm>
+#include <cmath>
 
 Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials()
 {
@@ -16,6 +20,17 @@ Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials()
     m_camSpeed = 0.05f;
     m_lastFrameTime = 0.0f;
     m_deltaTime = 0.0f;
+
+    m_lastCursorPosX = 0;
+    m_lastCursorPosY = 0;
+    m_cursorSensitivity = 0.05;
+    m_captureCursor = false;
+
+    /*
+     * 相机初始朝向设定为看向-z轴，所以初始yaw为-90度。
+    */
+    m_camYaw = -90;
+    m_camPitch = 0;
 }
 
 Scene::~Scene()
@@ -41,8 +56,11 @@ Scene::~Scene()
     }
 }
 
-void Scene::Init()
+void Scene::Init(int width, int height)
 {
+    m_lastCursorPosX = (double)width / 2;
+    m_lastCursorPosY = (double)height / 2;
+
     Material *material = SetupMat_2();
     if (!material)
         return;
@@ -386,4 +404,32 @@ void Scene::MoveCamLeft()
 void Scene::MoveCamRight()
 {
     m_camPos += glm::normalize(glm::cross(m_camFront, m_camUp)) * m_camSpeed;
+}
+
+void Scene::UpdateCamYawAndPitch(double xPos, double yPos)
+{
+    if (!m_captureCursor)
+    {
+        m_captureCursor = true;
+        m_lastCursorPosX = xPos;
+        m_lastCursorPosY = yPos;
+    }
+
+    // 窗口中捕获的鼠标位置是从右上角到左下角坐标逐渐增大的
+    double xOffset = xPos - m_lastCursorPosX;
+    double yOffset = m_lastCursorPosY - yPos;
+
+    m_lastCursorPosX = xPos;
+    m_lastCursorPosY = yPos;
+
+    m_camYaw += xOffset * m_cursorSensitivity;
+    m_camPitch += yOffset * m_cursorSensitivity;
+
+    m_camPitch = std::clamp(m_camPitch, -89.0, 89.0);
+
+    double vec_x = cos(glm::radians(m_camYaw)) * cos(glm::radians(m_camPitch));
+    double vec_y = sin(glm::radians(m_camPitch));
+    double vec_z = sin(glm::radians(m_camYaw)) * cos(glm::radians(m_camPitch));
+
+    m_camFront = glm::normalize(glm::vec3(vec_x, vec_y, vec_z));
 }

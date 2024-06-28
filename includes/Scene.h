@@ -23,6 +23,14 @@ class Scene
     float m_lastFrameTime;
     float m_deltaTime;
 
+    double m_lastCursorPosX;
+    double m_lastCursorPosY;
+    double m_cursorSensitivity;
+    double m_captureCursor;
+
+    double m_camYaw;
+    double m_camPitch;
+
     void AddMesh(Mesh *mesh);
     void AddShader(Shader *shader);
     void AddTexture(Texture *texture);
@@ -44,7 +52,7 @@ class Scene
     Scene(const Scene &) = delete;
     Scene &operator=(const Scene &) = delete;
 
-    void Init();
+    void Init(int width, int height);
 
     Material *SetupMat_1();
     Mesh *SetupMesh_1(Material *material);
@@ -58,4 +66,5 @@ class Scene
     void MoveCamBackward();
     void MoveCamLeft();
     void MoveCamRight();
+    void UpdateCamYawAndPitch(double xPos, double yPos);
 };
