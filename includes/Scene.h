@@ -4,7 +4,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "glm/fwd.hpp"
+#include "glm/glm.hpp"
 #include <vector>
 
 class Scene
