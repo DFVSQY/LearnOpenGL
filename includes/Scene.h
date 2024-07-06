@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "glm/glm.hpp"
 #include <vector>
+#include "Camera.h"
 
 class Scene
 {
@@ -15,9 +16,7 @@ class Scene
     std::vector<Texture *> m_textures;
     std::vector<Material *> m_materials;
 
-    glm::vec3 m_camPos;
-    glm::vec3 m_camFront;
-    glm::vec3 m_camUp;
+    Camera m_camera;
 
     float m_camSpeed;
     float m_lastFrameTime;
@@ -28,10 +27,6 @@ class Scene
     double m_cursorSensitivity;
     double m_captureCursor;
 
-    double m_camYaw;
-    double m_camPitch;
-    double m_camFov;
-
     void AddMesh(Mesh *mesh);
     void AddShader(Shader *shader);
     void AddTexture(Texture *texture);
@@ -41,7 +36,7 @@ class Scene
     Texture *LoadTexture(const char *texturePath, GLenum format);
     Material *GenMaterial(Shader *shader);
 
-    void SetupMVP(Material *material);
+    void InitMVP(Material *material);
 
     void UpdateModelMatrix(Material *material);
     void UpdateViewMatrix(Material *material);

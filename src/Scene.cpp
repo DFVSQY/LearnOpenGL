@@ -11,12 +11,8 @@
 #include <algorithm>
 #include <cmath>
 
-Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials()
+Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials(), m_camera()
 {
-    m_camPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    m_camFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    m_camUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
     m_camSpeed = 0.05f;
     m_lastFrameTime = 0.0f;
     m_deltaTime = 0.0f;
@@ -25,14 +21,6 @@ Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials()
     m_lastCursorPosY = 0;
     m_cursorSensitivity = 0.05;
     m_captureCursor = false;
-
-    /*
-     * 相机初始朝向设定为看向-z轴，所以初始yaw为-90度。
-    */
-    m_camYaw = -90;
-    m_camPitch = 0;
-
-    m_camFov = 45.0;
 }
 
 Scene::~Scene()
@@ -68,8 +56,6 @@ void Scene::Init(int width, int height)
         return;
 
     SetupMesh_2(material);
-
-    SetupMVP(material);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -241,7 +227,7 @@ Mesh *Scene::SetupMesh_2(Material *material)
     return mesh;
 }
 
-void Scene::SetupMVP(Material *material)
+void Scene::InitMVP(Material *material)
 {
     /* 
      * MVP矩阵初始化为单位矩阵
@@ -264,38 +250,8 @@ void Scene::SetupMVP(Material *material)
     // view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
     // view = glm::inverse(view);
 
-    /*
-     * 通过lookAt函数创建视图矩阵。
-
-     * 函数原型：
-     *  glm::mat4 glm::lookAt(glm::vec3 const& eye, glm::vec3 const& center, glm::vec3 const& up);
-     * 函数参数：
-     *  glm::vec3 const& eye: 相机的位置
-     *  glm::vec3 const& center: 相机看向的目标点
-     *  glm::vec3 const& up: 世界空间中的上方向向量
-
-     * 基本实现原理：
-     * glm::mat4 myLookAt(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up)
-     * {
-     *    glm::vec3 F = glm::normalize(center - eye);
-     *    glm::vec3 R = glm::normalize(glm::cross(F, up));
-     *    glm::vec3 U = glm::cross(R, F);
-     *    return glm::mat4(
-     *        R.x, U.x, -F.x, 0,                                                    // 第一列
-     *        R.y, U.y, -F.y, 0,                                                    // 第二列
-     *        R.z, U.z, -F.z, 0,                                                    // 第三列
-     *        -glm::dot(R, eye), -glm::dot(U, eye), glm::dot(F, eye), 1             // 第四列
-     *    );
-     * }
-    */
-    view = glm::lookAt(m_camPos, m_camPos + m_camFront, m_camUp);
-
-    /*
-     * 设置投影矩阵为透视投影矩阵，参数分别为：
-     * 视野角度45度，宽高比800/600，近裁剪面0.1，远裁剪面100。
-     * 这定义了一个视锥体，只有在这个视锥体内的对象才会被渲染。
-    */
-    projection = glm::perspective(glm::radians(m_camFov), (double)800 / (double)600, 0.1, 100.0);
+    view = m_camera.GetViewMatrix();
+    projection = m_camera.GetProjectionMatrix();
 
     material->SetMat4f("model", model);
     material->SetMat4f("view", view);
@@ -370,11 +326,6 @@ void Scene::Render()
     {
         Mesh *mesh = m_meshes[i];
 
-        /*
-         * Material *mat = mesh->GetMaterial();
-         * SetupMVP(mat);
-        */
-
         Material *mat = mesh->GetMaterial();
         UpdateModelMatrix(mat);
         UpdateViewMatrix(mat);
@@ -394,34 +345,34 @@ void Scene::UpdateModelMatrix(Material *material)
 
 void Scene::UpdateViewMatrix(Material *material)
 {
-    glm::mat4 view = glm::lookAt(m_camPos, m_camPos + m_camFront, m_camUp);
+    glm::mat4 view = m_camera.GetViewMatrix();
     material->SetMat4f("view", view);
 }
 
 void Scene::UpdateProjectionMatrix(Material *material)
 {
-    glm::mat4 projection = glm::perspective(glm::radians(m_camFov), (double)800 / (double)600, 0.1, 100.0);
+    glm::mat4 projection = m_camera.GetProjectionMatrix();
     material->SetMat4f("projection", projection);
 }
 
 void Scene::MoveCamForward()
 {
-    m_camPos += m_camFront * m_camSpeed;
+    m_camera.MoveForwardOrBackward(m_camSpeed);
 }
 
 void Scene::MoveCamBackward()
 {
-    m_camPos -= m_camFront * m_camSpeed;
+    m_camera.MoveForwardOrBackward(-m_camSpeed);
 }
 
 void Scene::MoveCamLeft()
 {
-    m_camPos -= glm::normalize(glm::cross(m_camFront, m_camUp)) * m_camSpeed;
+    m_camera.MoveLeftOrRight(-m_camSpeed);
 }
 
 void Scene::MoveCamRight()
 {
-    m_camPos += glm::normalize(glm::cross(m_camFront, m_camUp)) * m_camSpeed;
+    m_camera.MoveLeftOrRight(m_camSpeed);
 }
 
 void Scene::UpdateCamYawAndPitch(double xPos, double yPos)
@@ -440,20 +391,10 @@ void Scene::UpdateCamYawAndPitch(double xPos, double yPos)
     m_lastCursorPosX = xPos;
     m_lastCursorPosY = yPos;
 
-    m_camYaw += xOffset * m_cursorSensitivity;
-    m_camPitch += yOffset * m_cursorSensitivity;
-
-    m_camPitch = std::clamp(m_camPitch, -89.0, 89.0);
-
-    double vec_x = cos(glm::radians(m_camYaw)) * cos(glm::radians(m_camPitch));
-    double vec_y = sin(glm::radians(m_camPitch));
-    double vec_z = sin(glm::radians(m_camYaw)) * cos(glm::radians(m_camPitch));
-
-    m_camFront = glm::normalize(glm::vec3(vec_x, vec_y, vec_z));
+    m_camera.TuneYawAndPitch(xOffset * m_cursorSensitivity, yOffset * m_cursorSensitivity);
 }
 
 void Scene::UpdateCamZoom(double yOffset)
 {
-    m_camFov -= yOffset;
-    m_camFov = std::clamp(m_camFov, 1.0, 60.0);
+    m_camera.TuneZoom(yOffset);
 }
