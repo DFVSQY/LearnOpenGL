@@ -2,6 +2,7 @@
 
 #include "Material.h"
 #include "glad/glad.h"
+#include "VertexAttribute.h"
 
 class Mesh
 {
@@ -14,17 +15,14 @@ class Mesh
 
     Material *material;
 
-    void SetupVAO(const GLfloat *vertices, const int vertexNum);
-
-    void SetupVAO_Elements(const GLfloat *vertices, const int vertexNum, const GLuint *indices, const int indexNum);
+    void SetupMesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
+                   const std::vector<VertexAttribute> &attributes);
 
   public:
-    Mesh();
     ~Mesh();
-    bool Init(const GLfloat *vertices, const int vertexNum);
 
-    bool Init_Elements(const GLfloat *vertices, const GLuint *indices, const int vertexNum, const int indexNum,
-                       Material *material);
+    Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
+         const std::vector<VertexAttribute> &attributes, Material *material);
 
     void Draw() const;
 

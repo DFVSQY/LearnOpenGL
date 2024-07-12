@@ -10,6 +10,8 @@
 #include "glm/trigonometric.hpp"
 #include <algorithm>
 #include <cmath>
+#include <vector>
+#include "VertexAttribute.h"
 
 Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials(), m_camera()
 {
@@ -100,26 +102,20 @@ Material *Scene::SetupMat_1()
 */
 Mesh *Scene::SetupMesh_1(Material *material)
 {
-    // 网格
-    GLfloat vertices[] = {
-        // postion          // color
+    const std::vector<GLfloat> vertices_vec = {
+        // postion                      // color                      // 纹理坐标
         0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // top right
         0.5f,  -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, // bottom right
         -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom left
         -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, // top left
     };
-    GLuint indices[] = {
+
+    const std::vector<GLuint> indices_vec = {
         0, 1, 3, // first Triangle
         1, 2, 3  // second Triangle
     };
-    Mesh *mesh = new Mesh();
-    bool mesh_succ = mesh->Init_Elements(vertices, indices, 32, 6, material);
-    if (!mesh_succ)
-    {
-        delete mesh;
-        return nullptr;
-    }
 
+    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::getPositionColorTexCoords(), material);
     AddMesh(mesh);
 
     return mesh;
@@ -154,8 +150,8 @@ Material *Scene::SetupMat_2()
 */
 Mesh *Scene::SetupMesh_2(Material *material)
 {
-    GLfloat vertices[] = {
-        // postion           // color           // 纹理坐标
+    std::vector<GLfloat> vertices = {
+        // postion                       // color                      // 纹理坐标
         -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, //
         0.5f,  -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, //
         0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, //
@@ -205,7 +201,7 @@ Mesh *Scene::SetupMesh_2(Material *material)
         -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  //
     };
 
-    GLuint indices[] = {
+    std::vector<GLuint> indices = {
         0,  1,  2,  3,  4,  5,  // 前面
         6,  7,  8,  9,  10, 11, // 后面
         12, 13, 14, 15, 16, 17, // 左面
@@ -214,14 +210,7 @@ Mesh *Scene::SetupMesh_2(Material *material)
         30, 31, 32, 33, 34, 35  // 顶面
     };
 
-    Mesh *mesh = new Mesh();
-    bool mesh_succ = mesh->Init_Elements(vertices, indices, 36 * 8, 6 * 6, material);
-    if (!mesh_succ)
-    {
-        delete mesh;
-        return nullptr;
-    }
-
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::getPositionColorTexCoords(), material);
     AddMesh(mesh);
 
     return mesh;
