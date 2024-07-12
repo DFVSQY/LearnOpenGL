@@ -9,8 +9,10 @@ struct VertexPCT
     glm::vec2 texCoords;
 };
 
-// 定义 getPositionColorTexCoords 方法
-const std::vector<VertexAttribute> &VertexAttributePresets::getPositionColorTexCoords()
+/*
+ * 位置-颜色-纹理坐标 布局
+*/
+const std::vector<VertexAttribute> &VertexAttributePresets::GetPosColorTexLayout()
 {
     static const std::vector<VertexAttribute> attributes = {
         {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPCT)), (void *)offsetof(VertexPCT, position)},
@@ -20,36 +22,20 @@ const std::vector<VertexAttribute> &VertexAttributePresets::getPositionColorTexC
     return attributes;
 }
 
-struct VertexPT
+struct VertexPC
 {
     glm::vec3 position;
-    glm::vec2 texCoords;
+    glm::vec3 color;
 };
 
-// 定义 getPositionTexCoords 方法
-const std::vector<VertexAttribute> &VertexAttributePresets::getPositionTexCoords()
+/*
+ * 位置-颜色 布局
+*/
+const std::vector<VertexAttribute> &VertexAttributePresets::GetPosColorLayout()
 {
     static const std::vector<VertexAttribute> attributes = {
-        {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPT)), (void *)offsetof(VertexPT, position)},
-        {2, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPT)), (void *)offsetof(VertexPT, texCoords)},
-    };
-    return attributes;
-}
-
-struct VertexPTN
-{
-    glm::vec3 position;
-    glm::vec2 texCoords;
-    glm::vec3 normal;
-};
-
-// 定义 getPositionTexCoordsNormals 方法
-const std::vector<VertexAttribute> &VertexAttributePresets::getPositionTexCoordsNormals()
-{
-    static const std::vector<VertexAttribute> attributes = {
-        {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPTN)), (void *)offsetof(VertexPTN, position)},
-        {2, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPTN)), (void *)offsetof(VertexPTN, texCoords)},
-        {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPTN)), (void *)offsetof(VertexPTN, normal)},
+        {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPC)), (void *)offsetof(VertexPC, position)},
+        {2, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPC)), (void *)offsetof(VertexPC, color)},
     };
     return attributes;
 }

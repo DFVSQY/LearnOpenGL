@@ -43,11 +43,9 @@ struct VertexAttribute
 class VertexAttributePresets
 {
   public:
-    static const std::vector<VertexAttribute> &getPositionColorTexCoords(); /* 纹理-颜色-纹理坐标 */
+    static const std::vector<VertexAttribute> &GetPosColorTexLayout(); /* 纹理-颜色-纹理坐标 */
 
-    static const std::vector<VertexAttribute> &getPositionTexCoords(); /* 位置-纹理 */
-
-    static const std::vector<VertexAttribute> &getPositionTexCoordsNormals(); /* 位置-纹理-法线 */
+    static const std::vector<VertexAttribute> &GetPosColorLayout(); /* 位置-颜色 */
 
   private:
     // 禁止实例化该类

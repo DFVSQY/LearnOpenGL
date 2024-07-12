@@ -115,7 +115,7 @@ Mesh *Scene::SetupMesh_1(Material *material)
         1, 2, 3  // second Triangle
     };
 
-    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::getPositionColorTexCoords(), material);
+    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::GetPosColorTexLayout(), material);
     AddMesh(mesh);
 
     return mesh;
@@ -210,7 +210,7 @@ Mesh *Scene::SetupMesh_2(Material *material)
         30, 31, 32, 33, 34, 35  // 顶面
     };
 
-    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::getPositionColorTexCoords(), material);
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosColorTexLayout(), material);
     AddMesh(mesh);
 
     return mesh;
