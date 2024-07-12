@@ -233,4 +233,20 @@ std::string Shader::ReadShaderFile(const char *filePath)
 
 Shader::~Shader()
 {
+    if (shader_program > 0)
+    {
+        /*
+         * glDeleteProgram 是 OpenGL 中用于删除着色器程序对象的函数。
+         * 它的主要作用是释放与特定着色器程序对象相关的资源，以避免内存泄漏和其他不必要的资源占用。
+         * glDeleteProgram 函数会删除指定的着色器程序对象，释放其占用的 GPU 资源。
+
+         * 函数原型：void glDeleteProgram(GLuint program);
+         *  program：要删除的着色器程序对象的标识符。
+
+         * 当调用 glDeleteProgram 删除一个着色器程序时，如果该程序对象当前仍被使用（例如，通过 glUseProgram 激活），程序对象不会立即销毁。
+         * 相反，它会在不再被使用时才实际销毁。这意味着你可以安全地调用 glDeleteProgram 删除一个仍在渲染管线中使用的程序对象，OpenGL 会确保在适当的时间点释放资源。
+        */
+        glDeleteProgram(shader_program);
+        shader_program = 0;
+    }
 }

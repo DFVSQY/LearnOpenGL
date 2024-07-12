@@ -8,6 +8,21 @@ Texture::Texture() : texture_id(0), width(0), height(0), channel_num(0)
 
 Texture::~Texture()
 {
+    if (texture_id > 0)
+    {
+        /*
+         * glDeleteTextures 是 OpenGL 中用于删除纹理对象的函数。它的作用是释放先前由 glGenTextures 创建的纹理对象及其相关资源。
+         * 当调用 glDeleteTextures 时，OpenGL 会将指定的纹理对象标记为删除。
+         * 实际的删除动作不会立即发生，直到所有对该纹理对象的引用（例如在着色器中使用或绑定到任何目标）都被解除。
+         * 这样做可以避免在实际应用过程中由于突然删除纹理导致的问题。
+
+         * 函数原型：void glDeleteTextures(GLsizei n, const GLuint *textures);
+         *  n：要删除的纹理对象的数量。
+         *  textures：一个包含要删除的纹理对象名称（ID）的数组。
+        */
+        glDeleteTextures(1, &texture_id);
+        texture_id = 0;
+    }
 }
 
 bool Texture::Init(const char *filePath, GLenum format)

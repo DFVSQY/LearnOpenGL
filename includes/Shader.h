@@ -18,6 +18,10 @@ class Shader
     GLint GetUniformLocation(const std::string &name) const;
 
   public:
+    // 删除复制构造函数和赋值操作符
+    Shader(const Shader &) = delete;
+    Shader &operator=(const Shader &) = delete;
+
     Shader();
     ~Shader();
 

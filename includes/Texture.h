@@ -12,6 +12,10 @@ class Texture
     int channel_num;
 
   public:
+    // 删除复制构造函数和赋值操作符
+    Texture(const Texture &) = delete;
+    Texture &operator=(const Texture &) = delete;
+
     Texture();
     ~Texture();
 
