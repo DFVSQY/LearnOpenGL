@@ -27,10 +27,13 @@ class Shader
 
     bool Init(const char *vertexFilePath, const char *fragmentFilePath);
 
-    void SetBool(const std::string &name, bool value) const;
-    void SetInt(const std::string &name, GLint value) const;
-    void SetFloat(const std::string &name, GLfloat value) const;
-    void SetFloat4(const std::string &name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) const;
+    void SetBool(const std::string &name, const GLboolean value) const;
+    void SetInt(const std::string &name, const GLint value) const;
+    void SetFloat(const std::string &name, const GLfloat value) const;
+    void SetFloat4(const std::string &name, const GLfloat v0, const GLfloat v1, const GLfloat v2,
+                   const GLfloat v3) const;
     void SetMat4f(const std::string &name, const glm::mat4 &matrix) const;
+    void SetMat3f(const std::string &name, const glm::mat3 &matrix) const;
+    void SetVec3f(const std::string &name, const glm::vec3 &vector) const;
     void Use();
 };

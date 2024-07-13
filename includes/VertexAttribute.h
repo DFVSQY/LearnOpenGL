@@ -49,6 +49,10 @@ class VertexAttributePresets
 
     static const std::vector<VertexAttribute> &GetPosLayout(); /* 位置 */
 
+    static const std::vector<VertexAttribute> &GetPosNormalLayout(); /* 位置-法线 */
+
+    static const std::vector<VertexAttribute> &GetPosNormalTexLayout(); /* 位置-法线-纹理坐标 */
+
   private:
     // 禁止实例化该类
     VertexAttributePresets() = delete;

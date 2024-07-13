@@ -60,21 +60,21 @@ void Shader::Use()
 }
 
 // 向shader传递bool值
-void Shader::SetBool(const std::string &name, bool value) const
+void Shader::SetBool(const std::string &name, const GLboolean value) const
 {
     GLint location = GetUniformLocation(name);
     glUniform1i(location, (GLint)value);
 }
 
 // 向shader传递int值
-void Shader::SetInt(const std::string &name, GLint value) const
+void Shader::SetInt(const std::string &name, const GLint value) const
 {
     GLint location = GetUniformLocation(name);
     glUniform1i(location, value);
 }
 
 // 向shader传递float值
-void Shader::SetFloat(const std::string &name, GLfloat value) const
+void Shader::SetFloat(const std::string &name, const GLfloat value) const
 {
     GLint location = GetUniformLocation(name);
 
@@ -112,6 +112,19 @@ void Shader::SetMat4f(const std::string &name, const glm::mat4 &matrix) const
      *  value：指向包含矩阵数据的数组的指针。矩阵数据应按照列主序存储，即矩阵的第一个列的元素在数组的前四个位置。
     */
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetMat3f(const std::string &name, const glm::mat3 &matrix) const
+{
+    GLuint location = GetUniformLocation(name);
+    glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetVec3f(const std::string &name, const glm::vec3 &vector) const
+{
+    GLuint location = GetUniformLocation(name);
+
+    glUniform3f(location, vector.x, vector.y, vector.z);
 }
 
 // 获取uniform变量位置

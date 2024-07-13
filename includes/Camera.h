@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 
 class Camera
@@ -30,6 +31,8 @@ class Camera
 
     glm::mat4 GetViewMatrix();
     glm::mat4 GetProjectionMatrix();
+
+    glm::vec3 GetPos() const;
 
     void MoveForwardOrBackward(float delta);
     void MoveLeftOrRight(float delta);

@@ -56,3 +56,40 @@ const std::vector<VertexAttribute> &VertexAttributePresets::GetPosLayout()
     };
     return attributes;
 }
+
+struct VertextPN
+{
+    glm::vec3 position;
+    glm::vec3 normal;
+};
+
+/*
+ * 位置-法线 布局
+*/
+const std::vector<VertexAttribute> &VertexAttributePresets::GetPosNormalLayout()
+{
+    static const std::vector<VertexAttribute> attributes = {
+        {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertextPN)), (void *)offsetof(VertextPN, position)},
+        {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertextPN)), (void *)offsetof(VertextPN, normal)}};
+    return attributes;
+}
+
+struct VertexPNT
+{
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 texCoords;
+};
+
+/*
+ * 位置-法线-纹理坐标 布局
+*/
+const std::vector<VertexAttribute> &VertexAttributePresets::GetPosNormalTexLayout()
+{
+    static const std::vector<VertexAttribute> attributes = {
+        {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPNT)), (void *)offsetof(VertexPNT, position)},
+        {3, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPNT)), (void *)offsetof(VertexPNT, normal)},
+        {2, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(sizeof(VertexPNT)), (void *)offsetof(VertexPNT, texCoords)},
+    };
+    return attributes;
+}

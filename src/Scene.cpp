@@ -6,7 +6,9 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
+#include "glm/fwd.hpp"
 #include "glm/glm.hpp"
+#include "glm/matrix.hpp"
 #include "glm/trigonometric.hpp"
 #include <algorithm>
 #include <cmath>
@@ -53,11 +55,11 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    Material *material = SetupMat_2();
+    Material *material = SetupMat_3();
     if (!material)
         return;
 
-    SetupMesh_2(material);
+    SetupMesh_3(material);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -216,6 +218,96 @@ Mesh *Scene::SetupMesh_2(Material *material)
     return mesh;
 }
 
+Material *Scene::SetupMat_3()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/vertex_03.glsl", "../shaders/fragment_03.glsl");
+    if (!shader)
+        return nullptr;
+
+    // 纹理
+    Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
+    if (!texture)
+        return nullptr;
+
+    Material *material = GenMaterial(shader);
+
+    material->SetTexture("texture0", texture);
+
+    // 设置灯光的世界坐标位置
+    material->SetVec3f("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
+
+    // 设置灯光颜色
+    material->SetVec3f("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+
+    AddMaterial(material);
+
+    return material;
+    return nullptr;
+}
+
+Mesh *Scene::SetupMesh_3(Material *material)
+{
+    std::vector<GLfloat> vertices = {
+        // 位置                           // 法线                           // 纹理坐标
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 0.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f, //
+
+        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, //
+
+        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,  0.0f, 0.0f, //
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  1.0f, 0.0f, //
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  1.0f, 0.0f, //
+        -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.0f, 1.0f, //
+
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, //
+
+        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  1.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  1.0f, 1.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  1.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f, 0.0f, //
+
+        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  1.0f, 0.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f  //
+    };
+
+    std::vector<GLuint> indices = {
+        0,  1,  2,  3,  4,  5,  // 前面
+        6,  7,  8,  9,  10, 11, // 后面
+        12, 13, 14, 15, 16, 17, // 左面
+        18, 19, 20, 21, 22, 23, // 右面
+        24, 25, 26, 27, 28, 29, // 底面
+        30, 31, 32, 33, 34, 35  // 顶面
+    };
+
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), material);
+    AddMesh(mesh);
+
+    return mesh;
+}
+
 void Scene::InitMVP(Material *material)
 {
     /* 
@@ -330,12 +422,21 @@ void Scene::UpdateModelMatrix(Material *material)
     model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 
     material->SetMat4f("model", model);
+
+    /*
+     * 将法向量从模型空间变换到世界空间中需要用到的矩阵
+    */
+    glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model)));
+    material->SetMat3f("normalMatrix", normal_matrix);
 }
 
 void Scene::UpdateViewMatrix(Material *material)
 {
     glm::mat4 view = m_camera.GetViewMatrix();
     material->SetMat4f("view", view);
+
+    glm::vec3 pos = m_camera.GetPos();
+    material->SetVec3f("camPos", pos);
 }
 
 void Scene::UpdateProjectionMatrix(Material *material)

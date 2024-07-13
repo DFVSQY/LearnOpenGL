@@ -18,6 +18,11 @@ Camera::~Camera()
 {
 }
 
+glm::vec3 Camera::GetPos() const
+{
+    return m_pos;
+}
+
 glm::mat4 Camera::GetViewMatrix()
 {
     /*
