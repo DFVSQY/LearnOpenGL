@@ -47,6 +47,8 @@ class VertexAttributePresets
 
     static const std::vector<VertexAttribute> &GetPosColorLayout(); /* 位置-颜色 */
 
+    static const std::vector<VertexAttribute> &GetPosLayout(); /* 位置 */
+
   private:
     // 禁止实例化该类
     VertexAttributePresets() = delete;
