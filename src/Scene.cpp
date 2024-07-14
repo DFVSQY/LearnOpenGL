@@ -55,11 +55,11 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    Material *material = SetupMat_3();
+    Material *material = SetupMat_4();
     if (!material)
         return;
 
-    SetupMesh_3(material);
+    SetupMesh_4(material);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -258,6 +258,103 @@ Material *Scene::SetupMat_3()
 }
 
 Mesh *Scene::SetupMesh_3(Material *material)
+{
+    std::vector<GLfloat> vertices = {
+        // 位置                           // 法线                           // 纹理坐标
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 0.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f, //
+
+        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, //
+
+        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,  0.0f, 0.0f, //
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  1.0f, 0.0f, //
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  1.0f, 0.0f, //
+        -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.0f, 1.0f, //
+
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, //
+
+        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  1.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  1.0f, 1.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  1.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f, 0.0f, //
+
+        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  1.0f, 0.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f  //
+    };
+
+    std::vector<GLuint> indices = {
+        0,  1,  2,  3,  4,  5,  // 前面
+        6,  7,  8,  9,  10, 11, // 后面
+        12, 13, 14, 15, 16, 17, // 左面
+        18, 19, 20, 21, 22, 23, // 右面
+        24, 25, 26, 27, 28, 29, // 底面
+        30, 31, 32, 33, 34, 35  // 顶面
+    };
+
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), material);
+    AddMesh(mesh);
+
+    return mesh;
+}
+
+Material *Scene::SetupMat_4()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/vertex_04.glsl", "../shaders/fragment_04.glsl");
+    if (!shader)
+        return nullptr;
+
+    // 漫反射纹理
+    Texture *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
+    if (!diffuse_tex)
+        return nullptr;
+
+    // 高光纹理
+    Texture *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
+    if (!specular_tex)
+        return nullptr;
+
+    Material *material = GenMaterial(shader);
+
+    // 材质属性
+    material->SetTexture("material.diffuse", diffuse_tex);
+    material->SetTexture("material.specular", specular_tex);
+    material->SetFloat("material.shininess", 64.0f);
+
+    // 设置灯光属性
+    material->SetVec3f("light.position", glm::vec3(1.2f, 1.0f, 2.0f));
+    material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    material->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    material->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+    AddMaterial(material);
+
+    return material;
+}
+
+Mesh *Scene::SetupMesh_4(Material *material)
 {
     std::vector<GLfloat> vertices = {
         // 位置                           // 法线                           // 纹理坐标
