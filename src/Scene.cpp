@@ -235,15 +235,26 @@ Material *Scene::SetupMat_3()
     material->SetTexture("texture0", texture);
 
     // 设置灯光的世界坐标位置
-    material->SetVec3f("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
+    // material->SetVec3f("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
 
     // 设置灯光颜色
-    material->SetVec3f("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    // material->SetVec3f("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+
+    // 设置灯光属性
+    material->SetVec3f("light.position", glm::vec3(1.2f, 1.0f, 2.0f));
+    material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    material->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    material->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+    // 设置物体材质属性
+    material->SetVec3f("material.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
+    material->SetVec3f("material.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    material->SetVec3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+    material->SetFloat("material.shininess", 32.0f);
 
     AddMaterial(material);
 
     return material;
-    return nullptr;
 }
 
 Mesh *Scene::SetupMesh_3(Material *material)
