@@ -55,11 +55,11 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    Material *material = SetupMat_4();
+    Material *material = SetupMat_5();
     if (!material)
         return;
 
-    SetupMesh_4(material);
+    SetupMesh_5(material);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -414,6 +414,46 @@ Mesh *Scene::SetupMesh_4(Material *material)
     AddMesh(mesh);
 
     return mesh;
+}
+
+Material *Scene::SetupMat_5()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/vertex_05.glsl", "../shaders/fragment_05.glsl");
+    if (!shader)
+        return nullptr;
+
+    // 漫反射纹理
+    Texture *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
+    if (!diffuse_tex)
+        return nullptr;
+
+    // 高光纹理
+    Texture *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
+    if (!specular_tex)
+        return nullptr;
+
+    Material *material = GenMaterial(shader);
+
+    // 材质属性
+    material->SetTexture("material.diffuse", diffuse_tex);
+    material->SetTexture("material.specular", specular_tex);
+    material->SetFloat("material.shininess", 64.0f);
+
+    // 设置灯光属性
+    material->SetVec3f("light.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
+    material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    material->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    material->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+    AddMaterial(material);
+
+    return material;
+}
+
+Mesh *Scene::SetupMesh_5(Material *material)
+{
+    return SetupMesh_4(material);
 }
 
 void Scene::InitMVP(Material *material)
