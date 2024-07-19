@@ -6,7 +6,6 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
-#include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "glm/matrix.hpp"
 #include "glm/trigonometric.hpp"
