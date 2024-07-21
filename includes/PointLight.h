@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BaseLight.h"
-#include "glm/glm.hpp"
 
 class PointLight : public BaseLight
 {

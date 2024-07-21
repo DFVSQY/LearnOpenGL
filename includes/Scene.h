@@ -4,7 +4,6 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "glm/glm.hpp"
 #include <vector>
 #include "Camera.h"
 

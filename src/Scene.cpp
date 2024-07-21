@@ -3,14 +3,10 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
-#include "glm/glm.hpp"
 #include "glm/matrix.hpp"
 #include "glm/trigonometric.hpp"
-#include <algorithm>
-#include <cmath>
 #include <vector>
 #include "VertexAttribute.h"
 

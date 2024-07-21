@@ -1,6 +1,5 @@
 #include "Camera.h"
 #include "glm/ext/matrix_clip_space.hpp"
-#include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
 Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up, double fov, double aspect, double near, double far)

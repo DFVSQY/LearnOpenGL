@@ -1,4 +1,3 @@
-#include <iostream>
 #include <vector>
 #include "Mesh.h"
 #include "Material.h"

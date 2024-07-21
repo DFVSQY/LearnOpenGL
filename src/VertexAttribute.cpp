@@ -1,7 +1,7 @@
 #include "VertexAttribute.h"
-#include "glm/glm.hpp"
 #include <cstddef>
 #include <vector>
+#include "glm/glm.hpp"
 
 struct VertexPCT
 {

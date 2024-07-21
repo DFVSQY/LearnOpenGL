@@ -2,7 +2,6 @@
 
 #include "glad/glad.h"
 #include <vector>
-#include "glm/glm.hpp"
 
 /*
  * 顶点属性结构体，用于指定顶点属性的格式。
