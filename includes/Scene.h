@@ -66,6 +66,9 @@ class Scene
     Material *SetupMat_5();
     Mesh *SetupMesh_5(Material *material);
 
+    Material *SetupMat_6();
+    Mesh *SetupMesh_6(Material *material);
+
     void Render();
 
     void MoveCamForward();
