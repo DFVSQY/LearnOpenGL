@@ -32,6 +32,7 @@ class Camera
     glm::mat4 GetProjectionMatrix();
 
     glm::vec3 GetPos() const;
+    glm::vec3 GetFront() const;
 
     void MoveForwardOrBackward(float delta);
     void MoveLeftOrRight(float delta);

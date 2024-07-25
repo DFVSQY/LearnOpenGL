@@ -21,6 +21,11 @@ glm::vec3 Camera::GetPos() const
     return m_pos;
 }
 
+glm::vec3 Camera::GetFront() const
+{
+    return m_front;
+}
+
 glm::mat4 Camera::GetViewMatrix()
 {
     /*
