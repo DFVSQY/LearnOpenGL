@@ -524,6 +524,10 @@ Material *Scene::SetupMat_7()
     material->SetVec3f("light.position", m_camera.GetPos());
     material->SetVec3f("light.direction", m_camera.GetFront());
     material->SetFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+    material->SetFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+    material->SetFloat("light.constant", 1.0f);
+    material->SetFloat("light.linear", 0.045f);
+    material->SetFloat("light.quadratic", 0.0075f);
 
     // 灯光的光照属性
     material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));

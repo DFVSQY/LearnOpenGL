@@ -29,6 +29,11 @@ struct Light {
     vec3 position;
     vec3 direction;
     float cutOff;
+    float outerCutOff;
+
+    float constant;
+    float linear;
+    float quadratic;
 
     vec3 ambient;
     vec3 diffuse;
@@ -46,25 +51,31 @@ void main()
     // 计算环境光
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, texCoord).rgb);
 
-    if (theta > light.cutOff) // 聚光灯范围内使用光照点亮颜色
-    {
-        // 计算漫反射颜色
-        vec3 norm = normalize(normal);
-        float diff = max(dot(norm, lightDir), 0.0);
-        vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord).rgb);
+    // 计算漫反射颜色
+    vec3 norm = normalize(normal);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, texCoord).rgb);
 
-        // 计算镜面反射颜色
-        vec3 viewDir = normalize(camPos - worldPos);
-        vec3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-        vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord).rgb);
+    // 计算镜面反射颜色
+    vec3 viewDir = normalize(camPos - worldPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    vec3 specular = light.specular * spec * vec3(texture(material.specular, texCoord).rgb);
 
-        vec3 result = diffuse + ambient + specular;
+    // spotlight (soft edges)
+    float epsilon = (light.cutOff - light.outerCutOff);
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    diffuse *= intensity;
+    specular *= intensity;
 
-        FragColor = vec4(result, 1.0);
-    }
-    else // 聚光灯范围外，使用环境光让场景在聚光之外时不至于完全黑暗
-    {
-        FragColor = vec4(ambient, 1.0);
-    }
+    // attenuation
+    float distance = length(light.position - worldPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
+
+    vec3 result = diffuse + ambient + specular;
+
+    FragColor = vec4(result, 1.0);
 }
