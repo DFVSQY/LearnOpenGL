@@ -65,7 +65,6 @@ void main()
     }
     else // 聚光灯范围外，使用环境光让场景在聚光之外时不至于完全黑暗
     {
-        // FragColor = vec4(ambient, 1.0);
-        FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        FragColor = vec4(ambient, 1.0);
     }
 }
