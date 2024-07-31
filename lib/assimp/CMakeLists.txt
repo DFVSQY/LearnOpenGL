@@ -128,7 +128,7 @@ OPTION ( ASSIMP_BUILD_DOCS
 )
 OPTION( ASSIMP_INJECT_DEBUG_POSTFIX
   "Inject debug postfix in .a/.so/.dll lib names"
-  ON
+  OFF
 )
 
 OPTION ( ASSIMP_IGNORE_GIT_HASH

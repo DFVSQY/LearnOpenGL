@@ -30,7 +30,7 @@ add_executable(main ${SRC})
 target_include_directories(main PRIVATE "includes")
 
 # 链接引入的依赖库（glfw，glad，...）
-target_link_libraries(main PRIVATE glfw glad stb glm assimpd)
+target_link_libraries(main PRIVATE glfw glad stb glm assimp)
 
 if(WIN32)
     target_link_libraries(main PRIVATE opengl32)
