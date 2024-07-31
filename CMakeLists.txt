@@ -18,6 +18,7 @@ add_subdirectory(lib/glfw)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/stb)
 add_subdirectory(lib/glm)
+add_subdirectory(lib/assimp)
 
 # 将 src 目录下的所有 .cpp 文件添加到变量 SRC 中
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS "src/*.cpp")
@@ -29,7 +30,7 @@ add_executable(main ${SRC})
 target_include_directories(main PRIVATE "includes")
 
 # 链接引入的依赖库（glfw，glad，...）
-target_link_libraries(main PRIVATE glfw glad stb glm)
+target_link_libraries(main PRIVATE glfw glad stb glm assimpd)
 
 if(WIN32)
     target_link_libraries(main PRIVATE opengl32)
