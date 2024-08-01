@@ -54,3 +54,7 @@ dkms.conf
 build/
 .cache/
 *.DS_Store
+
+# 不忽略 models 文件夹下的 .obj 文件
+!models/
+!models/**/*.obj
