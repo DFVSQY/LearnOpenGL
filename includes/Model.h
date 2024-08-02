@@ -14,7 +14,7 @@ class Model
     void LoadModel(const std::string &path);
 
     void ProcessNode(aiNode *node, const aiScene *scene);
-    void ProcessMesh(aiMesh *mesh, const aiScene *scene);
+    Mesh ProcessMesh(aiMesh *mesh, const aiScene *scene);
 
   public:
     // 删除复制构造函数和赋值操作符

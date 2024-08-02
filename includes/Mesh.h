@@ -19,10 +19,6 @@ class Mesh
                    const std::vector<VertexAttribute> &attributes);
 
   public:
-    // 删除复制构造函数和赋值操作符
-    Mesh(const Mesh &) = delete;
-    Mesh &operator=(const Mesh &) = delete;
-
     ~Mesh();
 
     Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
