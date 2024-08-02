@@ -21,18 +21,19 @@ Model::~Model()
 
 void Model::LoadModel(const std::string &path)
 {
-    Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    // todo: 有问题，编译通不过
+    // Assimp::Importer importer;
+    // const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-    if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == nullptr)
-    {
-        std::cerr << "Import model error:" << importer.GetErrorString() << std::endl;
-        return;
-    }
+    // if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == nullptr)
+    // {
+    //     std::cerr << "Import model error:" << importer.GetErrorString() << std::endl;
+    //     return;
+    // }
 
-    m_directory = path.substr(0, path.find_last_of('/'));
+    // m_directory = path.substr(0, path.find_last_of('/'));
 
-    ProcessNode(scene->mRootNode, scene);
+    // ProcessNode(scene->mRootNode, scene);
 }
 
 void Model::ProcessNode(aiNode *node, const aiScene *scene)
