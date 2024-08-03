@@ -2,10 +2,12 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "VertexAttribute.h"
 #include "assimp/Importer.hpp"
 #include "assimp/mesh.h"
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
+#include "assimp/vector3.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -21,19 +23,18 @@ Model::~Model()
 
 void Model::LoadModel(const std::string &path)
 {
-    // todo: 有问题，编译通不过
-    // Assimp::Importer importer;
-    // const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    Assimp::Importer importer;
+    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-    // if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == nullptr)
-    // {
-    //     std::cerr << "Import model error:" << importer.GetErrorString() << std::endl;
-    //     return;
-    // }
+    if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == nullptr)
+    {
+        std::cerr << "Import model error:" << importer.GetErrorString() << std::endl;
+        return;
+    }
 
-    // m_directory = path.substr(0, path.find_last_of('/'));
+    m_directory = path.substr(0, path.find_last_of('/'));
 
-    // ProcessNode(scene->mRootNode, scene);
+    ProcessNode(scene->mRootNode, scene);
 }
 
 void Model::ProcessNode(aiNode *node, const aiScene *scene)
@@ -54,12 +55,51 @@ void Model::ProcessNode(aiNode *node, const aiScene *scene)
 
 Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 {
-    // todo: 临时代码，具体待定
-
     std::vector<GLfloat> vertices;
+
+    // 顶点列表
+    for (unsigned int idx = 0; idx < mesh->mNumVertices; idx++)
+    {
+        // 位置
+        aiVector3D position = mesh->mVertices[idx];
+        vertices.push_back(position.x);
+        vertices.push_back(position.y);
+        vertices.push_back(position.z);
+
+        // 法线
+        aiVector3D normal = mesh->mNormals[idx];
+        vertices.push_back(normal.x);
+        vertices.push_back(normal.y);
+        vertices.push_back(normal.z);
+
+        // 纹理坐标
+        if (mesh->mTextureCoords[0])
+        {
+            aiVector3D texCoord = mesh->mTextureCoords[0][idx];
+            vertices.push_back(texCoord.x);
+            vertices.push_back(texCoord.y);
+        }
+        else
+        {
+            vertices.push_back(0.0f);
+        }
+    }
+
     std::vector<GLuint> indices;
-    std::vector<VertexAttribute> attributes;
+
+    // 索引列表
+    for (unsigned int idx = 0; idx < mesh->mNumFaces; idx++)
+    {
+        aiFace face = mesh->mFaces[idx];
+        for (unsigned int idx2 = 0; idx2 < face.mNumIndices; idx2++)
+        {
+            indices.push_back(face.mIndices[idx2]);
+        }
+    }
+
+    // todo: 材质待定
+
     Material *material = nullptr;
 
-    return Mesh(vertices, indices, attributes, material);
+    return Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), material);
 }

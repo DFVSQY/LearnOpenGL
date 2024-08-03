@@ -48,12 +48,11 @@ Mesh::~Mesh()
 
 void Mesh::Draw() const
 {
-    if (vao == 0)
+    if (vao == 0 || material == nullptr)
         return;
 
     // 准备好渲染所需要的材质
-    if (material != nullptr)
-        material->Use();
+    material->Use();
 
     // draw mesh content
     glBindVertexArray(vao);
