@@ -1,16 +1,23 @@
 #pragma once
 
-#include <unordered_map>
 #include "Shader.h"
 #include "Texture.h"
 #include <string>
+#include <vector>
 
 class Material
 {
   private:
+    struct TextureTuple
+    {
+        const int idx;
+        const Texture *texture;
+        const std::string name;
+    };
+
     Shader *shader;
 
-    std::unordered_map<int, Texture *> map_textures;
+    std::vector<TextureTuple> texture_tuples;
 
     int texture_idx;
 

@@ -176,7 +176,7 @@ GLsizei Texture::GetHeight() const
     return height;
 }
 
-void Texture::Use(int idx)
+void Texture::Use(int idx) const
 {
     /*
      * 函数原型：void glActiveTexture(GLenum texture);

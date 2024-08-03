@@ -1,7 +1,7 @@
 #include "Material.h"
 #include "Texture.h"
 
-Material::Material() : shader(nullptr), map_textures(), texture_idx(0)
+Material::Material() : shader(nullptr), texture_tuples(), texture_idx(0)
 {
 }
 
@@ -19,7 +19,7 @@ void Material::SetTexture(const std::string &name, Texture *texture)
     shader->Use();
     shader->SetInt(name, texture_idx);
 
-    map_textures.insert(std::make_pair(texture_idx, texture));
+    texture_tuples.push_back({texture_idx, texture, name});
 
     texture_idx++;
 }
@@ -56,9 +56,15 @@ void Material::SetFloat(const std::string &name, const GLfloat value)
 
 void Material::Use()
 {
-    for (auto &texture : map_textures)
+    for (auto &texture_tuple : texture_tuples)
     {
-        texture.second->Use(texture.first);
+        texture_tuple.texture->Use(texture_tuple.idx);
     }
+
     shader->Use();
+
+    for (auto &texture_tuple : texture_tuples)
+    {
+        shader->SetInt(texture_tuple.name, texture_tuple.idx);
+    }
 }

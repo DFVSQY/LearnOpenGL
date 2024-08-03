@@ -24,5 +24,5 @@ class Texture
     GLsizei GetWidth() const;
     GLsizei GetHeight() const;
 
-    void Use(int idx);
+    void Use(int idx) const;
 };
