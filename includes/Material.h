@@ -8,16 +8,16 @@
 class Material
 {
   private:
-    struct TextureTuple
+    struct TexturePair
     {
         const int idx;
         const Texture *texture;
-        const std::string name;
+        // const std::string name;
     };
 
     Shader *shader;
 
-    std::vector<TextureTuple> texture_tuples;
+    std::vector<TexturePair> texture_tuples;
 
     int texture_idx;
 

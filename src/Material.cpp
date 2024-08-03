@@ -19,7 +19,7 @@ void Material::SetTexture(const std::string &name, Texture *texture)
     shader->Use();
     shader->SetInt(name, texture_idx);
 
-    texture_tuples.push_back({texture_idx, texture, name});
+    texture_tuples.push_back({texture_idx, texture});
 
     texture_idx++;
 }
@@ -62,9 +62,4 @@ void Material::Use()
     }
 
     shader->Use();
-
-    for (auto &texture_tuple : texture_tuples)
-    {
-        shader->SetInt(texture_tuple.name, texture_tuple.idx);
-    }
 }
