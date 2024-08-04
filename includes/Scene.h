@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Material.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -13,7 +12,7 @@ class Scene
     std::vector<Mesh *> m_meshes;
     std::vector<Shader *> m_shaders;
     std::vector<Texture *> m_textures;
-    std::vector<Material *> m_materials;
+    std::vector<Shader *> m_materials;
 
     Camera m_camera;
 
@@ -29,17 +28,16 @@ class Scene
     void AddMesh(Mesh *mesh);
     void AddShader(Shader *shader);
     void AddTexture(Texture *texture);
-    void AddMaterial(Material *material);
+    void AddMaterial(Shader *material);
 
-    Shader *LoadShader(const char *vertextPath, const char *fragmentPath);
-    Texture *LoadTexture(const char *texturePath, GLenum format);
-    Material *GenMaterial(Shader *shader);
+    Shader *LoadShader(const std::string &vertextPath, const std::string &fragmentPath);
+    Texture *LoadTexture(const std::string &texturePath, const GLenum format);
 
-    void InitMVP(Material *material);
+    void InitMVP(Shader *material);
 
-    void UpdateModelMatrix(Material *material);
-    void UpdateViewMatrix(Material *material);
-    void UpdateProjectionMatrix(Material *material);
+    void UpdateModelMatrix(Shader *material);
+    void UpdateViewMatrix(Shader *material);
+    void UpdateProjectionMatrix(Shader *material);
 
   public:
     Scene();
@@ -51,29 +49,29 @@ class Scene
 
     void Init(int width, int height);
 
-    Material *SetupMat_1();
-    Mesh *SetupMesh_1(Material *material);
+    Shader *SetupMat_1();
+    Mesh *SetupMesh_1(Shader *material);
 
-    Material *SetupMat_2();
-    Mesh *SetupMesh_2(Material *material);
+    Shader *SetupMat_2();
+    Mesh *SetupMesh_2(Shader *material);
 
-    Material *SetupMat_3();
-    Mesh *SetupMesh_3(Material *material);
+    Shader *SetupMat_3();
+    Mesh *SetupMesh_3(Shader *material);
 
-    Material *SetupMat_4();
-    Mesh *SetupMesh_4(Material *material);
+    Shader *SetupMat_4();
+    Mesh *SetupMesh_4(Shader *material);
 
-    Material *SetupMat_5();
-    Mesh *SetupMesh_5(Material *material);
+    Shader *SetupMat_5();
+    Mesh *SetupMesh_5(Shader *material);
 
-    Material *SetupMat_6();
-    Mesh *SetupMesh_6(Material *material);
+    Shader *SetupMat_6();
+    Mesh *SetupMesh_6(Shader *material);
 
-    Material *SetupMat_7();
-    Mesh *SetupMesh_7(Material *material);
+    Shader *SetupMat_7();
+    Mesh *SetupMesh_7(Shader *material);
 
-    Material *SetupMat_8();
-    Mesh *SetupMesh_8(Material *material);
+    Shader *SetupMat_8();
+    Mesh *SetupMesh_8(Shader *material);
 
     void Render();
 

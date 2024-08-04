@@ -1,32 +1,44 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include "Texture.h"
 #include "glad/glad.h"
 #include "glm/glm.hpp"
+#include "ShaderUnit.h"
 
 class Shader
 {
   private:
+    struct TexturePair
+    {
+        const int idx;
+        const Texture *texture;
+    };
+
     GLuint shader_program;
 
-    std::string ReadShaderFile(const char *filePath);
+    int texture_idx;
 
-    GLuint Compile(GLenum shaderType, const char *fileContent);
+    std::vector<TexturePair> texture_tuples;
+
+    std::string ReadShaderFile(const char *filePath);
 
     GLuint Link(GLuint vertexShader, GLuint fragmentShader);
 
     GLint GetUniformLocation(const std::string &name) const;
+
+    void InnerUse() const;
 
   public:
     // 删除复制构造函数和赋值操作符
     Shader(const Shader &) = delete;
     Shader &operator=(const Shader &) = delete;
 
-    Shader();
+    Shader(const ShaderUnit &vertexShader, const ShaderUnit &fragmentShader);
     ~Shader();
 
-    bool Init(const char *vertexFilePath, const char *fragmentFilePath);
-
+    void SetTexture(const std::string &name, const Texture *texture);
     void SetBool(const std::string &name, const GLboolean value) const;
     void SetInt(const std::string &name, const GLint value) const;
     void SetFloat(const std::string &name, const GLfloat value) const;
@@ -35,5 +47,8 @@ class Shader
     void SetMat4f(const std::string &name, const glm::mat4 &matrix) const;
     void SetMat3f(const std::string &name, const glm::mat3 &matrix) const;
     void SetVec3f(const std::string &name, const glm::vec3 &vector) const;
-    void Use();
+
+    void Use() const;
+
+    bool IsValidProgram() const;
 };

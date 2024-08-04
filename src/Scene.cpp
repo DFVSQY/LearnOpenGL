@@ -1,7 +1,7 @@
 #include "Scene.h"
-#include "Material.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "ShaderUnit.h"
 #include "Texture.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
@@ -50,7 +50,7 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    Material *material = SetupMat_8();
+    Shader *material = SetupMat_8();
     if (!material)
         return;
 
@@ -62,7 +62,7 @@ void Scene::Init(int width, int height)
 /*
  * 配置渲染用的材质1
 */
-Material *Scene::SetupMat_1()
+Shader *Scene::SetupMat_1()
 {
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
@@ -79,25 +79,23 @@ Material *Scene::SetupMat_1()
     if (!texture2)
         return nullptr;
 
-    Material *material = GenMaterial(shader);
-
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::rotate(trans, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     trans = glm::scale(trans, glm::vec3(0.5f));
-    material->SetMat4f("trans", trans);
+    shader->SetMat4f("trans", trans);
 
-    material->SetTexture("texture0", texture);
-    material->SetTexture("texture1", texture2);
+    shader->SetTexture("texture0", texture);
+    shader->SetTexture("texture1", texture2);
 
-    AddMaterial(material);
+    AddMaterial(shader);
 
-    return material;
+    return shader;
 }
 
 /*
  * 配置渲染用的网格1
 */
-Mesh *Scene::SetupMesh_1(Material *material)
+Mesh *Scene::SetupMesh_1(Shader *shader)
 {
     const std::vector<GLfloat> vertices_vec = {
         // postion                      // color                      // 纹理坐标
@@ -112,7 +110,7 @@ Mesh *Scene::SetupMesh_1(Material *material)
         1, 2, 3  // second Triangle
     };
 
-    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::GetPosColorTexLayout(), material);
+    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::GetPosColorTexLayout(), shader);
     AddMesh(mesh);
 
     return mesh;
@@ -121,7 +119,7 @@ Mesh *Scene::SetupMesh_1(Material *material)
 /*
  * 配置渲染用的材质2
 */
-Material *Scene::SetupMat_2()
+Shader *Scene::SetupMat_2()
 {
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_02.glsl", "../shaders/fragment_02.glsl");
@@ -133,19 +131,17 @@ Material *Scene::SetupMat_2()
     if (!texture)
         return nullptr;
 
-    Material *material = GenMaterial(shader);
+    shader->SetTexture("texture0", texture);
 
-    material->SetTexture("texture0", texture);
+    AddMaterial(shader);
 
-    AddMaterial(material);
-
-    return material;
+    return shader;
 }
 
 /*
  * 配置渲染用的网格2
 */
-Mesh *Scene::SetupMesh_2(Material *material)
+Mesh *Scene::SetupMesh_2(Shader *shader)
 {
     std::vector<GLfloat> vertices = {
         // postion                       // color                      // 纹理坐标
@@ -207,13 +203,13 @@ Mesh *Scene::SetupMesh_2(Material *material)
         30, 31, 32, 33, 34, 35  // 顶面
     };
 
-    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosColorTexLayout(), material);
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosColorTexLayout(), shader);
     AddMesh(mesh);
 
     return mesh;
 }
 
-Material *Scene::SetupMat_3()
+Shader *Scene::SetupMat_3()
 {
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_03.glsl", "../shaders/fragment_03.glsl");
@@ -225,34 +221,32 @@ Material *Scene::SetupMat_3()
     if (!texture)
         return nullptr;
 
-    Material *material = GenMaterial(shader);
-
-    material->SetTexture("texture0", texture);
+    shader->SetTexture("texture0", texture);
 
     // 设置灯光的世界坐标位置
-    // material->SetVec3f("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
+    // shader->SetVec3f("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
 
     // 设置灯光颜色
-    // material->SetVec3f("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    // shader->SetVec3f("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // 设置灯光属性
-    material->SetVec3f("light.position", glm::vec3(1.2f, 1.0f, 2.0f));
-    material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    material->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("light.position", glm::vec3(1.2f, 1.0f, 2.0f));
+    shader->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // 设置物体材质属性
-    material->SetVec3f("material.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
-    material->SetVec3f("material.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    material->SetVec3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetFloat("material.shininess", 32.0f);
+    shader->SetVec3f("material.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
+    shader->SetVec3f("material.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    shader->SetVec3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetFloat("material.shininess", 32.0f);
 
-    AddMaterial(material);
+    AddMaterial(shader);
 
-    return material;
+    return shader;
 }
 
-Mesh *Scene::SetupMesh_3(Material *material)
+Mesh *Scene::SetupMesh_3(Shader *shader)
 {
     std::vector<GLfloat> vertices = {
         // 位置                           // 法线                           // 纹理坐标
@@ -308,13 +302,13 @@ Mesh *Scene::SetupMesh_3(Material *material)
         30, 31, 32, 33, 34, 35  // 顶面
     };
 
-    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), material);
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
     AddMesh(mesh);
 
     return mesh;
 }
 
-Material *Scene::SetupMat_4()
+Shader *Scene::SetupMat_4()
 {
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_04.glsl", "../shaders/fragment_04.glsl");
@@ -331,25 +325,25 @@ Material *Scene::SetupMat_4()
     if (!specular_tex)
         return nullptr;
 
-    Material *material = GenMaterial(shader);
+    // Shader *material = GenMaterial(shader);
 
     // 材质属性
-    material->SetTexture("material.diffuse", diffuse_tex);
-    material->SetTexture("material.specular", specular_tex);
-    material->SetFloat("material.shininess", 64.0f);
+    shader->SetTexture("material.diffuse", diffuse_tex);
+    shader->SetTexture("material.specular", specular_tex);
+    shader->SetFloat("material.shininess", 64.0f);
 
     // 设置灯光属性
-    material->SetVec3f("light.position", glm::vec3(1.2f, 1.0f, 2.0f));
-    material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    material->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("light.position", glm::vec3(1.2f, 1.0f, 2.0f));
+    shader->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(material);
+    AddMaterial(shader);
 
-    return material;
+    return shader;
 }
 
-Mesh *Scene::SetupMesh_4(Material *material)
+Mesh *Scene::SetupMesh_4(Shader *shader)
 {
     std::vector<GLfloat> vertices = {
         // 位置                           // 法线                           // 纹理坐标
@@ -405,13 +399,13 @@ Mesh *Scene::SetupMesh_4(Material *material)
         30, 31, 32, 33, 34, 35  // 顶面
     };
 
-    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), material);
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
     AddMesh(mesh);
 
     return mesh;
 }
 
-Material *Scene::SetupMat_5()
+Shader *Scene::SetupMat_5()
 {
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_05.glsl", "../shaders/fragment_05.glsl");
@@ -428,30 +422,28 @@ Material *Scene::SetupMat_5()
     if (!specular_tex)
         return nullptr;
 
-    Material *material = GenMaterial(shader);
-
     // 材质属性
-    material->SetTexture("material.diffuse", diffuse_tex);
-    material->SetTexture("material.specular", specular_tex);
-    material->SetFloat("material.shininess", 64.0f);
+    shader->SetTexture("material.diffuse", diffuse_tex);
+    shader->SetTexture("material.specular", specular_tex);
+    shader->SetFloat("material.shininess", 64.0f);
 
     // 设置灯光属性
-    material->SetVec3f("light.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
-    material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    material->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("light.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
+    shader->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(material);
+    AddMaterial(shader);
 
-    return material;
+    return shader;
 }
 
-Mesh *Scene::SetupMesh_5(Material *material)
+Mesh *Scene::SetupMesh_5(Shader *shader)
 {
-    return SetupMesh_4(material);
+    return SetupMesh_4(shader);
 }
 
-Material *Scene::SetupMat_6()
+Shader *Scene::SetupMat_6()
 {
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_06.glsl", "../shaders/fragment_06.glsl");
@@ -468,35 +460,33 @@ Material *Scene::SetupMat_6()
     if (!specular_tex)
         return nullptr;
 
-    Material *material = GenMaterial(shader);
-
     // 材质属性
-    material->SetTexture("material.diffuse", diffuse_tex);
-    material->SetTexture("material.specular", specular_tex);
-    material->SetFloat("material.shininess", 64.0f);
+    shader->SetTexture("material.diffuse", diffuse_tex);
+    shader->SetTexture("material.specular", specular_tex);
+    shader->SetFloat("material.shininess", 64.0f);
 
     // 点光源属性
-    material->SetVec3f("light.position", glm::vec3(0.0f, 0.0f, 3.0f));
-    material->SetFloat("light.constant", 1.0f);
-    material->SetFloat("light.linear", 0.045f);
-    material->SetFloat("light.quadratic", 0.0075f);
+    shader->SetVec3f("light.position", glm::vec3(0.0f, 0.0f, 3.0f));
+    shader->SetFloat("light.constant", 1.0f);
+    shader->SetFloat("light.linear", 0.045f);
+    shader->SetFloat("light.quadratic", 0.0075f);
 
     // 灯光的光照属性
-    material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    material->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(material);
+    AddMaterial(shader);
 
-    return material;
+    return shader;
 }
 
-Mesh *Scene::SetupMesh_6(Material *material)
+Mesh *Scene::SetupMesh_6(Shader *shader)
 {
-    return SetupMesh_4(material);
+    return SetupMesh_4(shader);
 }
 
-Material *Scene::SetupMat_7()
+Shader *Scene::SetupMat_7()
 {
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_07.glsl", "../shaders/fragment_07.glsl");
@@ -513,38 +503,36 @@ Material *Scene::SetupMat_7()
     if (!specular_tex)
         return nullptr;
 
-    Material *material = GenMaterial(shader);
-
     // 材质属性
-    material->SetTexture("material.diffuse", diffuse_tex);
-    material->SetTexture("material.specular", specular_tex);
-    material->SetFloat("material.shininess", 64.0f);
+    shader->SetTexture("material.diffuse", diffuse_tex);
+    shader->SetTexture("material.specular", specular_tex);
+    shader->SetFloat("material.shininess", 64.0f);
 
     // 聚光灯属性
-    material->SetVec3f("light.position", m_camera.GetPos());
-    material->SetVec3f("light.direction", m_camera.GetFront());
-    material->SetFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-    material->SetFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
-    material->SetFloat("light.constant", 1.0f);
-    material->SetFloat("light.linear", 0.045f);
-    material->SetFloat("light.quadratic", 0.0075f);
+    shader->SetVec3f("light.position", m_camera.GetPos());
+    shader->SetVec3f("light.direction", m_camera.GetFront());
+    shader->SetFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+    shader->SetFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+    shader->SetFloat("light.constant", 1.0f);
+    shader->SetFloat("light.linear", 0.045f);
+    shader->SetFloat("light.quadratic", 0.0075f);
 
     // 灯光的光照属性
-    material->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    material->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(material);
+    AddMaterial(shader);
 
-    return material;
+    return shader;
 }
 
-Mesh *Scene::SetupMesh_7(Material *material)
+Mesh *Scene::SetupMesh_7(Shader *shader)
 {
-    return SetupMesh_4(material);
+    return SetupMesh_4(shader);
 }
 
-Material *Scene::SetupMat_8()
+Shader *Scene::SetupMat_8()
 {
     // Shader
     Shader *shader = LoadShader("../shaders/vertex_08.glsl", "../shaders/fragment_08.glsl");
@@ -561,51 +549,49 @@ Material *Scene::SetupMat_8()
     if (!specular_tex)
         return nullptr;
 
-    Material *material = GenMaterial(shader);
-
     // 材质属性
-    material->SetTexture("material.diffuse", diffuse_tex);
-    material->SetTexture("material.specular", specular_tex);
-    material->SetFloat("material.shininess", 64.0f);
+    shader->SetTexture("material.diffuse", diffuse_tex);
+    shader->SetTexture("material.specular", specular_tex);
+    shader->SetFloat("material.shininess", 64.0f);
 
     // 方向光属性
-    material->SetVec3f("dirLight.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
-    material->SetVec3f("dirLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    material->SetVec3f("dirLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("dirLight.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
+    shader->SetVec3f("dirLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("dirLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // 点光源属性
-    material->SetVec3f("pointLight.position", glm::vec3(0.0f, 0.0f, 3.0f));
-    material->SetFloat("pointLight.constant", 1.0f);
-    material->SetFloat("pointLight.linear", 0.045f);
-    material->SetFloat("pointLight.quadratic", 0.0075f);
-    material->SetVec3f("pointLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    material->SetVec3f("pointLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetVec3f("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("pointLight.position", glm::vec3(0.0f, 0.0f, 3.0f));
+    shader->SetFloat("pointLight.constant", 1.0f);
+    shader->SetFloat("pointLight.linear", 0.045f);
+    shader->SetFloat("pointLight.quadratic", 0.0075f);
+    shader->SetVec3f("pointLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("pointLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // 聚光灯属性
-    material->SetVec3f("spotLight.position", m_camera.GetPos());
-    material->SetVec3f("spotLight.direction", m_camera.GetFront());
-    material->SetFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-    material->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
-    material->SetFloat("spotLight.constant", 1.0f);
-    material->SetFloat("spotLight.linear", 0.045f);
-    material->SetFloat("spotLight.quadratic", 0.0075f);
-    material->SetVec3f("spotLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    material->SetVec3f("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    material->SetVec3f("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("spotLight.position", m_camera.GetPos());
+    shader->SetVec3f("spotLight.direction", m_camera.GetFront());
+    shader->SetFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+    shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+    shader->SetFloat("spotLight.constant", 1.0f);
+    shader->SetFloat("spotLight.linear", 0.045f);
+    shader->SetFloat("spotLight.quadratic", 0.0075f);
+    shader->SetVec3f("spotLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(material);
+    AddMaterial(shader);
 
-    return material;
+    return shader;
 }
 
-Mesh *Scene::SetupMesh_8(Material *material)
+Mesh *Scene::SetupMesh_8(Shader *shader)
 {
-    return SetupMesh_4(material);
+    return SetupMesh_4(shader);
 }
 
-void Scene::InitMVP(Material *material)
+void Scene::InitMVP(Shader *shader)
 {
     /* 
      * MVP矩阵初始化为单位矩阵
@@ -631,30 +617,33 @@ void Scene::InitMVP(Material *material)
     view = m_camera.GetViewMatrix();
     projection = m_camera.GetProjectionMatrix();
 
-    material->SetMat4f("model", model);
-    material->SetMat4f("view", view);
-    material->SetMat4f("projection", projection);
+    shader->SetMat4f("model", model);
+    shader->SetMat4f("view", view);
+    shader->SetMat4f("projection", projection);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Shader *Scene::LoadShader(const char *vertexFilePath, const char *fragmentFilePath)
+Shader *Scene::LoadShader(const std::string &vertexFilePath, const std::string &fragmentFilePath)
 {
-    Shader *shader = new Shader();
-    bool shader_succ = shader->Init(vertexFilePath, fragmentFilePath);
-    if (!shader_succ)
+    ShaderUnit vertex_unit = ShaderUnit(vertexFilePath, GL_VERTEX_SHADER);
+    ShaderUnit fragment_unit = ShaderUnit(fragmentFilePath, GL_FRAGMENT_SHADER);
+
+    Shader *shader = new Shader(vertex_unit, fragment_unit);
+
+    if (!shader->IsValidProgram())
     {
         delete shader;
         return nullptr;
     }
-    AddShader(shader);
+
     return shader;
 }
 
-Texture *Scene::LoadTexture(const char *filePath, GLenum format)
+Texture *Scene::LoadTexture(const std::string &filePath, GLenum format)
 {
     Texture *texture = new Texture();
-    bool texture_succ = texture->Init(filePath, format);
+    bool texture_succ = texture->Init(filePath.c_str(), format);
     if (!texture_succ)
     {
         delete texture;
@@ -662,13 +651,6 @@ Texture *Scene::LoadTexture(const char *filePath, GLenum format)
     }
     AddTexture(texture);
     return texture;
-}
-
-Material *Scene::GenMaterial(Shader *shader)
-{
-    Material *material = new Material();
-    material->Init(shader);
-    return material;
 }
 
 void Scene::AddMesh(Mesh *mesh)
@@ -686,9 +668,9 @@ void Scene::AddTexture(Texture *texture)
     m_textures.push_back(texture);
 }
 
-void Scene::AddMaterial(Material *material)
+void Scene::AddMaterial(Shader *shader)
 {
-    m_materials.push_back(material);
+    m_materials.push_back(shader);
 }
 
 void Scene::Render()
@@ -704,7 +686,7 @@ void Scene::Render()
     {
         Mesh *mesh = m_meshes[i];
 
-        Material *mat = mesh->GetMaterial();
+        Shader *mat = mesh->GetShader();
         UpdateModelMatrix(mat);
         UpdateViewMatrix(mat);
         UpdateProjectionMatrix(mat);
@@ -713,33 +695,33 @@ void Scene::Render()
     }
 }
 
-void Scene::UpdateModelMatrix(Material *material)
+void Scene::UpdateModelMatrix(Shader *shader)
 {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 
-    material->SetMat4f("model", model);
+    shader->SetMat4f("model", model);
 
     /*
      * 将法向量从模型空间变换到世界空间中需要用到的矩阵
     */
     glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model)));
-    material->SetMat3f("normalMatrix", normal_matrix);
+    shader->SetMat3f("normalMatrix", normal_matrix);
 }
 
-void Scene::UpdateViewMatrix(Material *material)
+void Scene::UpdateViewMatrix(Shader *shader)
 {
     glm::mat4 view = m_camera.GetViewMatrix();
-    material->SetMat4f("view", view);
+    shader->SetMat4f("view", view);
 
     glm::vec3 pos = m_camera.GetPos();
-    material->SetVec3f("camPos", pos);
+    shader->SetVec3f("camPos", pos);
 }
 
-void Scene::UpdateProjectionMatrix(Material *material)
+void Scene::UpdateProjectionMatrix(Shader *shader)
 {
     glm::mat4 projection = m_camera.GetProjectionMatrix();
-    material->SetMat4f("projection", projection);
+    shader->SetMat4f("projection", projection);
 }
 
 void Scene::MoveCamForward()

@@ -1,5 +1,4 @@
 #include "Model.h"
-#include "Material.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "VertexAttribute.h"
@@ -99,7 +98,7 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 
     // todo: 材质待定
 
-    Material *material = nullptr;
+    // Material *material = nullptr;
 
-    return Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), material);
+    return Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), nullptr);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Material.h"
+#include "Shader.h"
 #include "glad/glad.h"
 #include "VertexAttribute.h"
 
@@ -13,7 +13,7 @@ class Mesh
 
     GLsizei index_num; // 索引缓冲区中索引的数量
 
-    Material *material;
+    Shader *shader;
 
     void SetupMesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
                    const std::vector<VertexAttribute> &attributes);
@@ -22,9 +22,9 @@ class Mesh
     ~Mesh();
 
     Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
-         const std::vector<VertexAttribute> &attributes, Material *material);
+         const std::vector<VertexAttribute> &attributes, Shader *shader);
 
     void Draw() const;
 
-    Material *GetMaterial() const;
+    Shader *GetShader() const;
 };

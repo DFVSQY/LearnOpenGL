@@ -4,41 +4,46 @@
 #include <sstream>
 #include "glm/gtc/type_ptr.hpp"
 
-Shader::Shader() : shader_program(0)
+Shader::Shader(const ShaderUnit &vertexUnit, const ShaderUnit &fragmentUnit) : shader_program(0), texture_idx(0)
 {
-}
-
-bool Shader::Init(const char *vertexPath, const char *fragmentPath)
-{
-    std::string vertex_str = ReadShaderFile(vertexPath);
-    std::string fragment_str = ReadShaderFile(fragmentPath);
-
-    const char *vertex_content = vertex_str.c_str();
-    const char *fragment_content = fragment_str.c_str();
-
-    GLuint vertex_shader = Compile(GL_VERTEX_SHADER, vertex_content);
+    const GLuint vertex_shader = vertexUnit.GetShaderID();
     if (vertex_shader == 0)
     {
         std::cerr << "Shader Init failed, vertex shader compile failed!" << std::endl;
-        return false;
+        return;
     }
 
-    GLuint fragment_shader = Compile(GL_FRAGMENT_SHADER, fragment_content);
+    const GLuint fragment_shader = fragmentUnit.GetShaderID();
     if (fragment_shader == 0)
     {
         std::cerr << "Shader Init failed, fragment shader compile failed!" << std::endl;
-        return false;
+        return;
     }
 
     shader_program = Link(vertex_shader, fragment_shader);
-
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-
-    return true;
 }
 
-void Shader::Use()
+Shader::~Shader()
+{
+    if (shader_program > 0)
+    {
+        /*
+         * glDeleteProgram 是 OpenGL 中用于删除着色器程序对象的函数。
+         * 它的主要作用是释放与特定着色器程序对象相关的资源，以避免内存泄漏和其他不必要的资源占用。
+         * glDeleteProgram 函数会删除指定的着色器程序对象，释放其占用的 GPU 资源。
+
+         * 函数原型：void glDeleteProgram(GLuint program);
+         *  program：要删除的着色器程序对象的标识符。
+
+         * 当调用 glDeleteProgram 删除一个着色器程序时，如果该程序对象当前仍被使用（例如，通过 glUseProgram 激活），程序对象不会立即销毁。
+         * 相反，它会在不再被使用时才实际销毁。这意味着你可以安全地调用 glDeleteProgram 删除一个仍在渲染管线中使用的程序对象，OpenGL 会确保在适当的时间点释放资源。
+        */
+        glDeleteProgram(shader_program);
+        shader_program = 0;
+    }
+}
+
+void Shader::InnerUse() const
 {
     /*
      * 主要作用:
@@ -59,9 +64,35 @@ void Shader::Use()
     glUseProgram(shader_program);
 }
 
+void Shader::Use() const
+{
+    for (auto &texture_tuple : texture_tuples)
+    {
+        texture_tuple.texture->Use(texture_tuple.idx);
+    }
+
+    InnerUse();
+}
+
+bool Shader::IsValidProgram() const
+{
+    return shader_program > 0;
+}
+
+void Shader::SetTexture(const std::string &name, const Texture *texture)
+{
+    SetInt(name, texture_idx);
+
+    texture_tuples.push_back({texture_idx, texture});
+
+    texture_idx++;
+}
+
 // 向shader传递bool值
 void Shader::SetBool(const std::string &name, const GLboolean value) const
 {
+    InnerUse();
+
     GLint location = GetUniformLocation(name);
     glUniform1i(location, (GLint)value);
 }
@@ -69,6 +100,8 @@ void Shader::SetBool(const std::string &name, const GLboolean value) const
 // 向shader传递int值
 void Shader::SetInt(const std::string &name, const GLint value) const
 {
+    InnerUse();
+
     GLint location = GetUniformLocation(name);
     glUniform1i(location, value);
 }
@@ -76,14 +109,17 @@ void Shader::SetInt(const std::string &name, const GLint value) const
 // 向shader传递float值
 void Shader::SetFloat(const std::string &name, const GLfloat value) const
 {
-    GLint location = GetUniformLocation(name);
+    InnerUse();
 
+    GLint location = GetUniformLocation(name);
     glUniform1f(location, value);
 }
 
 // 向shader传递浮点型vec4值
 void Shader::SetFloat4(const std::string &name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) const
 {
+    InnerUse();
+
     GLint location = GetUniformLocation(name);
 
     /*
@@ -99,6 +135,8 @@ void Shader::SetFloat4(const std::string &name, GLfloat v0, GLfloat v1, GLfloat 
 
 void Shader::SetMat4f(const std::string &name, const glm::mat4 &matrix) const
 {
+    InnerUse();
+
     GLuint location = GetUniformLocation(name);
 
     /*
@@ -116,14 +154,17 @@ void Shader::SetMat4f(const std::string &name, const glm::mat4 &matrix) const
 
 void Shader::SetMat3f(const std::string &name, const glm::mat3 &matrix) const
 {
+    InnerUse();
+
     GLuint location = GetUniformLocation(name);
     glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::SetVec3f(const std::string &name, const glm::vec3 &vector) const
 {
-    GLuint location = GetUniformLocation(name);
+    InnerUse();
 
+    GLuint location = GetUniformLocation(name);
     glUniform3f(location, vector.x, vector.y, vector.z);
 }
 
@@ -146,49 +187,6 @@ GLint Shader::GetUniformLocation(const std::string &name) const
         std::cerr << "Uniform variable '" << name << "' doesn't exist!" << std::endl;
     }
     return location;
-}
-
-GLuint Shader::Compile(GLenum shaderType, const char *fileContent)
-{
-    GLenum shader_type = shaderType;
-    const char *file_content = fileContent;
-
-    /*
-     * glCreateShader 函数创建一个指定类型的着色器对象，并返回其标识符。
-     * 这个对象将用于存储和编译 GLSL 代码。
-    */
-    GLuint shader = glCreateShader(shader_type);
-
-    /*
-     * glShaderSource 函数将 GLSL 着色器源码上传到指定的着色器对象中。这些源码将在后续步骤中被编译成可执行的着色器程序。
-
-     * 函数原型：void glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint *length);
-     *  shader：着色器对象的标识符，由 glCreateShader 函数返回。
-     *  count：字符串数组中的字符串数量。
-     *  string：指向着色器源码字符串数组的指针。
-     *  length：每个字符串的长度。如果是 NULL，则认为每个字符串都以 ‘\0’ 结尾。
-    */
-    glShaderSource(shader, 1, &file_content, NULL);
-
-    /*
-     * glCompileShader 函数编译之前通过 glShaderSource 上传的着色器源码。如果源码有错误，编译将失败，可以通过查询编译状态来获取错误信息。
-
-     * 函数原型：void glCompileShader(GLuint shader);
-     *  shader：着色器对象的标识符，由 glCreateShader 函数返回。
-    */
-    glCompileShader(shader);
-
-    // check for shader compile errors
-    GLint success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        char infoLog[1024];
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        std::cout << "error, shader compilation is failed:\n" << infoLog << "\n" << std::endl;
-    }
-
-    return shader;
 }
 
 GLuint Shader::Link(GLuint vertexShader, GLuint fragmentShader)
@@ -242,24 +240,4 @@ std::string Shader::ReadShaderFile(const char *filePath)
     }
 
     return str_content;
-}
-
-Shader::~Shader()
-{
-    if (shader_program > 0)
-    {
-        /*
-         * glDeleteProgram 是 OpenGL 中用于删除着色器程序对象的函数。
-         * 它的主要作用是释放与特定着色器程序对象相关的资源，以避免内存泄漏和其他不必要的资源占用。
-         * glDeleteProgram 函数会删除指定的着色器程序对象，释放其占用的 GPU 资源。
-
-         * 函数原型：void glDeleteProgram(GLuint program);
-         *  program：要删除的着色器程序对象的标识符。
-
-         * 当调用 glDeleteProgram 删除一个着色器程序时，如果该程序对象当前仍被使用（例如，通过 glUseProgram 激活），程序对象不会立即销毁。
-         * 相反，它会在不再被使用时才实际销毁。这意味着你可以安全地调用 glDeleteProgram 删除一个仍在渲染管线中使用的程序对象，OpenGL 会确保在适当的时间点释放资源。
-        */
-        glDeleteProgram(shader_program);
-        shader_program = 0;
-    }
 }

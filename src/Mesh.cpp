@@ -1,10 +1,9 @@
 #include <vector>
 #include "Mesh.h"
-#include "Material.h"
 
 Mesh::Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
-           const std::vector<VertexAttribute> &attributes, Material *material)
-    : material(material)
+           const std::vector<VertexAttribute> &attributes, Shader *shader)
+    : shader(shader)
 {
     SetupMesh(vertices, indices, attributes);
 
@@ -48,11 +47,11 @@ Mesh::~Mesh()
 
 void Mesh::Draw() const
 {
-    if (vao == 0 || material == nullptr)
+    if (vao == 0 || shader == nullptr)
         return;
 
     // 准备好渲染所需要的材质
-    material->Use();
+    shader->Use();
 
     // draw mesh content
     glBindVertexArray(vao);
@@ -102,9 +101,9 @@ void Mesh::Draw() const
     }
 }
 
-Material *Mesh::GetMaterial() const
+Shader *Mesh::GetShader() const
 {
-    return material;
+    return shader;
 }
 
 void Mesh::SetupMesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
