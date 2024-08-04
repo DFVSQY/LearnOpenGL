@@ -35,9 +35,9 @@ class Scene
 
     void InitMVP(Shader *material);
 
-    void UpdateModelMatrix(Shader *material);
-    void UpdateViewMatrix(Shader *material);
-    void UpdateProjectionMatrix(Shader *material);
+    void UpdateModelMatrix(Shader &shader);
+    void UpdateViewMatrix(Shader &shader);
+    void UpdateProjectionMatrix(Shader &shader);
 
   public:
     Scene();
@@ -50,28 +50,28 @@ class Scene
     void Init(int width, int height);
 
     Shader *SetupMat_1();
-    Mesh *SetupMesh_1(Shader *material);
+    Mesh *SetupMesh_1(Shader &shader);
 
     Shader *SetupMat_2();
-    Mesh *SetupMesh_2(Shader *material);
+    Mesh *SetupMesh_2(Shader &shader);
 
     Shader *SetupMat_3();
-    Mesh *SetupMesh_3(Shader *material);
+    Mesh *SetupMesh_3(Shader &shader);
 
     Shader *SetupMat_4();
-    Mesh *SetupMesh_4(Shader *material);
+    Mesh *SetupMesh_4(Shader &shader);
 
     Shader *SetupMat_5();
-    Mesh *SetupMesh_5(Shader *material);
+    Mesh *SetupMesh_5(Shader &shader);
 
     Shader *SetupMat_6();
-    Mesh *SetupMesh_6(Shader *material);
+    Mesh *SetupMesh_6(Shader &shader);
 
     Shader *SetupMat_7();
-    Mesh *SetupMesh_7(Shader *material);
+    Mesh *SetupMesh_7(Shader &shader);
 
     Shader *SetupMat_8();
-    Mesh *SetupMesh_8(Shader *material);
+    Mesh *SetupMesh_8(Shader &shader);
 
     void Render();
 

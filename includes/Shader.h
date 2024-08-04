@@ -31,9 +31,9 @@ class Shader
     void InnerUse() const;
 
   public:
-    // 删除复制构造函数和赋值操作符
-    Shader(const Shader &) = delete;
-    Shader &operator=(const Shader &) = delete;
+    // // 删除复制构造函数和赋值操作符
+    // Shader(const Shader &) = delete;
+    // Shader &operator=(const Shader &) = delete;
 
     Shader(const ShaderUnit &vertexShader, const ShaderUnit &fragmentShader);
     ~Shader();

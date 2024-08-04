@@ -54,7 +54,7 @@ void Scene::Init(int width, int height)
     if (!material)
         return;
 
-    SetupMesh_8(material);
+    SetupMesh_8(*material);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -95,7 +95,7 @@ Shader *Scene::SetupMat_1()
 /*
  * 配置渲染用的网格1
 */
-Mesh *Scene::SetupMesh_1(Shader *shader)
+Mesh *Scene::SetupMesh_1(Shader &shader)
 {
     const std::vector<GLfloat> vertices_vec = {
         // postion                      // color                      // 纹理坐标
@@ -141,7 +141,7 @@ Shader *Scene::SetupMat_2()
 /*
  * 配置渲染用的网格2
 */
-Mesh *Scene::SetupMesh_2(Shader *shader)
+Mesh *Scene::SetupMesh_2(Shader &shader)
 {
     std::vector<GLfloat> vertices = {
         // postion                       // color                      // 纹理坐标
@@ -246,7 +246,7 @@ Shader *Scene::SetupMat_3()
     return shader;
 }
 
-Mesh *Scene::SetupMesh_3(Shader *shader)
+Mesh *Scene::SetupMesh_3(Shader &shader)
 {
     std::vector<GLfloat> vertices = {
         // 位置                           // 法线                           // 纹理坐标
@@ -343,7 +343,7 @@ Shader *Scene::SetupMat_4()
     return shader;
 }
 
-Mesh *Scene::SetupMesh_4(Shader *shader)
+Mesh *Scene::SetupMesh_4(Shader &shader)
 {
     std::vector<GLfloat> vertices = {
         // 位置                           // 法线                           // 纹理坐标
@@ -438,7 +438,7 @@ Shader *Scene::SetupMat_5()
     return shader;
 }
 
-Mesh *Scene::SetupMesh_5(Shader *shader)
+Mesh *Scene::SetupMesh_5(Shader &shader)
 {
     return SetupMesh_4(shader);
 }
@@ -481,7 +481,7 @@ Shader *Scene::SetupMat_6()
     return shader;
 }
 
-Mesh *Scene::SetupMesh_6(Shader *shader)
+Mesh *Scene::SetupMesh_6(Shader &shader)
 {
     return SetupMesh_4(shader);
 }
@@ -527,7 +527,7 @@ Shader *Scene::SetupMat_7()
     return shader;
 }
 
-Mesh *Scene::SetupMesh_7(Shader *shader)
+Mesh *Scene::SetupMesh_7(Shader &shader)
 {
     return SetupMesh_4(shader);
 }
@@ -586,7 +586,7 @@ Shader *Scene::SetupMat_8()
     return shader;
 }
 
-Mesh *Scene::SetupMesh_8(Shader *shader)
+Mesh *Scene::SetupMesh_8(Shader &shader)
 {
     return SetupMesh_4(shader);
 }
@@ -686,42 +686,42 @@ void Scene::Render()
     {
         Mesh *mesh = m_meshes[i];
 
-        Shader *mat = mesh->GetShader();
-        UpdateModelMatrix(mat);
-        UpdateViewMatrix(mat);
-        UpdateProjectionMatrix(mat);
+        Shader &shader = mesh->GetShader();
+        UpdateModelMatrix(shader);
+        UpdateViewMatrix(shader);
+        UpdateProjectionMatrix(shader);
 
         mesh->Draw();
     }
 }
 
-void Scene::UpdateModelMatrix(Shader *shader)
+void Scene::UpdateModelMatrix(Shader &shader)
 {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 
-    shader->SetMat4f("model", model);
+    shader.SetMat4f("model", model);
 
     /*
      * 将法向量从模型空间变换到世界空间中需要用到的矩阵
     */
     glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model)));
-    shader->SetMat3f("normalMatrix", normal_matrix);
+    shader.SetMat3f("normalMatrix", normal_matrix);
 }
 
-void Scene::UpdateViewMatrix(Shader *shader)
+void Scene::UpdateViewMatrix(Shader &shader)
 {
     glm::mat4 view = m_camera.GetViewMatrix();
-    shader->SetMat4f("view", view);
+    shader.SetMat4f("view", view);
 
     glm::vec3 pos = m_camera.GetPos();
-    shader->SetVec3f("camPos", pos);
+    shader.SetVec3f("camPos", pos);
 }
 
-void Scene::UpdateProjectionMatrix(Shader *shader)
+void Scene::UpdateProjectionMatrix(Shader &shader)
 {
     glm::mat4 projection = m_camera.GetProjectionMatrix();
-    shader->SetMat4f("projection", projection);
+    shader.SetMat4f("projection", projection);
 }
 
 void Scene::MoveCamForward()

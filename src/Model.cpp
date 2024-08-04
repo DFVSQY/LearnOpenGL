@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "ShaderUnit.h"
 #include "VertexAttribute.h"
 #include "assimp/Importer.hpp"
 #include "assimp/mesh.h"
@@ -100,5 +101,9 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 
     // Material *material = nullptr;
 
-    return Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), nullptr);
+    ShaderUnit vertex_unit = ShaderUnit("", GL_VERTEX_SHADER);
+    ShaderUnit fragment_unit = ShaderUnit("", GL_FRAGMENT_SHADER);
+    Shader shader(vertex_unit, fragment_unit);
+
+    return Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
 }
