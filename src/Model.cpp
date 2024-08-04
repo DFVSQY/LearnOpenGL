@@ -19,6 +19,13 @@ Model::Model(const char *path)
 
 Model::~Model()
 {
+    for (auto mesh : m_meshes)
+        delete mesh;
+    m_meshes.clear();
+
+    for (auto shader : m_shaders)
+        delete shader;
+    m_shaders.clear();
 }
 
 void Model::LoadModel(const std::string &path)
