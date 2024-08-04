@@ -34,26 +34,29 @@ void Model::LoadModel(const std::string &path)
 
     m_directory = path.substr(0, path.find_last_of('/'));
 
-    ProcessNode(scene->mRootNode, scene);
+    ShaderUnit vertex_unit = ShaderUnit("../shaders/vertex_08.glsl", GL_VERTEX_SHADER);
+    ShaderUnit fragment_unit = ShaderUnit("../shaders/fragment_08.glsl", GL_FRAGMENT_SHADER);
+
+    ProcessNode(scene->mRootNode, scene, vertex_unit, fragment_unit);
 }
 
-void Model::ProcessNode(aiNode *node, const aiScene *scene)
+void Model::ProcessNode(aiNode *node, const aiScene *scene, ShaderUnit &vertexUnit, ShaderUnit &fragmentUnit)
 {
     // 处理节点的每个网格
     for (unsigned int idx = 0; idx < node->mNumMeshes; idx++)
     {
         aiMesh *aiMesh = scene->mMeshes[node->mMeshes[idx]];
-        m_meshes.push_back(ProcessMesh(aiMesh, scene));
+        m_meshes.push_back(ProcessMesh(aiMesh, scene, vertexUnit, fragmentUnit));
     }
 
     // 处理子节点
     for (unsigned int idx = 0; idx < node->mNumChildren; idx++)
     {
-        ProcessNode(node->mChildren[idx], scene);
+        ProcessNode(node->mChildren[idx], scene, vertexUnit, fragmentUnit);
     }
 }
 
-Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
+Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexUnit, ShaderUnit &fragmentUnit)
 {
     std::vector<GLfloat> vertices;
 
@@ -98,12 +101,9 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
     }
 
     // todo: 材质待定
+    Shader shader(vertexUnit, fragmentUnit);
 
-    // Material *material = nullptr;
+    Mesh *new_mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
 
-    ShaderUnit vertex_unit = ShaderUnit("", GL_VERTEX_SHADER);
-    ShaderUnit fragment_unit = ShaderUnit("", GL_FRAGMENT_SHADER);
-    Shader shader(vertex_unit, fragment_unit);
-
-    return Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
+    return new_mesh;
 }
