@@ -19,7 +19,7 @@ class Texture
     Texture();
     ~Texture();
 
-    bool Init(const char *filePath, GLenum format);
+    bool Init(const char *filePath, GLenum format = 0);
 
     GLsizei GetWidth() const;
     GLsizei GetHeight() const;

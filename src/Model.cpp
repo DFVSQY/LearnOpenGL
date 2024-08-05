@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "ShaderUnit.h"
+#include "Texture.h"
 #include "VertexAttribute.h"
 #include "assimp/Importer.hpp"
 #include "assimp/mesh.h"
@@ -26,6 +27,10 @@ Model::~Model()
     for (auto shader : m_shaders)
         delete shader;
     m_shaders.clear();
+
+    for (auto texture : m_textures)
+        delete texture;
+    m_textures.clear();
 }
 
 void Model::LoadModel(const std::string &path)
@@ -53,7 +58,8 @@ void Model::ProcessNode(aiNode *node, const aiScene *scene, ShaderUnit &vertexUn
     for (unsigned int idx = 0; idx < node->mNumMeshes; idx++)
     {
         aiMesh *aiMesh = scene->mMeshes[node->mMeshes[idx]];
-        m_meshes.push_back(ProcessMesh(aiMesh, scene, vertexUnit, fragmentUnit));
+        Mesh *mesh = ProcessMesh(aiMesh, scene, vertexUnit, fragmentUnit);
+        m_meshes.push_back(mesh);
     }
 
     // 处理子节点
@@ -92,6 +98,7 @@ Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexU
         else
         {
             vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
         }
     }
 
@@ -107,10 +114,96 @@ Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexU
         }
     }
 
-    // todo: 材质待定
     Shader shader(vertexUnit, fragmentUnit);
+
+    // 材质
+    if (mesh->mMaterialIndex >= 0)
+    {
+        aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+
+        std::vector<Texture *> diffuse_textures = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
+        std::vector<Texture *> specular_textures = LoadMaterialTextures(material, aiTextureType_SPECULAR);
+
+        if (!diffuse_textures.empty())
+            shader.SetTexture("material.diffuse", diffuse_textures[0]);
+
+        if (!specular_textures.empty())
+            shader.SetTexture("material.specular", specular_textures[0]);
+
+        shader.SetFloat("material.shininess", 64.0f);
+    }
+
+    // 方向光属性
+    shader.SetVec3f("dirLight.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
+    shader.SetVec3f("dirLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader.SetVec3f("dirLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader.SetVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+    // 点光源属性
+    shader.SetVec3f("pointLight.position", glm::vec3(0.0f, 0.0f, 3.0f));
+    shader.SetFloat("pointLight.constant", 1.0f);
+    shader.SetFloat("pointLight.linear", 0.045f);
+    shader.SetFloat("pointLight.quadratic", 0.0075f);
+    shader.SetVec3f("pointLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader.SetVec3f("pointLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader.SetVec3f("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+    // 聚光灯属性
+    shader.SetVec3f("spotLight.position", glm::vec3(0.0f, 0.0f, 5.0f));
+    shader.SetVec3f("spotLight.direction", glm::vec3(0.0f, 0.0f, -1.0f));
+    shader.SetFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+    shader.SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+    shader.SetFloat("spotLight.constant", 1.0f);
+    shader.SetFloat("spotLight.linear", 0.045f);
+    shader.SetFloat("spotLight.quadratic", 0.0075f);
+    shader.SetVec3f("spotLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader.SetVec3f("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader.SetVec3f("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     Mesh *new_mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
 
     return new_mesh;
+}
+
+std::vector<Texture *> Model::LoadMaterialTextures(const aiMaterial *mat, const aiTextureType type)
+{
+    std::vector<Texture *> textures;
+
+    unsigned int count = mat->GetTextureCount(type);
+    for (unsigned int idx = 0; idx < count; idx++)
+    {
+        aiString str;
+        mat->GetTexture(type, idx, &str);
+
+        Texture *texture = new Texture();
+
+        const std::string &file_path = m_directory + '/' + str.C_Str();
+        texture->Init(file_path.c_str());
+
+        m_textures.push_back(texture);
+        textures.push_back(texture);
+    }
+
+    return textures;
+}
+
+void Model::ForeachMesh(std::function<void(Mesh *)> func) const
+{
+    for (auto mesh : m_meshes)
+    {
+        func(mesh);
+    }
+}
+
+void Model::Draw() const
+{
+    for (auto mesh : m_meshes)
+    {
+        mesh->Draw();
+    }
+}
+
+bool Model::HasValidMesh() const
+{
+    return !m_meshes.empty();
 }

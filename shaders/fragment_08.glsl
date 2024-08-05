@@ -12,9 +12,6 @@ in vec3 normal;
 // 世界坐标
 in vec3 worldPos;
 
-// 纹理
-uniform sampler2D texture0;
-
 // 摄像机位置
 uniform vec3 camPos;
 

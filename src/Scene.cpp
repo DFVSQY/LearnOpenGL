@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Mesh.h"
+#include "Model.h"
 #include "Shader.h"
 #include "ShaderUnit.h"
 #include "Texture.h"
@@ -10,7 +11,7 @@
 #include <vector>
 #include "VertexAttribute.h"
 
-Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials(), m_camera()
+Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_models(), m_camera()
 {
     m_camSpeed = 0.05f;
     m_lastFrameTime = 0.0f;
@@ -25,30 +26,28 @@ Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_materials(), m_camera(
 Scene::~Scene()
 {
     for (auto mesh : m_meshes)
-    {
         delete mesh;
-    }
+    m_meshes.clear();
 
     for (auto shader : m_shaders)
-    {
         delete shader;
-    }
+    m_shaders.clear();
 
     for (auto texture : m_textures)
-    {
         delete texture;
-    }
+    m_textures.clear();
 
-    for (auto material : m_materials)
-    {
-        delete material;
-    }
+    for (auto model : m_models)
+        delete model;
+    m_models.clear();
 }
 
 void Scene::Init(int width, int height)
 {
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
+
+    // SetupModel_1();
 
     Shader *material = SetupMat_8();
     if (!material)
@@ -87,7 +86,7 @@ Shader *Scene::SetupMat_1()
     shader->SetTexture("texture0", texture);
     shader->SetTexture("texture1", texture2);
 
-    AddMaterial(shader);
+    AddShader(shader);
 
     return shader;
 }
@@ -133,7 +132,7 @@ Shader *Scene::SetupMat_2()
 
     shader->SetTexture("texture0", texture);
 
-    AddMaterial(shader);
+    AddShader(shader);
 
     return shader;
 }
@@ -241,7 +240,7 @@ Shader *Scene::SetupMat_3()
     shader->SetVec3f("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
     shader->SetFloat("material.shininess", 32.0f);
 
-    AddMaterial(shader);
+    AddShader(shader);
 
     return shader;
 }
@@ -338,7 +337,7 @@ Shader *Scene::SetupMat_4()
     shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
     shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(shader);
+    AddShader(shader);
 
     return shader;
 }
@@ -433,7 +432,7 @@ Shader *Scene::SetupMat_5()
     shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
     shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(shader);
+    AddShader(shader);
 
     return shader;
 }
@@ -476,7 +475,7 @@ Shader *Scene::SetupMat_6()
     shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
     shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(shader);
+    AddShader(shader);
 
     return shader;
 }
@@ -522,7 +521,7 @@ Shader *Scene::SetupMat_7()
     shader->SetVec3f("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
     shader->SetVec3f("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(shader);
+    AddShader(shader);
 
     return shader;
 }
@@ -581,7 +580,7 @@ Shader *Scene::SetupMat_8()
     shader->SetVec3f("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
     shader->SetVec3f("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    AddMaterial(shader);
+    AddShader(shader);
 
     return shader;
 }
@@ -589,6 +588,18 @@ Shader *Scene::SetupMat_8()
 Mesh *Scene::SetupMesh_8(Shader &shader)
 {
     return SetupMesh_4(shader);
+}
+
+void Scene::SetupModel_1()
+{
+    Model *model = new Model("../models/nanosuit/nanosuit.obj");
+    if (!model->HasValidMesh())
+    {
+        delete model;
+        return;
+    }
+
+    AddModel(model);
 }
 
 void Scene::InitMVP(Shader *shader)
@@ -668,9 +679,9 @@ void Scene::AddTexture(Texture *texture)
     m_textures.push_back(texture);
 }
 
-void Scene::AddMaterial(Shader *shader)
+void Scene::AddModel(Model *model)
 {
-    m_materials.push_back(shader);
+    m_models.push_back(model);
 }
 
 void Scene::Render()
@@ -682,9 +693,9 @@ void Scene::Render()
     m_deltaTime = now_time - m_lastFrameTime;
     m_lastFrameTime = now_time;
 
-    for (size_t i = 0; i < m_meshes.size(); ++i)
+    for (size_t idx = 0; idx < m_meshes.size(); ++idx)
     {
-        Mesh *mesh = m_meshes[i];
+        Mesh *mesh = m_meshes[idx];
 
         Shader &shader = mesh->GetShader();
         UpdateModelMatrix(shader);
@@ -692,6 +703,21 @@ void Scene::Render()
         UpdateProjectionMatrix(shader);
 
         mesh->Draw();
+    }
+
+    std::function<void(Mesh *)> each_mesh_func = [this](Mesh *mesh) {
+        Shader &shader = mesh->GetShader();
+
+        UpdateModelMatrix(shader);
+        UpdateViewMatrix(shader);
+        UpdateProjectionMatrix(shader);
+    };
+
+    for (size_t idx = 0; idx < m_models.size(); ++idx)
+    {
+        Model *model = m_models[idx];
+        model->ForeachMesh(each_mesh_func);
+        model->Draw();
     }
 }
 

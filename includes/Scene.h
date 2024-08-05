@@ -1,9 +1,10 @@
 #pragma once
 
+#include <vector>
 #include "Mesh.h"
+#include "Model.h"
 #include "Shader.h"
 #include "Texture.h"
-#include <vector>
 #include "Camera.h"
 
 class Scene
@@ -12,7 +13,7 @@ class Scene
     std::vector<Mesh *> m_meshes;
     std::vector<Shader *> m_shaders;
     std::vector<Texture *> m_textures;
-    std::vector<Shader *> m_materials;
+    std::vector<Model *> m_models;
 
     Camera m_camera;
 
@@ -28,7 +29,7 @@ class Scene
     void AddMesh(Mesh *mesh);
     void AddShader(Shader *shader);
     void AddTexture(Texture *texture);
-    void AddMaterial(Shader *material);
+    void AddModel(Model *model);
 
     Shader *LoadShader(const std::string &vertextPath, const std::string &fragmentPath);
     Texture *LoadTexture(const std::string &texturePath, const GLenum format);
@@ -72,6 +73,8 @@ class Scene
 
     Shader *SetupMat_8();
     Mesh *SetupMesh_8(Shader &shader);
+
+    void SetupModel_1();
 
     void Render();
 

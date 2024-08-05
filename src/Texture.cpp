@@ -49,6 +49,17 @@ bool Texture::Init(const char *filePath, GLenum format)
         return false;
     }
 
+    // 自动确定纹理的格式
+    if (format == 0)
+    {
+        if (channel_num == 1)
+            format = GL_RED;
+        else if (channel_num == 3)
+            format = GL_RGB;
+        else if (channel_num == 4)
+            format = GL_RGBA;
+    }
+
     /*
      * glGenTextures是OpenGL中用于生成纹理对象名称的函数。
      * 这个函数的主要目的是创建一个或多个唯一的纹理对象标识符,这些标识符可以在后续的纹理操作中使用。
