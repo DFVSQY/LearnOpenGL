@@ -2,6 +2,29 @@
 #include "stb_image.h"
 #include "iostream"
 
+Texture *Texture::white_2d_texture = nullptr;
+Texture *Texture::black_2d_texture = nullptr;
+
+Texture *Texture::GetWhite2DTexture()
+{
+    if (white_2d_texture == nullptr)
+    {
+        white_2d_texture = new Texture();
+        white_2d_texture->Init("../textures/Default_White.png", GL_RGBA);
+    }
+    return white_2d_texture;
+}
+
+Texture *Texture::GetBlack2DTexture()
+{
+    if (black_2d_texture == nullptr)
+    {
+        black_2d_texture = new Texture();
+        black_2d_texture->Init("../textures/Default_Black.png", GL_RGBA);
+    }
+    return black_2d_texture;
+}
+
 Texture::Texture() : texture_id(0), width(0), height(0), channel_num(0)
 {
 }

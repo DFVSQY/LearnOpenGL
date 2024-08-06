@@ -126,12 +126,20 @@ Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexU
 
         if (!diffuse_textures.empty())
             shader->SetTexture("material.diffuse", diffuse_textures[0]);
+        else
+            shader->SetTexture("material.diffuse", Texture::GetWhite2DTexture());
 
         if (!specular_textures.empty())
             shader->SetTexture("material.specular", specular_textures[0]);
-
-        shader->SetFloat("material.shininess", 64.0f);
+        else
+            shader->SetTexture("material.specular", Texture::GetWhite2DTexture());
     }
+    else
+    {
+        shader->SetTexture("material.diffuse", Texture::GetWhite2DTexture());
+        shader->SetTexture("material.specular", Texture::GetWhite2DTexture());
+    }
+    shader->SetFloat("material.shininess", 64.0f);
 
     // 方向光属性
     shader->SetVec3f("dirLight.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
