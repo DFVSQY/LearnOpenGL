@@ -6,4 +6,4 @@
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/59135f7d-25d6-4730-a4b3-9714ffc4f280">
 
-![image](https://github.com/user-attachments/assets/cec0d911-d711-4ebf-ae80-cbb0dcab0e15)
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/58d5de17-6108-4679-835a-8293b8feb0ef">
