@@ -47,13 +47,7 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    // SetupModel_1();
-
-    Shader *material = SetupMat_8();
-    if (!material)
-        return;
-
-    SetupMesh_8(*material);
+    SetupModel_1();
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////

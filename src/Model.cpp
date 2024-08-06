@@ -58,8 +58,7 @@ void Model::ProcessNode(aiNode *node, const aiScene *scene, ShaderUnit &vertexUn
     for (unsigned int idx = 0; idx < node->mNumMeshes; idx++)
     {
         aiMesh *aiMesh = scene->mMeshes[node->mMeshes[idx]];
-        Mesh *mesh = ProcessMesh(aiMesh, scene, vertexUnit, fragmentUnit);
-        m_meshes.push_back(mesh);
+        ProcessMesh(aiMesh, scene, vertexUnit, fragmentUnit);
     }
 
     // 处理子节点
@@ -114,7 +113,8 @@ Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexU
         }
     }
 
-    Shader shader(vertexUnit, fragmentUnit);
+    Shader *shader = new Shader(vertexUnit, fragmentUnit);
+    m_shaders.push_back(shader);
 
     // 材质
     if (mesh->mMaterialIndex >= 0)
@@ -125,42 +125,43 @@ Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexU
         std::vector<Texture *> specular_textures = LoadMaterialTextures(material, aiTextureType_SPECULAR);
 
         if (!diffuse_textures.empty())
-            shader.SetTexture("material.diffuse", diffuse_textures[0]);
+            shader->SetTexture("material.diffuse", diffuse_textures[0]);
 
         if (!specular_textures.empty())
-            shader.SetTexture("material.specular", specular_textures[0]);
+            shader->SetTexture("material.specular", specular_textures[0]);
 
-        shader.SetFloat("material.shininess", 64.0f);
+        shader->SetFloat("material.shininess", 64.0f);
     }
 
     // 方向光属性
-    shader.SetVec3f("dirLight.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
-    shader.SetVec3f("dirLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    shader.SetVec3f("dirLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    shader.SetVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("dirLight.direction", glm::vec3(-0.0f, -0.0f, -5.0f));
+    shader->SetVec3f("dirLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("dirLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // 点光源属性
-    shader.SetVec3f("pointLight.position", glm::vec3(0.0f, 0.0f, 3.0f));
-    shader.SetFloat("pointLight.constant", 1.0f);
-    shader.SetFloat("pointLight.linear", 0.045f);
-    shader.SetFloat("pointLight.quadratic", 0.0075f);
-    shader.SetVec3f("pointLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    shader.SetVec3f("pointLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    shader.SetVec3f("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("pointLight.position", glm::vec3(0.0f, 0.0f, 3.0f));
+    shader->SetFloat("pointLight.constant", 1.0f);
+    shader->SetFloat("pointLight.linear", 0.045f);
+    shader->SetFloat("pointLight.quadratic", 0.0075f);
+    shader->SetVec3f("pointLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("pointLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // 聚光灯属性
-    shader.SetVec3f("spotLight.position", glm::vec3(0.0f, 0.0f, 5.0f));
-    shader.SetVec3f("spotLight.direction", glm::vec3(0.0f, 0.0f, -1.0f));
-    shader.SetFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-    shader.SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
-    shader.SetFloat("spotLight.constant", 1.0f);
-    shader.SetFloat("spotLight.linear", 0.045f);
-    shader.SetFloat("spotLight.quadratic", 0.0075f);
-    shader.SetVec3f("spotLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    shader.SetVec3f("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-    shader.SetVec3f("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetVec3f("spotLight.position", glm::vec3(0.0f, 0.0f, 5.0f));
+    shader->SetVec3f("spotLight.direction", glm::vec3(0.0f, 0.0f, -1.0f));
+    shader->SetFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+    shader->SetFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+    shader->SetFloat("spotLight.constant", 1.0f);
+    shader->SetFloat("spotLight.linear", 0.045f);
+    shader->SetFloat("spotLight.quadratic", 0.0075f);
+    shader->SetVec3f("spotLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetVec3f("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader->SetVec3f("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    Mesh *new_mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
+    Mesh *new_mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), *shader);
+    m_meshes.push_back(new_mesh);
 
     return new_mesh;
 }
