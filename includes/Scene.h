@@ -75,6 +75,7 @@ class Scene
     Mesh *SetupMesh_8(Shader &shader);
 
     void SetupModel_1();
+    void SetupModel_2();
 
     void Render();
 

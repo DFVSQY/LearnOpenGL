@@ -47,7 +47,7 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    SetupModel_1();
+    SetupModel_2();
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -587,6 +587,18 @@ Mesh *Scene::SetupMesh_8(Shader &shader)
 void Scene::SetupModel_1()
 {
     Model *model = new Model("../models/nanosuit/nanosuit.obj");
+    if (!model->HasValidMesh())
+    {
+        delete model;
+        return;
+    }
+
+    AddModel(model);
+}
+
+void Scene::SetupModel_2()
+{
+    Model *model = new Model("../models/Skull/12140_Skull_v3_L2.obj");
     if (!model->HasValidMesh())
     {
         delete model;
