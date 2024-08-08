@@ -3,6 +3,7 @@
 #include "GLFW/glfw3.h"
 #include "Game.h"
 #include <iostream>
+#include "Util.h"
 
 /***********************************************函数回调区****************************************************/
 
@@ -139,7 +140,7 @@ static void APIENTRY glfw_debug_output(GLenum source, GLenum type, unsigned int 
 }
 /***********************************************************************************************************/
 
-Game::Game() : window(nullptr), scene() {};
+Game::Game() : window(nullptr), scene(){};
 
 Game::~Game()
 {
@@ -189,6 +190,9 @@ bool Game::Init(const char *title, int width, int height)
         return false;
     }
 
+    // 打印默认帧缓存的信息
+    QueryDefaultFramebufferInfos();
+
     // 需要确保OpenGL上下文已经被正确创建并绑定到当前线程。
     SetupGLDebugContext();
 
@@ -218,6 +222,50 @@ bool Game::Init(const char *title, int width, int height)
 
     return true;
 }
+
+void Game::QueryDefaultFramebufferInfos() const
+{
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cerr << "Framebuffer is not complete: " << status << std::endl;
+    }
+
+    // 查询红色分量的位数
+    // GL_BACK_LEFT 是指默认帧缓冲区的后端左缓冲区，这通常是标准的颜色缓冲区目标。
+    int redBits = 0;
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE,
+                                          &redBits);
+    std::cout << "Red buffer bit size: " << redBits << std::endl;
+
+    // 查询绿色分量的位数
+    int greenBits = 0;
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE,
+                                          &greenBits);
+    std::cout << "Green buffer bit size: " << greenBits << std::endl;
+
+    // 查询蓝色分量的位数
+    int blueBits = 0;
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE,
+                                          &blueBits);
+    std::cout << "Blue buffer bit size: " << blueBits << std::endl;
+
+    // 查询 Alpha 分量的位数
+    int alphaBits = 0;
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE,
+                                          &alphaBits);
+    std::cout << "Alpha buffer bit size: " << alphaBits << std::endl;
+
+    int depthBits = 0;
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE,
+                                          &depthBits);
+    std::cout << "Depth buffer bit size: " << depthBits << std::endl;
+
+    GLint stencilSize = 0;
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_STENCIL, GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE,
+                                          &stencilSize);
+    std::cout << "Stencil buffer bit size: " << stencilSize << std::endl;
+};
 
 void Game::PrintOpenGLVersion() const
 {

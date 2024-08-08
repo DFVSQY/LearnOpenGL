@@ -18,6 +18,8 @@ class Game
 
     void PrintOpenGLVersion() const;
 
+    void QueryDefaultFramebufferInfos() const;
+
   public:
     // 删除复制构造函数和赋值操作符
     Game(const Game &) = delete;
