@@ -140,7 +140,7 @@ static void APIENTRY glfw_debug_output(GLenum source, GLenum type, unsigned int 
 }
 /***********************************************************************************************************/
 
-Game::Game() : window(nullptr), scene(){};
+Game::Game() : window(nullptr), scene() {};
 
 Game::~Game()
 {
@@ -356,6 +356,14 @@ void Game::Draw()
 {
     // 清理缓冲区并设置为指定的颜色
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // 状态值设置，用于指定颜色值
+
+    /*
+     * 为了清除深度缓冲区，OpenGL 提供了 glClearDepth 函数，用于设置深度缓冲区清除时所使用的深度值。
+     * 这个值默认情况下是1.0，对应深度缓冲的最大深度（通常为最远的可见范围）。这样新一帧的任何片元的深度值都会小于或等于此值，从而确保正确的深度测试。
+     * 这也是为什么在大多数情况下，不会看到开发者为深度缓冲设置特定的初始值，因为默认的最大深度已经能满足大多数场景的需求。
+    */
+    // glClearDepth(1.0);
+
     glClear(GL_COLOR_BUFFER_BIT |
             GL_DEPTH_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区
 
