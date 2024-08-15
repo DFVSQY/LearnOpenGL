@@ -16,6 +16,8 @@ class Game
 
     void SetupGLDebugContext() const;
 
+    void PrintGPUInfo() const;
+
     void PrintOpenGLVersion() const;
 
     void QueryDefaultFramebufferInfos() const;

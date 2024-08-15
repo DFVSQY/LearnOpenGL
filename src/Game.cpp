@@ -190,6 +190,9 @@ bool Game::Init(const char *title, int width, int height)
         return false;
     }
 
+    // 打印GPU的一些信息
+    PrintGPUInfo();
+
     // 打印默认帧缓存的信息
     QueryDefaultFramebufferInfos();
 
@@ -274,6 +277,15 @@ void Game::PrintOpenGLVersion() const
     glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
     glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
     std::cout << "OpenGL Version: " << majorVersion << "." << minorVersion << std::endl;
+}
+
+void Game::PrintGPUInfo() const
+{
+    const GLubyte *vendor = glGetString(GL_VENDOR);     // 返回厂商名称
+    const GLubyte *renderer = glGetString(GL_RENDERER); // 返回渲染器名称（GPU 型号）
+
+    std::cout << "Vendor: " << vendor << std::endl;
+    std::cout << "Renderer: " << renderer << std::endl;
 }
 
 void Game::SetupWindowHint() const
