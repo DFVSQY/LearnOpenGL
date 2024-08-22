@@ -140,7 +140,7 @@ static void APIENTRY glfw_debug_output(GLenum source, GLenum type, unsigned int 
 }
 /***********************************************************************************************************/
 
-Game::Game() : window(nullptr), scene() {};
+Game::Game() : window(nullptr), scene(){};
 
 Game::~Game()
 {
@@ -220,6 +220,27 @@ bool Game::Init(const char *title, int width, int height)
     glViewport(0, 0, fb_width, fb_height);
 
     glEnable(GL_DEPTH_TEST); // 开启深度测试
+
+    /*
+     * 在 OpenGL 中，如果启用了模板测试（Stencil Test）但没有明确指定任何模板函数，OpenGL 会使用默认的模板测试设置。默认情况下，模板测试的行为如下：
+
+     * 默认模板函数：
+     * 默认的模板函数是 GL_ALWAYS，即模板测试总是通过。
+
+     * 默认模板参考值：
+     * 模板参考值（Stencil Reference Value）默认是 0。
+
+     * 默认模板掩码：
+     * 模板掩码（Stencil Mask）默认是全 1，即所有位都参与测试。
+
+     * 默认模板操作：
+     * 模板操作（Stencil Operation）在 OpenGL 中由三个操作定义：
+
+     * glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)，即默认情况下，无论模板测试结果如何，当前帧缓冲区中的模板值都不会改变。
+     * 综合来看，如果启用了模板测试但没有指定任何模板函数，模板测试将始终通过，并且不会对模板缓冲区进行任何修改。
+     * 这意味着模板测试对最终的绘制结果不会产生影响，因为它的默认行为等效于模板测试被关闭的情况。
+    */
+    glEnable(GL_STENCIL_TEST); // 开启模板测试
 
     scene.Init(fb_width, fb_height);
 
@@ -376,8 +397,9 @@ void Game::Draw()
     */
     // glClearDepth(1.0);
 
-    glClear(GL_COLOR_BUFFER_BIT |
-            GL_DEPTH_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区
+    glClear(
+        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+        GL_STENCIL_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区、模板缓冲区
 
     scene.Render();
 
