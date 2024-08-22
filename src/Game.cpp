@@ -397,6 +397,14 @@ void Game::Draw()
     */
     // glClearDepth(1.0);
 
+    /*
+     * 当调用 glClear(GL_STENCIL_BUFFER_BIT) 时，模板缓冲区的每个像素都会被重置为一个指定的值。
+     * 这个值是由 glClearStencil 函数设置的，默认情况下，这个值是 0。
+     * 如果希望在清理模板缓冲区时将其重置为其他值，而不是默认的 0，可以使用 glClearStencil 函数来修改这个值。
+     * 调用 glClearStencil 时，指定的值将被用作下一次调用 glClear(GL_STENCIL_BUFFER_BIT) 时模板缓冲区的重置值。
+    */
+    // glClearStencil(0);
+
     glClear(
         GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
         GL_STENCIL_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区、模板缓冲区
