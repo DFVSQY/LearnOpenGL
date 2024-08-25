@@ -106,6 +106,11 @@ Shader &Mesh::GetShader() const
     return *shader;
 }
 
+void Mesh::ChangeShader(Shader *shader)
+{
+    this->shader = shader;
+}
+
 void Mesh::SetupMesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
                      const std::vector<VertexAttribute> &attributes)
 {

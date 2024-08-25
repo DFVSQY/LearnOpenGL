@@ -31,4 +31,6 @@ class Mesh
     void Draw() const;
 
     Shader &GetShader() const;
+
+    void ChangeShader(Shader *shader);
 };
