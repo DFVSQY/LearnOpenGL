@@ -104,7 +104,7 @@ Mesh *Scene::SetupMesh_1(Shader &shader)
         1, 2, 3  // second Triangle
     };
 
-    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::GetPosColorTexLayout(), shader);
+    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::GetPosColorTexLayout(), &shader);
     AddMesh(mesh);
 
     return mesh;
@@ -197,7 +197,7 @@ Mesh *Scene::SetupMesh_2(Shader &shader)
         30, 31, 32, 33, 34, 35  // 顶面
     };
 
-    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosColorTexLayout(), shader);
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosColorTexLayout(), &shader);
     AddMesh(mesh);
 
     return mesh;
@@ -296,7 +296,7 @@ Mesh *Scene::SetupMesh_3(Shader &shader)
         30, 31, 32, 33, 34, 35  // 顶面
     };
 
-    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), &shader);
     AddMesh(mesh);
 
     return mesh;
@@ -393,7 +393,7 @@ Mesh *Scene::SetupMesh_4(Shader &shader)
         30, 31, 32, 33, 34, 35  // 顶面
     };
 
-    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), &shader);
     AddMesh(mesh);
 
     return mesh;

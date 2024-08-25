@@ -2,7 +2,7 @@
 #include "Mesh.h"
 
 Mesh::Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
-           const std::vector<VertexAttribute> &attributes, Shader &shader)
+           const std::vector<VertexAttribute> &attributes, Shader *shader)
     : shader(shader)
 {
     SetupMesh(vertices, indices, attributes);
@@ -47,11 +47,11 @@ Mesh::~Mesh()
 
 void Mesh::Draw() const
 {
-    if (vao == 0 || !shader.IsValidProgram())
+    if (vao == 0 || !shader || !shader->IsValidProgram())
         return;
 
     // 准备好渲染所需要的材质
-    shader.Use();
+    shader->Use();
 
     // draw mesh content
     glBindVertexArray(vao);
@@ -103,7 +103,7 @@ void Mesh::Draw() const
 
 Shader &Mesh::GetShader() const
 {
-    return shader;
+    return *shader;
 }
 
 void Mesh::SetupMesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,

@@ -168,7 +168,7 @@ Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexU
     shader->SetVec3f("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
     shader->SetVec3f("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    Mesh *new_mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), *shader);
+    Mesh *new_mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), shader);
     m_meshes.push_back(new_mesh);
 
     return new_mesh;
