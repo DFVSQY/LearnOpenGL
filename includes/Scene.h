@@ -74,6 +74,8 @@ class Scene
     Shader *SetupMat_8();
     Mesh *SetupMesh_8(Shader &shader);
 
+    Shader *SetupMat_Outline();
+
     void SetupModel_1();
     void SetupModel_2();
 

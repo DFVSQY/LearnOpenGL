@@ -585,6 +585,17 @@ Mesh *Scene::SetupMesh_8(Shader &shader)
     return SetupMesh_4(shader);
 }
 
+Shader *Scene::SetupMat_Outline()
+{
+    Shader *shader = LoadShader("../shaders/vertex_outline.glsl", "../shaders/fragment_outline.glsl");
+    if (!shader)
+        return nullptr;
+
+    AddShader(shader);
+
+    return shader;
+}
+
 void Scene::SetupModel_1()
 {
     Model *model = new Model("../models/nanosuit/nanosuit.obj");
@@ -700,9 +711,10 @@ void Scene::Render()
     m_deltaTime = now_time - m_lastFrameTime;
     m_lastFrameTime = now_time;
 
-    for (size_t idx = 0; idx < m_meshes.size(); ++idx)
+    // 单网格渲染
+    if (!m_meshes.empty())
     {
-        Mesh *mesh = m_meshes[idx];
+        Mesh *mesh = m_meshes[0];
 
         Shader &shader = mesh->GetShader();
         UpdateModelMatrix(shader);
@@ -712,17 +724,18 @@ void Scene::Render()
         mesh->Draw();
     }
 
-    std::function<void(Mesh *)> each_mesh_func = [this](Mesh *mesh) {
-        Shader &shader = mesh->GetShader();
-
-        UpdateModelMatrix(shader);
-        UpdateViewMatrix(shader);
-        UpdateProjectionMatrix(shader);
-    };
-
-    for (size_t idx = 0; idx < m_models.size(); ++idx)
+    // 单模型渲染
+    if (!m_models.empty())
     {
-        Model *model = m_models[idx];
+        std::function<void(Mesh *)> each_mesh_func = [this](Mesh *mesh) {
+            Shader &shader = mesh->GetShader();
+
+            UpdateModelMatrix(shader);
+            UpdateViewMatrix(shader);
+            UpdateProjectionMatrix(shader);
+        };
+
+        Model *model = m_models[0];
         model->ForeachMesh(each_mesh_func);
         model->Draw();
     }
