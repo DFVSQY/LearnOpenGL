@@ -10,6 +10,7 @@
 #include "glm/trigonometric.hpp"
 #include <vector>
 #include "VertexAttribute.h"
+#include "Util.h"
 
 Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_models(), m_camera()
 {
@@ -49,6 +50,8 @@ void Scene::Init(int width, int height)
 
     Shader *shader = SetupMat_8();
     SetupMesh_8(*shader);
+
+    SetupMat_Outline();
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -716,12 +719,33 @@ void Scene::Render()
     {
         Mesh *mesh = m_meshes[0];
 
-        Shader &shader = mesh->GetShader();
-        UpdateModelMatrix(shader);
-        UpdateViewMatrix(shader);
-        UpdateProjectionMatrix(shader);
+        // 第一个遍正常渲染物体同时写入模板值
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
 
+        Shader *shader = m_shaders[0];
+        UpdateModelMatrix(*shader);
+        UpdateViewMatrix(*shader);
+        UpdateProjectionMatrix(*shader);
+        mesh->ChangeShader(shader);
         mesh->Draw();
+
+        // 第二遍渲染轮廓
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+
+        Shader *outlineShader = m_shaders[1];
+        UpdateModelMatrix(*outlineShader);
+        UpdateViewMatrix(*outlineShader);
+        UpdateProjectionMatrix(*outlineShader);
+        mesh->ChangeShader(outlineShader);
+        mesh->Draw();
+
+        // 恢复深度测试
+        glStencilMask(0xFF);
+        glEnable(GL_DEPTH_TEST);
     }
 
     // 单模型渲染
