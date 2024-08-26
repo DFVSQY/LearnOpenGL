@@ -59,7 +59,7 @@ void Scene::Init(int width, int height)
 Shader *Scene::SetupMat_1()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_01.glsl", "../shaders/fragment_01.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_01.vert", "../shaders/fragment_01.frag");
     if (!shader)
         return nullptr;
 
@@ -116,7 +116,7 @@ Mesh *Scene::SetupMesh_1(Shader &shader)
 Shader *Scene::SetupMat_2()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_02.glsl", "../shaders/fragment_02.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_02.vert", "../shaders/fragment_02.frag");
     if (!shader)
         return nullptr;
 
@@ -206,7 +206,7 @@ Mesh *Scene::SetupMesh_2(Shader &shader)
 Shader *Scene::SetupMat_3()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_03.glsl", "../shaders/fragment_03.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_03.vert", "../shaders/fragment_03.frag");
     if (!shader)
         return nullptr;
 
@@ -305,7 +305,7 @@ Mesh *Scene::SetupMesh_3(Shader &shader)
 Shader *Scene::SetupMat_4()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_04.glsl", "../shaders/fragment_04.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_04.vert", "../shaders/fragment_04.frag");
     if (!shader)
         return nullptr;
 
@@ -402,7 +402,7 @@ Mesh *Scene::SetupMesh_4(Shader &shader)
 Shader *Scene::SetupMat_5()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_05.glsl", "../shaders/fragment_05.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_05.vert", "../shaders/fragment_05.frag");
     if (!shader)
         return nullptr;
 
@@ -440,7 +440,7 @@ Mesh *Scene::SetupMesh_5(Shader &shader)
 Shader *Scene::SetupMat_6()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_06.glsl", "../shaders/fragment_06.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_06.vert", "../shaders/fragment_06.frag");
     if (!shader)
         return nullptr;
 
@@ -483,7 +483,7 @@ Mesh *Scene::SetupMesh_6(Shader &shader)
 Shader *Scene::SetupMat_7()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_07.glsl", "../shaders/fragment_07.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_07.vert", "../shaders/fragment_07.frag");
     if (!shader)
         return nullptr;
 
@@ -529,7 +529,7 @@ Mesh *Scene::SetupMesh_7(Shader &shader)
 Shader *Scene::SetupMat_8()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_08.glsl", "../shaders/fragment_08.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_08.vert", "../shaders/fragment_08.frag");
     if (!shader)
         return nullptr;
 
@@ -587,7 +587,7 @@ Mesh *Scene::SetupMesh_8(Shader &shader)
 
 Shader *Scene::SetupMat_Outline()
 {
-    Shader *shader = LoadShader("../shaders/vertex_outline.glsl", "../shaders/fragment_outline.glsl");
+    Shader *shader = LoadShader("../shaders/vertex_outline.vert", "../shaders/fragment_outline.frag");
     if (!shader)
         return nullptr;
 
