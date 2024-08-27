@@ -10,7 +10,6 @@
 #include "glm/trigonometric.hpp"
 #include <vector>
 #include "VertexAttribute.h"
-#include "Util.h"
 
 Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_models(), m_camera()
 {
@@ -737,8 +736,8 @@ void Scene::Render()
         glDisable(GL_DEPTH_TEST);
 
         Shader *outlineShader = m_shaders[1];
-        UpdateModelMatrix(*outlineShader);
-        UpdateViewMatrix(*outlineShader);
+        UpdateModelMatrix(*outlineShader, true);
+        UpdateViewMatrix(*outlineShader, true);
         UpdateProjectionMatrix(*outlineShader);
         mesh->ChangeShader(outlineShader);
         mesh->Draw();
@@ -765,27 +764,33 @@ void Scene::Render()
     }
 }
 
-void Scene::UpdateModelMatrix(Shader &shader)
+void Scene::UpdateModelMatrix(Shader &shader, bool ignoreNotModel)
 {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 
     shader.SetMat4f("model", model);
 
-    /*
-     * 将法向量从模型空间变换到世界空间中需要用到的矩阵
-    */
-    glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model)));
-    shader.SetMat3f("normalMatrix", normal_matrix);
+    if (!ignoreNotModel) // 不忽略非 model 值时
+    {
+        /*
+        * 将法向量从模型空间变换到世界空间中需要用到的矩阵
+        */
+        glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model)));
+        shader.SetMat3f("normalMatrix", normal_matrix);
+    }
 }
 
-void Scene::UpdateViewMatrix(Shader &shader)
+void Scene::UpdateViewMatrix(Shader &shader, bool ignoreNotView)
 {
     glm::mat4 view = m_camera.GetViewMatrix();
     shader.SetMat4f("view", view);
 
-    glm::vec3 pos = m_camera.GetPos();
-    shader.SetVec3f("camPos", pos);
+    if (!ignoreNotView) // 不忽略非 view 值时
+    {
+        glm::vec3 pos = m_camera.GetPos();
+        shader.SetVec3f("camPos", pos);
+    }
 }
 
 void Scene::UpdateProjectionMatrix(Shader &shader)

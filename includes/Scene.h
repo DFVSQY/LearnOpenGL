@@ -36,8 +36,8 @@ class Scene
 
     void InitMVP(Shader *material);
 
-    void UpdateModelMatrix(Shader &shader);
-    void UpdateViewMatrix(Shader &shader);
+    void UpdateModelMatrix(Shader &shader, bool ignoreNotModel = false);
+    void UpdateViewMatrix(Shader &shader, bool ignoreNotView = false);
     void UpdateProjectionMatrix(Shader &shader);
 
   public:

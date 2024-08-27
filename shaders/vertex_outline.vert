@@ -6,9 +6,6 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform mat3 normalMatrix;
-uniform vec3 camPos;
-
 void main()
 {
     // 稍微放大一点
