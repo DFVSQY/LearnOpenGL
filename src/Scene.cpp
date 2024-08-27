@@ -717,34 +717,9 @@ void Scene::Render()
     if (!m_meshes.empty())
     {
         Mesh *mesh = m_meshes[0];
-
-        // 第一个遍正常渲染物体同时写入模板值
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-
         Shader *shader = m_shaders[0];
-        UpdateModelMatrix(*shader);
-        UpdateViewMatrix(*shader);
-        UpdateProjectionMatrix(*shader);
-        mesh->ChangeShader(shader);
-        mesh->Draw();
-
-        // 第二遍渲染轮廓
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
-
         Shader *outlineShader = m_shaders[1];
-        UpdateModelMatrix(*outlineShader, true);
-        UpdateViewMatrix(*outlineShader, true);
-        UpdateProjectionMatrix(*outlineShader);
-        mesh->ChangeShader(outlineShader);
-        mesh->Draw();
-
-        // 恢复深度测试
-        glStencilMask(0xFF);
-        glEnable(GL_DEPTH_TEST);
+        DrawMeshAndOutline(mesh, shader, outlineShader);
     }
 
     // 单模型渲染
@@ -761,6 +736,129 @@ void Scene::Render()
         Model *model = m_models[0];
         model->ForeachMesh(each_mesh_func);
         model->Draw();
+    }
+}
+
+/*
+ * 绘制单网格及其轮廓
+ * 基本原理：
+ *  1. 第一个遍正常渲染物体同时写入模板值
+ *  2. 第二遍渲染轮廓 （第一轮写入了模板值的需要模板测试失败从而禁止写入颜色缓冲）
+*/
+void Scene::DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader)
+{
+    // 第一个遍正常渲染物体，
+    // 同时片元展示区域的模板缓冲写入模板值1
+    {
+        /*
+         * 在深入解释这个函数之前，先要理解模板缓冲区（Stencil Buffer）和模板测试（Stencil Test）的基本概念。
+
+         * 模板缓冲区（Stencil Buffer）：
+         *  模板缓冲区是一个与颜色缓冲区和深度缓冲区类似的附加缓冲区。它通常被用来在渲染过程中对某些像素执行复杂的遮罩或剪裁操作。
+         *  每个像素在模板缓冲区中都有一个对应的值，这些值可以用来决定像素是否应该被绘制。
+
+         * 模板测试（Stencil Test）：
+         *  在渲染过程中，模板测试会针对每个像素进行检查，以决定该像素是否会通过并被渲染。模板测试通常包含两个步骤：
+
+         * 比较测试：
+         *  根据设定的模板函数（通过 glStencilFunc 配置）将当前模板缓冲区中的值与参考值进行比较，决定测试是否通过。
+
+         * 模板操作：
+         *  根据比较测试的结果和深度测试的结果，决定如何修改模板缓冲区中的值。这里就是 glStencilOp 函数发挥作用的地方。
+
+         * 函数原型：void glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass);
+         * 参数解释
+         *  sfail: 当模板测试失败时，指定对模板缓冲区的操作。
+         *  dpfail: 当模板测试通过但深度测试失败时，指定对模板缓冲区的操作。
+         *  dppass: 当模板测试和深度测试都通过时，指定对模板缓冲区的操作。
+
+         * 可用的操作符
+         * OpenGL 提供了几种可用的操作符，用于控制模板缓冲区中的值：
+         *  GL_KEEP: 保持当前模板缓冲区的值不变。
+         *  GL_ZERO: 将模板缓冲区的值设置为0。
+         *  GL_REPLACE: 将模板缓冲区的值设置为参考值（由 glStencilFunc 设置）。
+         *  GL_INCR: 增加当前模板缓冲区的值。如果值已经是最大值，则保持不变。
+         *  GL_INCR_WRAP: 增加当前模板缓冲区的值。如果值已经是最大值，则包裹为0。
+         *  GL_DECR: 减少当前模板缓冲区的值。如果值已经是最小值，则保持不变。
+         *  GL_DECR_WRAP: 减少当前模板缓冲区的值。如果值已经是最小值，则包裹为最大值。
+         *  GL_INVERT: 按位反转当前模板缓冲区的值。
+        */
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+        /*
+         * glStencilFunc 是 OpenGL 中用于设置模板测试（Stencil Test）行为的函数。
+         * 它决定了模板缓冲区中存储的模板值如何与参考值进行比较，从而确定当前片段是否通过模板测试。
+
+         * 函数原型：void glStencilFunc(GLenum func, GLint ref, GLuint mask);
+         * 参数解释:
+         *  func: 用于指定模板测试的比较函数。这是一个 GLenum 值，定义了模板缓冲区的值与参考值之间的比较方式。
+         *  ref: 参考值（Reference Value），用于与模板缓冲区中的值进行比较。该值在比较时会先与 mask 进行按位与（bitwise AND）操作。
+         *  mask: 一个掩码（Mask），用于屏蔽模板缓冲区的某些位（bit）。在进行比较时，模板缓冲区的值和参考值都会与这个掩码进行按位与操作。
+
+         * func 可以是以下几个值之一：
+         *  GL_NEVER: 从不通过测试。即使模板值和参考值完全相同，测试也不会通过。
+         *  GL_ALWAYS: 始终通过测试。无论模板值与参考值是否匹配，测试都会通过。
+         *  GL_LESS: 当模板值小于参考值时，通过测试。
+         *  GL_LEQUAL: 当模板值小于或等于参考值时，通过测试。
+         *  GL_GREATER: 当模板值大于参考值时，通过测试。
+         *  GL_GEQUAL: 当模板值大于或等于参考值时，通过测试。
+         *  GL_EQUAL: 当模板值等于参考值时，通过测试。
+         *  GL_NOTEQUAL: 当模板值不等于参考值时，通过测试。
+        */
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+
+        /*
+         * glStencilMask 是 OpenGL 中用于控制模板缓冲区的写入权限的函数。
+         * 它定义了在渲染过程中哪些位可以被写入到模板缓冲区中。这允许你在渲染过程中对模板缓冲区进行细粒度的控制。
+
+         * 函数原型：void glStencilMask(GLuint mask);
+         * 参数解释:
+         *  mask: 一个掩码值，用于指定哪些位可以被写入到模板缓冲区中。mask 是一个 32 位的无符号整数，其中的每一位对应于模板缓冲区中的一个位。
+
+         * 当渲染一个片段并且通过了模板测试后，OpenGL 会将新的模板值写入到模板缓冲区中。这个新的值是片段的模板值和掩码应用后的结果。
+
+         * glStencilOp 用于定义在模板测试后应如何处理模板缓冲区中的值，而 glStencilMask 则控制哪些位可以被写入。
+         * 这两者通常需要一起使用，以实现所需的渲染效果。
+        */
+        glStencilMask(0xFF);
+
+        UpdateModelMatrix(*shader);
+        UpdateViewMatrix(*shader);
+        UpdateProjectionMatrix(*shader);
+        mesh->ChangeShader(shader);
+        mesh->Draw();
+    }
+
+    // 第二遍渲染轮廓
+    {
+        /*
+         * 模板缓冲区中的值不等于1时模板测试通过（即物体片元的渲染区域不会被渲染到）
+        */
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+
+        /*
+         * 禁止写入模板缓冲区
+        */
+        glStencilMask(0x00);
+
+        /*
+         * 在绘制物体轮廓时，禁止深度测试（Depth Test）是常见的做法。这主要是为了确保轮廓能够正确地渲染到物体的边缘上，而不被其他物体遮挡。
+         * 轮廓通常是较薄的几何体（如线条），如果深度测试开启，这些线条可能会因为深度冲突（z-fighting）而变得不清晰或不连续。
+         * 禁用深度测试可以避免这种情况，使轮廓的渲染效果更加清晰和稳定。
+        */
+        glDisable(GL_DEPTH_TEST);
+
+        UpdateModelMatrix(*outlineShader, true);
+        UpdateViewMatrix(*outlineShader, true);
+        UpdateProjectionMatrix(*outlineShader);
+        mesh->ChangeShader(outlineShader);
+        mesh->Draw();
+    }
+
+    // 恢复深度测试
+    {
+        glStencilMask(0xFF); // 开启模板缓冲区写入，不开启则使用 glClear(GL_STENCIL_BUFFER_BIT) 清空无法写入清空值。
+        glEnable(GL_DEPTH_TEST);
     }
 }
 

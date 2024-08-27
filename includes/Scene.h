@@ -40,6 +40,8 @@ class Scene
     void UpdateViewMatrix(Shader &shader, bool ignoreNotView = false);
     void UpdateProjectionMatrix(Shader &shader);
 
+    void DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader);
+
   public:
     Scene();
     ~Scene();
