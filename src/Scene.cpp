@@ -47,10 +47,10 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    Shader *shader = SetupMat_8();
-    SetupMesh_8(*shader);
+    // Shader *shader = SetupMat_8();
+    // SetupMesh_8(*shader);
 
-    SetupMat_Outline();
+    // SetupMat_Outline();
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -598,6 +598,89 @@ Shader *Scene::SetupMat_Outline()
     return shader;
 }
 
+Mesh *Scene::SetupCubeMesh(Shader &shader)
+{
+    std::vector<GLfloat> vertices = {
+        // 位置                           // 法线                           // 纹理坐标
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 0.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f, //
+
+        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, //
+
+        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,  0.0f, 0.0f, //
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  1.0f, 0.0f, //
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  1.0f, 0.0f, //
+        -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.0f, 1.0f, //
+
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, //
+
+        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f, 0.0f, //
+        0.5f,  -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  1.0f, 0.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  1.0f, 1.0f, //
+        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  1.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f, 0.0f, //
+
+        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f, //
+        0.5f,  0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  1.0f, 0.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, //
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, //
+        -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, //
+        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f  //
+    };
+
+    std::vector<GLuint> indices = {
+        0,  1,  2,  3,  4,  5,  // 前面
+        6,  7,  8,  9,  10, 11, // 后面
+        12, 13, 14, 15, 16, 17, // 左面
+        18, 19, 20, 21, 22, 23, // 右面
+        24, 25, 26, 27, 28, 29, // 底面
+        30, 31, 32, 33, 34, 35  // 顶面
+    };
+
+    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), &shader);
+    AddMesh(mesh);
+
+    return mesh;
+}
+
+Mesh *Scene::SetupRectangleMesh(Shader &shader)
+{
+    const std::vector<GLfloat> vertices_vec = {
+        // postion                      // color                      // 纹理坐标
+        0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // top right
+        0.5f,  -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom left
+        -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, // top left
+    };
+
+    const std::vector<GLuint> indices_vec = {
+        0, 1, 3, // first Triangle
+        1, 2, 3  // second Triangle
+    };
+
+    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::GetPosColorTexLayout(), &shader);
+    AddMesh(mesh);
+
+    return mesh;
+}
+
 void Scene::SetupModel_1()
 {
     Model *model = new Model("../models/nanosuit/nanosuit.obj");
@@ -713,16 +796,21 @@ void Scene::Render()
     m_deltaTime = now_time - m_lastFrameTime;
     m_lastFrameTime = now_time;
 
-    // 单网格渲染
+    // 网格渲染
     if (!m_meshes.empty())
     {
-        Mesh *mesh = m_meshes[0];
-        Shader *shader = m_shaders[0];
-        Shader *outlineShader = m_shaders[1];
-        DrawMeshAndOutline(mesh, shader, outlineShader);
+        Mesh *cube_mesh = m_meshes[0];
+        Shader &cube_shader = cube_mesh->GetShader();
+        UpdateModelMatrix(cube_shader);
+        UpdateViewMatrix(cube_shader);
+        UpdateProjectionMatrix(cube_shader);
+        cube_mesh->Draw();
+
+        Mesh *rectangle_mesh = m_meshes[1];
+        rectangle_mesh->Draw();
     }
 
-    // 单模型渲染
+    // 模型渲染
     if (!m_models.empty())
     {
         std::function<void(Mesh *)> each_mesh_func = [this](Mesh *mesh) {

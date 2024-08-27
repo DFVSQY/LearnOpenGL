@@ -42,16 +42,6 @@ class Scene
 
     void DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader);
 
-  public:
-    Scene();
-    ~Scene();
-
-    // 删除复制构造函数和赋值操作符
-    Scene(const Scene &) = delete;
-    Scene &operator=(const Scene &) = delete;
-
-    void Init(int width, int height);
-
     Shader *SetupMat_1();
     Mesh *SetupMesh_1(Shader &shader);
 
@@ -78,8 +68,21 @@ class Scene
 
     Shader *SetupMat_Outline();
 
+    Mesh *SetupCubeMesh(Shader &shader);      /* 立方体 */
+    Mesh *SetupRectangleMesh(Shader &shader); /* 矩形 */
+
     void SetupModel_1();
     void SetupModel_2();
+
+  public:
+    Scene();
+    ~Scene();
+
+    // 删除复制构造函数和赋值操作符
+    Scene(const Scene &) = delete;
+    Scene &operator=(const Scene &) = delete;
+
+    void Init(int width, int height);
 
     void Render();
 
