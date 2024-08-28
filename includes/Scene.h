@@ -41,6 +41,7 @@ class Scene
     void UpdateProjectionMatrix(Shader &shader);
 
     void DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader);
+    void DrawGlassWithoutBlend(Mesh *cube, Mesh *rectangle);
 
     Shader *SetupMat_1();
     Mesh *SetupMesh_1(Shader &shader);
@@ -67,6 +68,7 @@ class Scene
     Mesh *SetupMesh_8(Shader &shader);
 
     Shader *SetupMat_Outline();
+    Shader *SetupMat_GlassWind();
 
     Mesh *SetupCubeMesh(Shader &shader);      /* 立方体 */
     Mesh *SetupRectangleMesh(Shader &shader); /* 矩形 */

@@ -47,10 +47,11 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    // Shader *shader = SetupMat_8();
-    // SetupMesh_8(*shader);
+    Shader *cube_shader = SetupMat_8();
+    SetupCubeMesh(*cube_shader);
 
-    // SetupMat_Outline();
+    Shader *rect_shader = SetupMat_GlassWind();
+    SetupRectangleMesh(*rect_shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -598,6 +599,30 @@ Shader *Scene::SetupMat_Outline()
     return shader;
 }
 
+Shader *Scene::SetupMat_GlassWind()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/vertex_emojiface.vert", "../shaders/fragment_emojiface.frag");
+    if (!shader)
+        return nullptr;
+
+    // 纹理
+    Texture *texture = LoadTexture("../textures/glass_wnd.png", GL_RGBA);
+    if (!texture)
+        return nullptr;
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(0.7f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 3.0f));
+    shader->SetMat4f("model", model);
+
+    shader->SetTexture("texture0", texture);
+
+    AddShader(shader);
+
+    return shader;
+}
+
 Mesh *Scene::SetupCubeMesh(Shader &shader)
 {
     std::vector<GLfloat> vertices = {
@@ -800,14 +825,9 @@ void Scene::Render()
     if (!m_meshes.empty())
     {
         Mesh *cube_mesh = m_meshes[0];
-        Shader &cube_shader = cube_mesh->GetShader();
-        UpdateModelMatrix(cube_shader);
-        UpdateViewMatrix(cube_shader);
-        UpdateProjectionMatrix(cube_shader);
-        cube_mesh->Draw();
-
         Mesh *rectangle_mesh = m_meshes[1];
-        rectangle_mesh->Draw();
+
+        DrawGlassWithoutBlend(cube_mesh, rectangle_mesh);
     }
 
     // 模型渲染
@@ -947,6 +967,37 @@ void Scene::DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader
     {
         glStencilMask(0xFF); // 开启模板缓冲区写入，不开启则使用 glClear(GL_STENCIL_BUFFER_BIT) 清空无法写入清空值。
         glEnable(GL_DEPTH_TEST);
+    }
+}
+
+/*
+ * 不开启混合的情况下，测试渲染半透玻璃的效果
+*/
+void Scene::DrawGlassWithoutBlend(Mesh *cube, Mesh *rectangle)
+{
+    // 先渲染后面的立方体
+    {
+        Mesh *cube_mesh = cube;
+        Shader &cube_shader = cube_mesh->GetShader();
+        UpdateModelMatrix(cube_shader);
+        UpdateViewMatrix(cube_shader);
+        UpdateProjectionMatrix(cube_shader);
+        cube_mesh->Draw();
+    }
+
+    // 后渲染前面的半透玻璃
+    /*
+     * 无论 Alpha 值是多少，在未开启混合的情况下，片元最终在屏幕上的表现完全取决于其 RGB 颜色值。
+     * Alpha 值在此时没有任何影响，所有片元都会以完全不透明的形式展示其颜色。
+     * 如果采样到的纹理颜色是黑色（RGB = (0, 0, 0)），则会显示为黑色；
+     * 如果是其他颜色，则会显示为相应的颜色。
+    */
+    {
+        Mesh *rectangle_mesh = rectangle;
+        Shader &rectangle_shader = rectangle_mesh->GetShader();
+        UpdateViewMatrix(rectangle_shader, true);
+        UpdateProjectionMatrix(rectangle_shader);
+        rectangle_mesh->Draw();
     }
 }
 
