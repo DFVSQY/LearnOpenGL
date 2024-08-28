@@ -42,6 +42,7 @@ class Scene
 
     void DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader);
     void DrawGlassWithoutBlend(Mesh *cube, Mesh *rectangle);
+    void DrawGlassWithBlend(Mesh *cube, Mesh *rectangle);
 
     Shader *SetupMat_1();
     Mesh *SetupMesh_1(Shader &shader);
