@@ -32,7 +32,7 @@ class Scene
     void AddModel(Model *model);
 
     Shader *LoadShader(const std::string &vertextPath, const std::string &fragmentPath);
-    Texture *LoadTexture(const std::string &texturePath, const GLenum format);
+    Texture *LoadTexture(const std::string &texturePath, const GLenum format, const GLint wrapMode = GL_REPEAT);
 
     void InitMVP(Shader *material);
 
@@ -43,6 +43,7 @@ class Scene
     void DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader);
     void DrawGlassWithoutBlend(Mesh *cube, Mesh *rectangle);
     void DrawGlassWithBlend(Mesh *cube, Mesh *rectangle);
+    void DrawGrass(Mesh *mesh, Mesh *rectangle);
 
     Shader *SetupMat_1();
     Mesh *SetupMesh_1(Shader &shader);
@@ -70,6 +71,7 @@ class Scene
 
     Shader *SetupMat_Outline();
     Shader *SetupMat_GlassWind();
+    Shader *SetupMat_Grass();
 
     Mesh *SetupCubeMesh(Shader &shader);      /* 立方体 */
     Mesh *SetupRectangleMesh(Shader &shader); /* 矩形 */

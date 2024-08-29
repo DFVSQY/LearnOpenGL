@@ -22,7 +22,7 @@ class Texture
     Texture();
     ~Texture();
 
-    bool Init(const char *filePath, GLenum format = 0);
+    bool Init(const char *filePath, GLenum format = 0, GLint wrapMode = GL_REPEAT);
 
     GLsizei GetWidth() const;
     GLsizei GetHeight() const;

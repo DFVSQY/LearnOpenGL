@@ -48,7 +48,7 @@ Texture::~Texture()
     }
 }
 
-bool Texture::Init(const char *filePath, GLenum format)
+bool Texture::Init(const char *filePath, GLenum format, GLint wrapMode)
 {
     /*
      * 该函数用于在加载纹理时上下翻转图像。
@@ -119,8 +119,8 @@ bool Texture::Init(const char *filePath, GLenum format)
      * 这些设置应该在绑定纹理后、加载纹理数据之前进行。
      * 对于每个新的纹理对象，都需要单独设置这些参数。
     */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
 
     /*
      * 设置2D纹理的过滤参数，控制纹理在缩小和放大时的采样方式。

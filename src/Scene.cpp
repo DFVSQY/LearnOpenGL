@@ -50,7 +50,7 @@ void Scene::Init(int width, int height)
     Shader *cube_shader = SetupMat_8();
     SetupCubeMesh(*cube_shader);
 
-    Shader *rect_shader = SetupMat_GlassWind();
+    Shader *rect_shader = SetupMat_Grass();
     SetupRectangleMesh(*rect_shader);
 }
 
@@ -623,6 +623,30 @@ Shader *Scene::SetupMat_GlassWind()
     return shader;
 }
 
+Shader *Scene::SetupMat_Grass()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/vertex_grass.vert", "../shaders/fragment_grass.frag");
+    if (!shader)
+        return nullptr;
+
+    // 纹理
+    Texture *texture = LoadTexture("../textures/grass.png", GL_RGBA, GL_CLAMP_TO_EDGE);
+    if (!texture)
+        return nullptr;
+
+    glm::mat4 model = glm::mat4(1.0f);
+    // model = glm::scale(model, glm::vec3(0.7f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 3.0f));
+    shader->SetMat4f("model", model);
+
+    shader->SetTexture("texture0", texture);
+
+    AddShader(shader);
+
+    return shader;
+}
+
 Mesh *Scene::SetupCubeMesh(Shader &shader)
 {
     std::vector<GLfloat> vertices = {
@@ -779,10 +803,10 @@ Shader *Scene::LoadShader(const std::string &vertexFilePath, const std::string &
     return shader;
 }
 
-Texture *Scene::LoadTexture(const std::string &filePath, GLenum format)
+Texture *Scene::LoadTexture(const std::string &filePath, GLenum format, GLint wrapMode)
 {
     Texture *texture = new Texture();
-    bool texture_succ = texture->Init(filePath.c_str(), format);
+    bool texture_succ = texture->Init(filePath.c_str(), format, wrapMode);
     if (!texture_succ)
     {
         delete texture;
@@ -827,7 +851,7 @@ void Scene::Render()
         Mesh *cube_mesh = m_meshes[0];
         Mesh *rectangle_mesh = m_meshes[1];
 
-        DrawGlassWithBlend(cube_mesh, rectangle_mesh);
+        DrawGrass(cube_mesh, rectangle_mesh);
     }
 
     // 模型渲染
@@ -1015,6 +1039,51 @@ void Scene::DrawGlassWithBlend(Mesh *cube, Mesh *rectangle)
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        Mesh *rectangle_mesh = rectangle;
+        Shader &rectangle_shader = rectangle_mesh->GetShader();
+        UpdateViewMatrix(rectangle_shader, true);
+        UpdateProjectionMatrix(rectangle_shader);
+        rectangle_mesh->Draw();
+    }
+}
+
+/*
+ * 不开启混合的情况下，渲染有透明区域的草
+*/
+void Scene::DrawGrass(Mesh *cube, Mesh *rectangle)
+{
+    // 渲染后面的立方体
+    {
+        Mesh *cube_mesh = cube;
+        Shader &cube_shader = cube_mesh->GetShader();
+        UpdateModelMatrix(cube_shader);
+        UpdateViewMatrix(cube_shader);
+        UpdateProjectionMatrix(cube_shader);
+        cube_mesh->Draw();
+    }
+
+    // 渲染前面的2D草
+    /*
+     * 在不开启Blend的情况下，渲染带有透明区域的纹理时，可以采用Alpha测试从而discard掉一些透明片元。
+     * 比如草并不需要半透明，只需要根据纹理颜色值，显示一部分（完全不透明），或者不显示一部分（完全透明），没有中间情况。
+     * 所以当添加像草这样的植被到场景中时，我们不希望看到草的方形图像，而是只显示草的部分，并能看透图像其余的部分。
+     * 我们可以丢弃(Discard)显示纹理中透明部分的片段，不将这些片段存储到颜色缓冲中。
+
+     * 在游戏开发中，处理带有透明区域的纹理时，确实通常会将纹理的 WrapMode 设置为 Clamp。
+     * 这是为了避免在纹理采样时由于纹理坐标超出范围而导致的边缘问题，如黑边或其他不期望的瑕疵。
+
+     * 在游戏开发中，草地的渲染处理通常是放在 非透明队列 中，而不是透明队列。
+     * 为什么草地渲染通常在非透明队列
+     *  深度写入与排序问题：将草地渲染放在透明队列中会导致复杂的深度排序问题，尤其是草地通常由大量的平面片段组成，这些片段之间的透明排序会非常复杂且影响性能。
+     *                  而且，草地场景中往往存在大量的草叶片段，使用透明队列进行逐片段排序和混合的开销较大，容易导致性能下降。
+
+     *  更高效的渲染：使用非透明队列渲染草地时，可以启用深度写入，从而确保正确的遮挡关系，这对于草地的大规模渲染特别重要。
+     *              同时，由于草地片段相对较小且数量众多，从前到后的渲染顺序有助于提高渲染效率，因为后面片段可能被前面的草叶完全遮挡，减少了不必要的片段着色。
+
+     * 使用Alpha测试或Alpha裁剪：为了处理草地的透明区域，开发者通常会使用Alpha测试或Alpha裁剪（Alpha Cutoff），这意味着只有那些Alpha值超过某个阈值的片段才会被渲染为不透明。
+     *                      这种方法允许草叶片段在非透明队列中进行渲染，同时保留草地的形状和视觉效果。
+    */
+    {
         Mesh *rectangle_mesh = rectangle;
         Shader &rectangle_shader = rectangle_mesh->GetShader();
         UpdateViewMatrix(rectangle_shader, true);
