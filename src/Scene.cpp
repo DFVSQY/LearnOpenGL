@@ -50,7 +50,7 @@ void Scene::Init(int width, int height)
     Shader *cube_shader = SetupMat_8();
     SetupCubeMesh(*cube_shader);
 
-    Shader *rect_shader = SetupMat_Grass();
+    Shader *rect_shader = SetupMat_GlassWind();
     SetupRectangleMesh(*rect_shader);
 }
 
@@ -851,7 +851,7 @@ void Scene::Render()
         Mesh *cube_mesh = m_meshes[0];
         Mesh *rectangle_mesh = m_meshes[1];
 
-        DrawGrass(cube_mesh, rectangle_mesh);
+        DrawGlassWithBlend(cube_mesh, rectangle_mesh);
     }
 
     // 模型渲染
@@ -1037,8 +1037,74 @@ void Scene::DrawGlassWithBlend(Mesh *cube, Mesh *rectangle)
 
     // 后渲染前面的半透玻璃
     {
+        /*
+         * 'glEnable(GL_BLEND)'用于启用混合（Blending）操作。
+         * 在渲染过程中，混合操作是将当前片段的颜色（即正在渲染的像素）与已经存在于帧缓冲区中的颜色进行组合，以生成最终输出的颜色。
+         * 这在处理透明对象、半透明效果和一些特殊的光照效果时非常重要。
+         * 只有在混合被启用后，OpenGL 才会对片段执行混合操作，否则它会直接用当前片段的颜色覆盖帧缓冲区中的颜色。
+
+         * 混合操作通过以下步骤将片段的颜色与帧缓冲区中的颜色混合：        
+         *  源颜色（Source Color）：即当前渲染片段的颜色。
+         *  目标颜色（Destination Color）：即当前帧缓冲区中的颜色。
+         *  混合操作的基本公式如下： 
+         *      finalColor = (srcColor × srcFactor) + (dstColor × dstFactor)
+         *      srcColor 是源颜色。
+         *      dstColor 是目标颜色。
+         *      srcFactor 和 dstFactor 是混合因子，控制源颜色和目标颜色的权重。
+
+         * 使用 glBlendFunc 和 glBlendEquation 函数可以设置混合因子和混合方程，从而控制混合操作的行为。
+
+         * 如果开启了混合（通过调用glEnable(GL_BLEND)），但没有显式调用glBlendFunc来指定混合因子，OpenGL会使用默认的混合因子进行混合操作。
+         * 默认情况下，OpenGL 使用以下混合因子：
+         *  glBlendFunc(GL_ONE, GL_ZERO)
+         *      GL_ONE: 源因子被设置为 GL_ONE，表示源颜色将被完整保留（乘以 1）
+         *      GL_ZERO: 目标因子被设置为 GL_ZERO，表示目标颜色不会影响最终颜色（乘以 0）
+
+         * 最常见的 Alpha 混合模式
+         *  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+         *  用于处理透明度，其中源颜色按其 Alpha 值进行缩放，而目标颜色按 (1 - Alpha) 进行缩放。
+
+         * glBlendEquation(GLenum mode):
+         *  mode 控制混合操作的方程方式，决定了如何将源颜色与目标颜色组合。常见的模式包括：
+         *      GL_FUNC_ADD：将源颜色和目标颜色相加。
+         *      GL_FUNC_SUBTRACT：用源颜色减去目标颜色。
+         *      GL_FUNC_REVERSE_SUBTRACT：用目标颜色减去源颜色。
+         * 默认情况下，OpenGL 使用加法混合。
+
+         * 注意事项
+         *  顺序问题：在渲染半透明物体时，顺序非常重要。通常需要按照从远到近的顺序进行渲染，以确保混合结果正确。
+         *  性能影响：启用混合后，会增加 GPU 的计算负担，特别是在复杂场景中。这是因为每个片段都需要与帧缓冲区中的像素进行计算。
+        */
         glEnable(GL_BLEND);
+
+        /*
+         * glBlendFunc 是 OpenGL 中的一个函数，用于指定在混合（Blending）操作中使用的混合因子。
+         * 混合操作是指将当前片段的颜色与已经存在于帧缓冲区中的颜色进行组合，以生成最终的输出颜色。
+         * 通过使用 glBlendFunc，你可以控制源颜色（即当前片段的颜色）和目标颜色（即帧缓冲区中的颜色）如何组合，从而实现各种视觉效果，例如透明度、加法混合等。
+
+         * 函数原型：void glBlendFunc(GLenum sfactor, GLenum dfactor);
+         * 参数：
+         *  sfactor: 指定源颜色的混合因子。
+         *  dfactor: 指定目标颜色的混合因子。
+
+         * 混合因子（Blend Factor）在 OpenGL 中不是一个标量，而是一个向量，具体来说，是一个包含颜色分量的向量。
+         * 混合因子影响混合操作中的每个颜色分量（红色、绿色、蓝色和 alpha）如何参与混合计算。
+
+         * glBlendFunc 支持多种混合因子，以下是一些常见的混合因子及其含义：
+         *  GL_ZERO：因子为 (0, 0, 0, 0)，即完全忽略该颜色（乘以 0）。
+         *  GL_ONE：因子为 (1, 1, 1, 1)，即完全保留该颜色（乘以 1）。
+         *  GL_SRC_COLOR：因子为源颜色的每个分量，即 (R_s, G_s, B_s, A_s)。
+         *  GL_ONE_MINUS_SRC_COLOR：因子为1减去源颜色的每个分量，即 (1-R_s, 1-G_s, 1-B_s, 1-A_s)。
+         *  GL_DST_COLOR：因子为目标颜色的每个分量，即 (R_d, G_d, B_d, A_d)。
+         *  GL_ONE_MINUS_DST_COLOR：因子为1减去目标颜色的每个分量，即 (1-R_d, 1-G_d, 1-B_d, 1-A_d)。
+         *  GL_SRC_ALPHA：因子为源颜色的Alpha分量，即 (A_s, A_s, A_s, A_s)。
+         *  GL_ONE_MINUS_SRC_ALPHA：因子为1减去源颜色的Alpha分量，即 (1-A_s, 1-A_s, 1-A_s, 1-A_s)。
+         *  GL_DST_ALPHA：因子为目标颜色的Alpha分量，即 (A_d, A_d, A_d, A_d)。
+         *  GL_ONE_MINUS_DST_ALPHA：因子为1减去目标颜色的Alpha分量，即 (1-A_d, 1-A_d, 1-A_d, 1-A_d)。
+         *  GL_CONSTANT_COLOR 和 GL_CONSTANT_ALPHA：因子为一个常量颜色或常量 alpha，即 (R_c, G_c, B_c, A_c)，其中 R_c, G_c, B_c, A_c 是通过 glBlendColor 设置的常量颜色或 alpha。
+        */
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         Mesh *rectangle_mesh = rectangle;
         Shader &rectangle_shader = rectangle_mesh->GetShader();
         UpdateViewMatrix(rectangle_shader, true);
