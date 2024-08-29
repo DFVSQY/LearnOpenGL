@@ -602,7 +602,7 @@ Shader *Scene::SetupMat_Outline()
 Shader *Scene::SetupMat_GlassWind()
 {
     // Shader
-    Shader *shader = LoadShader("../shaders/vertex_emojiface.vert", "../shaders/fragment_emojiface.frag");
+    Shader *shader = LoadShader("../shaders/vertex_glasswind.vert", "../shaders/fragment_glasswind.frag");
     if (!shader)
         return nullptr;
 
