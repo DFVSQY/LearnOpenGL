@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
+#include "glm/fwd.hpp"
 #include "glm/matrix.hpp"
 #include "glm/trigonometric.hpp"
 #include <vector>
@@ -47,11 +48,8 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    Shader *cube_shader = SetupMat_8();
+    Shader *cube_shader = SetupMat_Enlarge();
     SetupCubeMesh(*cube_shader);
-
-    Shader *rect_shader = SetupMat_GlassWind();
-    SetupRectangleMesh(*rect_shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -647,60 +645,77 @@ Shader *Scene::SetupMat_Grass()
     return shader;
 }
 
+Shader *Scene::SetupMat_Enlarge()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/vertex_enlarge.vert", "../shaders/fragment_enlarge.frag");
+    if (!shader)
+        return nullptr;
+
+    // 纹理
+    Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
+    if (!texture)
+        return nullptr;
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, 45.0f, glm::vec3(0.5f, 1.0f, 0.0f));
+    shader->SetMat4f("model", model);
+
+    shader->SetTexture("texture0", texture);
+
+    AddShader(shader);
+
+    return shader;
+}
+
 Mesh *Scene::SetupCubeMesh(Shader &shader)
 {
     std::vector<GLfloat> vertices = {
-        // 位置                           // 法线                           // 纹理坐标
-        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f, //
-        0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 0.0f, //
-        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f, //
-        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f, //
-        -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 1.0f, //
-        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f, //
+        // Positions          // Normals           // Texture Coords
+        // 前面
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, //
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  //
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   //
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  //
 
-        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, //
-        0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f, //
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, //
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, //
-        -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f, //
-        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f, //
+        // 后面
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, //
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,  //
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,   //
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,  //
 
-        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.0f, 1.0f, //
-        -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,  0.0f, 0.0f, //
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  1.0f, 0.0f, //
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  1.0f, 0.0f, //
-        -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  1.0f, 1.0f, //
-        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.0f, 1.0f, //
+        // 左面
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   //
+        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  //
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
 
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, //
-        0.5f,  0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f, //
-        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f, //
-        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f, //
-        0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f, //
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, //
+        // 右面
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   //
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, //
+        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  //
 
-        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f, 0.0f, //
-        0.5f,  -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  1.0f, 0.0f, //
-        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  1.0f, 1.0f, //
-        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  1.0f, 1.0f, //
-        -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  0.0f, 1.0f, //
-        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.0f, 0.0f, //
+        // 上面
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,  //
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   //
+        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  //
 
-        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f, //
-        0.5f,  0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  1.0f, 0.0f, //
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, //
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, //
-        -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, //
-        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f  //
+        // 下面
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, //
+        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,  //
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,   //
+        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f   //
     };
 
     std::vector<GLuint> indices = {
-        0,  1,  2,  3,  4,  5,  // 前面
-        6,  7,  8,  9,  10, 11, // 后面
-        12, 13, 14, 15, 16, 17, // 左面
-        18, 19, 20, 21, 22, 23, // 右面
-        24, 25, 26, 27, 28, 29, // 底面
-        30, 31, 32, 33, 34, 35  // 顶面
+        0,  1,  2,  2,  3,  0,  // 前面
+        4,  5,  6,  6,  7,  4,  // 后面
+        8,  9,  10, 10, 11, 8,  // 左面
+        12, 13, 14, 14, 15, 12, // 右面
+        16, 17, 18, 18, 19, 16, // 上面
+        20, 21, 22, 22, 23, 20  // 下面
     };
 
     Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), &shader);
@@ -848,10 +863,8 @@ void Scene::Render()
     // 网格渲染
     if (!m_meshes.empty())
     {
-        Mesh *cube_mesh = m_meshes[0];
-        Mesh *rectangle_mesh = m_meshes[1];
-
-        DrawGlassWithBlend(cube_mesh, rectangle_mesh);
+        Mesh *mesh = m_meshes[0];
+        DrawCullFace(mesh);
     }
 
     // 模型渲染
@@ -1156,6 +1169,47 @@ void Scene::DrawGrass(Mesh *cube, Mesh *rectangle)
         UpdateProjectionMatrix(rectangle_shader);
         rectangle_mesh->Draw();
     }
+}
+
+/*
+ * 面剔除示例
+*/
+void Scene::DrawCullFace(Mesh *mesh)
+{
+    /*
+     * 在OpenGL中，Face Culling（面剔除）是一种优化技术，用于减少需要绘制的多边形面，从而提高渲染性能。
+     * 通过剔除不需要绘制的面（通常是不可见的面），我们可以减少图形处理单元（GPU）的负载，提高帧率和渲染效率。
+     * Face Culling 通过利用物体的面法向量和视图方向的关系来决定哪些面是不可见的，并将其剔除。
+     * 一个多边形面在3D空间中由多个顶点组成，根据这些顶点的连接顺序（顺时针或逆时针），可以确定该面是朝向观察者还是背向观察者。
+
+     * 工作原理
+     *  Face Culling 的工作原理基于物体表面的法向量和视点方向的关系。以下是Face Culling的具体过程：
+     *   确定面朝向：OpenGL通过顶点的绘制顺序来判断面的朝向。逆时针顶点顺序定义正面，顺时针顺序定义背面（或反之，取决于glFrontFace的设置）。
+     *   剔除背面：在默认设置下，背向视点的面将被剔除，即在OpenGL进行光栅化之前，这些面不会被送入渲染管线，从而节省了计算资源。
+    */
+
+    /*
+     * 在OpenGL中，使用以下函数来启用面剔除，默认面剔除是关闭的。
+    */
+    glEnable(GL_CULL_FACE);
+
+    /*
+     * 选择剔除哪些面（正面或反面）。OpenGL默认剔除的是背面。通过以下函数设置剔除的面。
+    */
+    glCullFace(GL_FRONT); // 剔除正面
+    // glCullFace(GL_BACK);           // 剔除背面（默认）
+    // glCullFace(GL_FRONT_AND_BACK); // 剔除正面和背面（通常用于调试）
+
+    /*
+     * OpenGL通过顶点的连接顺序来区分多边形的正面和背面。可以使用以下函数设置正面是顺时针还是逆时针。
+    */
+    // glFrontFace(GL_CCW); // 默认，逆时针（Counter-Clockwise）为正面
+    // glFrontFace(GL_CW);  // 顺时针（Clockwise）为正面
+
+    Shader &shader = mesh->GetShader();
+    UpdateViewMatrix(shader, true);
+    UpdateProjectionMatrix(shader);
+    mesh->Draw();
 }
 
 void Scene::UpdateModelMatrix(Shader &shader, bool ignoreNotModel)

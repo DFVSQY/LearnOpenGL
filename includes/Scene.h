@@ -44,6 +44,7 @@ class Scene
     void DrawGlassWithoutBlend(Mesh *cube, Mesh *rectangle);
     void DrawGlassWithBlend(Mesh *cube, Mesh *rectangle);
     void DrawGrass(Mesh *mesh, Mesh *rectangle);
+    void DrawCullFace(Mesh *mesh);
 
     Shader *SetupMat_1();
     Mesh *SetupMesh_1(Shader &shader);
@@ -72,6 +73,7 @@ class Scene
     Shader *SetupMat_Outline();
     Shader *SetupMat_GlassWind();
     Shader *SetupMat_Grass();
+    Shader *SetupMat_Enlarge();
 
     Mesh *SetupCubeMesh(Shader &shader);      /* 立方体 */
     Mesh *SetupRectangleMesh(Shader &shader); /* 矩形 */
