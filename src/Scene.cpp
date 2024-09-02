@@ -910,9 +910,9 @@ void Scene::Render()
     // 网格渲染
     if (!m_meshes.empty())
     {
-        // Mesh *mesh = m_meshes[0];
-        // Mesh *screen_rect_mesh = m_meshes[1];
-        // DrawRenderToTexture(mesh, screen_rect_mesh);
+        Mesh *mesh = m_meshes[0];
+        Mesh *screen_rect_mesh = m_meshes[1];
+        DrawRenderToTexture(mesh, screen_rect_mesh);
     }
 
     // 模型渲染
