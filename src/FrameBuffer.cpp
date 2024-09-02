@@ -1,4 +1,5 @@
 #include "FrameBuffer.h"
+#include "Texture.h"
 
 /*
  * 在 OpenGL 中，`RenderBuffer Object`（RBO）和 `Texture Object` 是两种可以附加到 `FrameBuffer Object`（FBO）上的图像数据存储对象。它们有不同的用途和特性，适合于不同的渲染场景。
@@ -331,4 +332,23 @@ bool FrameBuffer::IsComplete() const
      *  表示帧缓冲对象的配置组合（比如附件格式和内部格式）不被当前的 OpenGL 实现支持。这通常需要重新配置帧缓冲对象的格式或结构。
     */
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
+GLuint FrameBuffer::GetTextrueID(int idx) const
+{
+    GLuint texture_id = m_textures[idx];
+    return texture_id;
+}
+
+GLuint FrameBuffer::GetRenderBufferID(int idx) const
+{
+    GLuint renderBuffer = m_renderBuffers[idx];
+    return renderBuffer;
+}
+
+void FrameBuffer::BindTexture(int idx, int textureIdx)
+{
+    GLuint texture_id = GetTextrueID(idx);
+    glActiveTexture(GL_TEXTURE0 + textureIdx);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
 }

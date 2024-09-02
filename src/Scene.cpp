@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "FrameBuffer.h"
 #include "Mesh.h"
 #include "Model.h"
 #include "Shader.h"
@@ -9,10 +10,11 @@
 #include "glm/fwd.hpp"
 #include "glm/matrix.hpp"
 #include "glm/trigonometric.hpp"
+#include <iostream>
 #include <vector>
 #include "VertexAttribute.h"
 
-Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_models(), m_camera()
+Scene::Scene() : m_meshes(), m_shaders(), m_textures(), m_models(), m_fbo(nullptr), m_camera()
 {
     m_camSpeed = 0.05f;
     m_lastFrameTime = 0.0f;
@@ -41,6 +43,12 @@ Scene::~Scene()
     for (auto model : m_models)
         delete model;
     m_models.clear();
+
+    if (m_fbo != nullptr)
+    {
+        delete m_fbo;
+        m_fbo = nullptr;
+    }
 }
 
 void Scene::Init(int width, int height)
@@ -48,8 +56,13 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    Shader *cube_shader = SetupMat_Enlarge();
+    SetupFrameBuffer(width, height);
+
+    Shader *cube_shader = SetupMat_8();
     SetupCubeMesh(*cube_shader);
+
+    Shader *rect_shader = SetupMat_ScreenRect();
+    SetupRectangleMesh(*rect_shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -668,6 +681,18 @@ Shader *Scene::SetupMat_Enlarge()
     return shader;
 }
 
+Shader *Scene::SetupMat_ScreenRect()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/vertex_screenrect.vert", "../shaders/fragment_screenrect.frag");
+    if (!shader)
+        return nullptr;
+
+    AddShader(shader);
+
+    return shader;
+}
+
 Mesh *Scene::SetupCubeMesh(Shader &shader)
 {
     std::vector<GLfloat> vertices = {
@@ -800,6 +825,28 @@ void Scene::InitMVP(Shader *shader)
     shader->SetMat4f("projection", projection);
 }
 
+/*
+ * 配置离屏渲染的FrameBuffer
+*/
+void Scene::SetupFrameBuffer(int width, int height)
+{
+    m_fbo = new FrameBuffer();
+    m_fbo->Bind();
+
+    // 添加颜色缓冲
+    m_fbo->AttachTexture(GL_COLOR_ATTACHMENT0, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, width, height);
+
+    // 添加深度模板缓冲
+    m_fbo->AttachRenderBuffer(GL_DEPTH_STENCIL_ATTACHMENT, GL_DEPTH24_STENCIL8, width, height);
+
+    if (!m_fbo->IsComplete())
+    {
+        std::cerr << "SetupFrameBuffer error, FrameBuffer is not complete!" << std::endl;
+    }
+
+    m_fbo->Unbind();
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Shader *Scene::LoadShader(const std::string &vertexFilePath, const std::string &fragmentFilePath)
@@ -863,8 +910,9 @@ void Scene::Render()
     // 网格渲染
     if (!m_meshes.empty())
     {
-        Mesh *mesh = m_meshes[0];
-        DrawCullFace(mesh);
+        // Mesh *mesh = m_meshes[0];
+        // Mesh *screen_rect_mesh = m_meshes[1];
+        // DrawRenderToTexture(mesh, screen_rect_mesh);
     }
 
     // 模型渲染
@@ -1210,6 +1258,56 @@ void Scene::DrawCullFace(Mesh *mesh)
     UpdateViewMatrix(shader, true);
     UpdateProjectionMatrix(shader);
     mesh->Draw();
+}
+
+/*
+ * 渲染到纹理
+*/
+void Scene::DrawRenderToTexture(Mesh *mesh, Mesh *screenRectMesh)
+{
+    // 先将场景内容渲染到离屏FrameBuffer中
+    {
+        m_fbo->Bind();
+
+        // 清理缓冲区并设置为指定的颜色
+        glClearColor(0.2f, 0.2f, 0.5f, 1.0f); // 状态值设置，用于指定颜色值
+
+        /*
+         * glClear 函数的操作对象是当前绑定的帧缓冲区。根据你绑定的是默认帧缓冲区还是自定义的帧缓冲区，glClear 将作用于不同的缓冲区。
+         * 确保在调用 glClear 之前正确绑定了需要清除的帧缓冲区，以避免误操作。
+        */
+        glClear(
+            GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+            GL_STENCIL_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区、模板缓冲区
+
+        Shader &shader = mesh->GetShader();
+        UpdateModelMatrix(shader);
+        UpdateViewMatrix(shader);
+        UpdateProjectionMatrix(shader);
+        mesh->Draw();
+    }
+
+    // 切换到默认的FrameBuffer，然后将离屏FrameBuffer中的内容渲染到屏幕上
+    {
+        m_fbo->Unbind();
+
+        // 清理缓冲区并设置为指定的颜色
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // 状态值设置，用于指定颜色值
+
+        glClear(
+            GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+            GL_STENCIL_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区、模板缓冲区
+
+        // 将全屏举行渲染到屏幕上时不需要使用深度测试
+        glDisable(GL_DEPTH);
+
+        m_fbo->BindTexture(0, 0);
+        Shader &shader = screenRectMesh->GetShader();
+        shader.SetInt("texture0", 0);
+        screenRectMesh->Draw();
+
+        glEnable(GL_DEPTH);
+    }
 }
 
 void Scene::UpdateModelMatrix(Shader &shader, bool ignoreNotModel)

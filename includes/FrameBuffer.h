@@ -20,6 +20,11 @@ class FrameBuffer
 
     bool IsComplete() const;
 
+    GLuint GetTextrueID(int idx) const;
+    GLuint GetRenderBufferID(int idx) const;
+
+    void BindTexture(int idx, int textureIdx = 0);
+
   private:
     GLuint m_fbo;
     std::vector<GLuint> m_textures;

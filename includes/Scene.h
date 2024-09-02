@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "FrameBuffer.h"
 
 class Scene
 {
@@ -14,6 +15,8 @@ class Scene
     std::vector<Shader *> m_shaders;
     std::vector<Texture *> m_textures;
     std::vector<Model *> m_models;
+
+    FrameBuffer *m_fbo;
 
     Camera m_camera;
 
@@ -31,6 +34,8 @@ class Scene
     void AddTexture(Texture *texture);
     void AddModel(Model *model);
 
+    void SetupFrameBuffer(int width, int height);
+
     Shader *LoadShader(const std::string &vertextPath, const std::string &fragmentPath);
     Texture *LoadTexture(const std::string &texturePath, const GLenum format, const GLint wrapMode = GL_REPEAT);
 
@@ -45,6 +50,7 @@ class Scene
     void DrawGlassWithBlend(Mesh *cube, Mesh *rectangle);
     void DrawGrass(Mesh *mesh, Mesh *rectangle);
     void DrawCullFace(Mesh *mesh);
+    void DrawRenderToTexture(Mesh *mesh, Mesh *screenRectMesh);
 
     Shader *SetupMat_1();
     Mesh *SetupMesh_1(Shader &shader);
@@ -74,6 +80,7 @@ class Scene
     Shader *SetupMat_GlassWind();
     Shader *SetupMat_Grass();
     Shader *SetupMat_Enlarge();
+    Shader *SetupMat_ScreenRect();
 
     Mesh *SetupCubeMesh(Shader &shader);      /* 立方体 */
     Mesh *SetupRectangleMesh(Shader &shader); /* 矩形 */
