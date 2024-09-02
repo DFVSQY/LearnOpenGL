@@ -26,7 +26,7 @@ FrameBuffer::FrameBuffer()
      *  要实际使用 FBO，需要调用 glBindFramebuffer 绑定该 FBO，然后使用 glFramebufferTexture2D 或 glFramebufferRenderbuffer 来附加纹理或渲染缓冲区。
      *  删除 FBO：在不再需要 FBO 时，可以使用 glDeleteFramebuffers 删除它们，以释放资源。
      *  FBO 的状态：一个 FBO 只有在附加了至少一个附件后，才可以被用于渲染。
-     *  创建 FBO 后，通常需要检查它的状态，以确保它是“完整的”（complete），可以通过调用 glCheckFramebufferStatus 来检查。
+     *  创建 FBO 后，通常需要检查它的状态，以确保它是"完整的"（complete），可以通过调用 glCheckFramebufferStatus 来检查。
     */
     glGenFramebuffers(1, &m_fbo);
 }
