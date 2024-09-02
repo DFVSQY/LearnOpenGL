@@ -178,7 +178,67 @@ void FrameBuffer::AttachRenderBuffer(GLenum attachment, GLenum internalFormat, G
      *  一旦 Renderbuffer 被绑定，所有对渲染缓冲对象的操作都会作用于这个绑定的对象，直到再次绑定另一个 Renderbuffer。
     */
     glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+
+    /*
+     * glRenderbufferStorage 是 OpenGL 中用于为绑定的渲染缓冲对象（Renderbuffer）分配存储空间的函数。
+     * 渲染缓冲对象通常用于离屏渲染操作，特别是在需要深度缓冲、模板缓冲或者多重采样（MSAA）时。glRenderbufferStorage 确定了渲染缓冲的格式和尺寸。
+
+     * 函数原型：void glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+     * 参数详解
+     *  target:
+     *      必须为 GL_RENDERBUFFER，指定目标是渲染缓冲对象。
+     *
+     *  internalformat:
+     *      指定渲染缓冲对象的内部格式，这决定了存储的数据类型及其每个像素占用的位数。常见的内部格式包括：
+     *      GL_DEPTH_COMPONENT: 深度缓冲（通常是24位或32位）。
+     *      GL_STENCIL_INDEX: 模板缓冲（通常是8位）。
+     *      GL_DEPTH24_STENCIL8: 同时包含深度和模板的缓冲区（24位深度 + 8位模板）。
+     *      GL_RGBA8: 颜色缓冲区（8位每个颜色通道，RGBA）。
+     *      GL_RGB565: 颜色缓冲区（5位红色、6位绿色和5位蓝色）。
+     *      选择合适的内部格式非常重要，因为它会影响渲染效果和性能。
+     *
+     *  width:
+     *      渲染缓冲区的宽度，以像素为单位。
+     *
+     *  height:
+     *      渲染缓冲区的高度，以像素为单位。
+
+     * 函数的作用
+     *  glRenderbufferStorage 的作用是为当前绑定的渲染缓冲对象分配存储空间，并确定该缓冲区的格式及其尺寸。
+     *  在调用 glRenderbufferStorage 之前，渲染缓冲对象只是一个空壳，它没有实际的存储空间。通过这个函数，OpenGL 分配了特定的显存资源，用于存储渲染操作生成的数据（如深度值、颜色值等）。
+
+     * glRenderbufferStorage 是用于分配和设置渲染缓冲对象存储空间的关键函数。它决定了渲染缓冲区的格式、大小，以及其具体用途（如深度缓冲、模板缓冲等）。
+     * 在离屏渲染、多重采样、深度模板测试等场景中，glRenderbufferStorage 发挥了至关重要的作用。
+    */
     glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height);
+
+    /*
+     * glFramebufferRenderbuffer 是 OpenGL 中的一个函数，用于将一个渲染缓冲对象（Renderbuffer）附加到帧缓冲对象（Framebuffer）上。
+     * 这个操作通常用于离屏渲染场景，尤其是在需要使用深度缓冲、模板缓冲或多重采样时。
+
+     * 函数原型：void glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+     * 参数详解
+     *  target:
+     *      这个参数指定帧缓冲对象的目标，通常是 GL_FRAMEBUFFER，表示应用于当前绑定的帧缓冲对象。
+     *
+     *  attachment:
+     *      这个参数指定将渲染缓冲对象附加到帧缓冲对象的哪个附件点。常用的值包括：
+     *      GL_COLOR_ATTACHMENTi: 将渲染缓冲对象附加为第 i 个颜色附件，其中 i 是颜色附件的编号。
+     *      GL_DEPTH_ATTACHMENT: 将渲染缓冲对象附加为深度附件，用于存储深度值。
+     *      GL_STENCIL_ATTACHMENT: 将渲染缓冲对象附加为模板附件，用于存储模板值。
+     *      GL_DEPTH_STENCIL_ATTACHMENT: 将渲染缓冲对象附加为同时包含深度和模板的附件。
+     *
+     *  renderbuffertarget:
+     *      这个参数必须为 GL_RENDERBUFFER，指定附加的目标类型是渲染缓冲对象。
+     *
+     *  renderbuffer:
+     *      这是渲染缓冲对象的 ID，即要附加的渲染缓冲对象。如果传入 0，则会解除与该附件点的绑定。
+
+     * 函数的作用
+     *  glFramebufferRenderbuffer 的作用是将一个渲染缓冲对象附加到当前绑定的帧缓冲对象的指定附件点。
+     *  帧缓冲对象本质上是一个自定义的、可供渲染的缓冲集合，而渲染缓冲对象则是这些缓冲的一部分，用于特定的渲染目的（如深度、模板、多重采样等）。
+     *  通过这个函数，OpenGL 可以在渲染到帧缓冲对象时，将生成的渲染数据（如深度值或模板值）存储到附加的渲染缓冲区中。
+    */
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderBuffer);
 
     m_renderBuffers.push_back(renderBuffer);
@@ -186,5 +246,44 @@ void FrameBuffer::AttachRenderBuffer(GLenum attachment, GLenum internalFormat, G
 
 bool FrameBuffer::IsComplete() const
 {
+    /*
+     * glCheckFramebufferStatus 是 OpenGL 中用于检查帧缓冲对象（Framebuffer Object, FBO）是否完整的函数。
+     * 帧缓冲对象的完整性对于确保渲染操作能正确进行至关重要，因此在配置完帧缓冲对象后，使用 glCheckFramebufferStatus 函数来验证其状态是非常重要的步骤。
+
+     * 函数原型：GLenum glCheckFramebufferStatus(GLenum target);
+     * 参数详解
+     *  target:
+     *      这个参数指定要检查的帧缓冲对象的目标。通常为 GL_FRAMEBUFFER，表示检查当前绑定的帧缓冲对象。
+
+     * 返回值
+     *  glCheckFramebufferStatus 返回一个 GLenum 类型的值，用于指示帧缓冲对象的状态。可能的返回值包括以下几种：
+     *
+     *  GL_FRAMEBUFFER_COMPLETE:
+     *  表示帧缓冲对象是完整的，可以安全地用于渲染操作。这是你期望得到的结果。
+     *
+     *  GL_FRAMEBUFFER_UNDEFINED:
+     *  在 OpenGL ES 或部分桌面 OpenGL 中，这个状态表示默认帧缓冲对象的 target 参数未定义。这通常出现在尝试在不支持的环境中操作帧缓冲对象时。
+     *
+     *  GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+     *  表示帧缓冲对象附加的某个或多个附件是不完整的或有问题的。比如，一个颜色附件的格式与其他附件不兼容，或者附加的纹理或渲染缓冲对象是未完成的或无效的。
+     *
+     *  GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+     *  表示帧缓冲对象没有附加任何图像数据对象。通常，这是因为没有附加任何颜色、深度或模板缓冲对象。
+     *
+     *  GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+     *  当当前绑定的帧缓冲对象的某个 GL_DRAW_BUFFER 指向的附件不存在或不可用时，会返回此状态。这通常发生在多个渲染目标（MRT）配置不当时。
+     *
+     *  GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+     *  当 GL_READ_BUFFER 指向的附件不存在或不可用时，会返回此状态。这通常发生在读取操作配置不当时。
+     *
+     *  GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+     *  如果多重采样相关的附件之间的样本数或存储格式不一致时，会返回此状态。这个错误通常发生在配置多重采样缓冲区时。
+     *
+     *  GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+     *  当帧缓冲对象的某些附件是层目标（如立方体贴图或 3D 纹理），但层的选择或配置不一致时，会返回此状态。
+     *
+     *  GL_FRAMEBUFFER_UNSUPPORTED:
+     *  表示帧缓冲对象的配置组合（比如附件格式和内部格式）不被当前的 OpenGL 实现支持。这通常需要重新配置帧缓冲对象的格式或结构。
+    */
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
