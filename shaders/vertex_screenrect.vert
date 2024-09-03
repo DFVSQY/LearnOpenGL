@@ -9,7 +9,7 @@ out vec2 texCoord;
 
 void main()
 {
-    vec3 scale_pos = aPos * 2.0;
+    vec3 scale_pos = aPos * 1.0;
     gl_Position = vec4(scale_pos, 1.0);
 
     texCoord = aTexCoord;
