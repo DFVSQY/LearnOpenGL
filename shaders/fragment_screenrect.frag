@@ -75,6 +75,42 @@ void main()
 
     // Kernel Effect 之模糊（Blur）
     {
+        // vec2 offsets[9] = vec2[](
+        //         vec2(-offset, offset), // 左上
+        //         vec2(0.0f, offset), // 正上
+        //         vec2(offset, offset), // 右上
+        //         vec2(-offset, 0.0f), // 左
+        //         vec2(0.0f, 0.0f), // 中
+        //         vec2(offset, 0.0f), // 右
+        //         vec2(-offset, -offset), // 左下
+        //         vec2(0.0f, -offset), // 正下
+        //         vec2(offset, -offset) // 右下
+        //     );
+
+        // // 大部分核将所有的权重加起来之后都应该会等于1，如果它们加起来不等于1，这就意味着最终的纹理颜色将会比原纹理值更亮或者更暗了。
+        // float kernel[9] = float[](
+        //         1.0 / 16, 2.0 / 16, 1.0 / 16,
+        //         2.0 / 16, 4.0 / 16, 2.0 / 16,
+        //         1.0 / 16, 2.0 / 16, 1.0 / 16
+        //     );
+
+        // // 对片元对应的纹理坐标及其周边进行采样
+        // vec3 sampleTex[9];
+        // for (int i = 0; i < 9; i++)
+        // {
+        //     sampleTex[i] = vec3(texture(texture0, texCoord.st + offsets[i]));
+        // }
+
+        // // 按照权重混合
+        // vec3 col = vec3(0.0);
+        // for (int i = 0; i < 9; i++)
+        //     col += sampleTex[i] * kernel[i];
+
+        // color = vec4(col, 1.0);
+    }
+
+    // Kernel Effect 之边缘检测（Edge-detection）
+    {
         vec2 offsets[9] = vec2[](
                 vec2(-offset, offset), // 左上
                 vec2(0.0f, offset), // 正上
@@ -89,9 +125,9 @@ void main()
 
         // 大部分核将所有的权重加起来之后都应该会等于1，如果它们加起来不等于1，这就意味着最终的纹理颜色将会比原纹理值更亮或者更暗了。
         float kernel[9] = float[](
-                1.0 / 16, 2.0 / 16, 1.0 / 16,
-                2.0 / 16, 4.0 / 16, 2.0 / 16,
-                1.0 / 16, 2.0 / 16, 1.0 / 16
+                1, 1, 1,
+                1, -8, 1,
+                1, 1, 1
             );
 
         // 对片元对应的纹理坐标及其周边进行采样
