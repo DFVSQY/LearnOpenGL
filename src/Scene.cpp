@@ -1299,14 +1299,14 @@ void Scene::DrawRenderToTexture(Mesh *mesh, Mesh *screenRectMesh)
             GL_STENCIL_BUFFER_BIT); // 状态值应用，清理掉颜色缓冲区并设置为指定的颜色，同时也清理掉深度缓冲区、模板缓冲区
 
         // 将全屏举行渲染到屏幕上时不需要使用深度测试
-        glDisable(GL_DEPTH);
+        glDisable(GL_DEPTH_TEST);
 
         m_fbo->BindTexture(0, 0);
         Shader &shader = screenRectMesh->GetShader();
         shader.SetInt("texture0", 0);
         screenRectMesh->Draw();
 
-        glEnable(GL_DEPTH);
+        glEnable(GL_DEPTH_TEST);
     }
 }
 
