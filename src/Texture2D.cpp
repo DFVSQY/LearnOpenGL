@@ -1,35 +1,35 @@
-#include "Texture.h"
+#include "Texture2D.h"
 #include "stb_image.h"
 #include "iostream"
 
-Texture *Texture::white_2d_texture = nullptr;
-Texture *Texture::black_2d_texture = nullptr;
+Texture2D *Texture2D::white_2d_texture = nullptr;
+Texture2D *Texture2D::black_2d_texture = nullptr;
 
-Texture *Texture::GetWhite2DTexture()
+Texture2D *Texture2D::GetWhite2DTexture()
 {
     if (white_2d_texture == nullptr)
     {
-        white_2d_texture = new Texture();
+        white_2d_texture = new Texture2D();
         white_2d_texture->Init("../textures/Default_White.png", GL_RGBA);
     }
     return white_2d_texture;
 }
 
-Texture *Texture::GetBlack2DTexture()
+Texture2D *Texture2D::GetBlack2DTexture()
 {
     if (black_2d_texture == nullptr)
     {
-        black_2d_texture = new Texture();
+        black_2d_texture = new Texture2D();
         black_2d_texture->Init("../textures/Default_Black.png", GL_RGBA);
     }
     return black_2d_texture;
 }
 
-Texture::Texture() : texture_id(0), width(0), height(0), channel_num(0)
+Texture2D::Texture2D() : texture_id(0), width(0), height(0), channel_num(0)
 {
 }
 
-Texture::~Texture()
+Texture2D::~Texture2D()
 {
     if (texture_id > 0)
     {
@@ -48,7 +48,7 @@ Texture::~Texture()
     }
 }
 
-bool Texture::Init(const char *filePath, GLenum format, GLint wrapMode)
+bool Texture2D::Init(const char *filePath, GLenum format, GLint wrapMode)
 {
     /*
      * 该函数用于在加载纹理时上下翻转图像。
@@ -68,7 +68,7 @@ bool Texture::Init(const char *filePath, GLenum format, GLint wrapMode)
     unsigned char *data = stbi_load(filePath, &width, &height, &channel_num, 0);
     if (!data)
     {
-        std::cerr << "Texture load failed!" << std::endl;
+        std::cerr << "Texture2D load failed!" << std::endl;
         return false;
     }
 
@@ -200,17 +200,17 @@ bool Texture::Init(const char *filePath, GLenum format, GLint wrapMode)
     return true;
 }
 
-GLsizei Texture::GetWidth() const
+GLsizei Texture2D::GetWidth() const
 {
     return width;
 }
 
-GLsizei Texture::GetHeight() const
+GLsizei Texture2D::GetHeight() const
 {
     return height;
 }
 
-void Texture::Use(int idx) const
+void Texture2D::Use(int idx) const
 {
     /*
      * 函数原型：void glActiveTexture(GLenum texture);

@@ -4,7 +4,7 @@
 #include "Model.h"
 #include "Shader.h"
 #include "ShaderUnit.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
 #include "glm/fwd.hpp"
@@ -78,12 +78,12 @@ Shader *Scene::SetupMat_1()
         return nullptr;
 
     // 纹理
-    Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
+    Texture2D *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
     if (!texture)
         return nullptr;
 
     // 第二张纹理
-    Texture *texture2 = LoadTexture("../textures/awesomeface.png", GL_RGBA);
+    Texture2D *texture2 = LoadTexture("../textures/awesomeface.png", GL_RGBA);
     if (!texture2)
         return nullptr;
 
@@ -135,7 +135,7 @@ Shader *Scene::SetupMat_2()
         return nullptr;
 
     // 纹理
-    Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
+    Texture2D *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
     if (!texture)
         return nullptr;
 
@@ -225,7 +225,7 @@ Shader *Scene::SetupMat_3()
         return nullptr;
 
     // 纹理
-    Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
+    Texture2D *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
     if (!texture)
         return nullptr;
 
@@ -324,12 +324,12 @@ Shader *Scene::SetupMat_4()
         return nullptr;
 
     // 漫反射纹理
-    Texture *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
+    Texture2D *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
     if (!diffuse_tex)
         return nullptr;
 
     // 高光纹理
-    Texture *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
+    Texture2D *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
     if (!specular_tex)
         return nullptr;
 
@@ -421,12 +421,12 @@ Shader *Scene::SetupMat_5()
         return nullptr;
 
     // 漫反射纹理
-    Texture *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
+    Texture2D *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
     if (!diffuse_tex)
         return nullptr;
 
     // 高光纹理
-    Texture *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
+    Texture2D *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
     if (!specular_tex)
         return nullptr;
 
@@ -459,12 +459,12 @@ Shader *Scene::SetupMat_6()
         return nullptr;
 
     // 漫反射纹理
-    Texture *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
+    Texture2D *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
     if (!diffuse_tex)
         return nullptr;
 
     // 高光纹理
-    Texture *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
+    Texture2D *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
     if (!specular_tex)
         return nullptr;
 
@@ -502,12 +502,12 @@ Shader *Scene::SetupMat_7()
         return nullptr;
 
     // 漫反射纹理
-    Texture *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
+    Texture2D *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
     if (!diffuse_tex)
         return nullptr;
 
     // 高光纹理
-    Texture *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
+    Texture2D *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
     if (!specular_tex)
         return nullptr;
 
@@ -548,12 +548,12 @@ Shader *Scene::SetupMat_8()
         return nullptr;
 
     // 漫反射纹理
-    Texture *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
+    Texture2D *diffuse_tex = LoadTexture("../textures/container2.png", GL_RGBA);
     if (!diffuse_tex)
         return nullptr;
 
     // 高光纹理
-    Texture *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
+    Texture2D *specular_tex = LoadTexture("../textures/container2_specular.png", GL_RGBA);
     if (!specular_tex)
         return nullptr;
 
@@ -618,7 +618,7 @@ Shader *Scene::SetupMat_GlassWind()
         return nullptr;
 
     // 纹理
-    Texture *texture = LoadTexture("../textures/glass_wnd.png", GL_RGBA);
+    Texture2D *texture = LoadTexture("../textures/glass_wnd.png", GL_RGBA);
     if (!texture)
         return nullptr;
 
@@ -642,7 +642,7 @@ Shader *Scene::SetupMat_Grass()
         return nullptr;
 
     // 纹理
-    Texture *texture = LoadTexture("../textures/grass.png", GL_RGBA, GL_CLAMP_TO_EDGE);
+    Texture2D *texture = LoadTexture("../textures/grass.png", GL_RGBA, GL_CLAMP_TO_EDGE);
     if (!texture)
         return nullptr;
 
@@ -666,7 +666,7 @@ Shader *Scene::SetupMat_Enlarge()
         return nullptr;
 
     // 纹理
-    Texture *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
+    Texture2D *texture = LoadTexture("../textures/wall.jpg", GL_RGB);
     if (!texture)
         return nullptr;
 
@@ -696,7 +696,7 @@ Shader *Scene::SetupMat_ScreenRect()
 Mesh *Scene::SetupCubeMesh(Shader &shader)
 {
     std::vector<GLfloat> vertices = {
-        // Positions          // Normals           // Texture Coords
+        // Positions          // Normals           // Texture2D Coords
         // 前面
         -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, //
         0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  //
@@ -865,9 +865,9 @@ Shader *Scene::LoadShader(const std::string &vertexFilePath, const std::string &
     return shader;
 }
 
-Texture *Scene::LoadTexture(const std::string &filePath, GLenum format, GLint wrapMode)
+Texture2D *Scene::LoadTexture(const std::string &filePath, GLenum format, GLint wrapMode)
 {
-    Texture *texture = new Texture();
+    Texture2D *texture = new Texture2D();
     bool texture_succ = texture->Init(filePath.c_str(), format, wrapMode);
     if (!texture_succ)
     {
@@ -888,7 +888,7 @@ void Scene::AddShader(Shader *shader)
     m_shaders.push_back(shader);
 }
 
-void Scene::AddTexture(Texture *texture)
+void Scene::AddTexture(Texture2D *texture)
 {
     m_textures.push_back(texture);
 }

@@ -2,7 +2,7 @@
 
 #include "glad/glad.h"
 
-class Texture
+class Texture2D
 {
   private:
     GLuint texture_id;
@@ -11,16 +11,16 @@ class Texture
 
     int channel_num;
 
-    static Texture *white_2d_texture;
-    static Texture *black_2d_texture;
+    static Texture2D *white_2d_texture;
+    static Texture2D *black_2d_texture;
 
   public:
     // 删除复制构造函数和赋值操作符
-    Texture(const Texture &) = delete;
-    Texture &operator=(const Texture &) = delete;
+    Texture2D(const Texture2D &) = delete;
+    Texture2D &operator=(const Texture2D &) = delete;
 
-    Texture();
-    ~Texture();
+    Texture2D();
+    ~Texture2D();
 
     bool Init(const char *filePath, GLenum format = 0, GLint wrapMode = GL_REPEAT);
 
@@ -29,6 +29,6 @@ class Texture
 
     void Use(int idx) const;
 
-    static Texture *GetWhite2DTexture();
-    static Texture *GetBlack2DTexture();
+    static Texture2D *GetWhite2DTexture();
+    static Texture2D *GetBlack2DTexture();
 };

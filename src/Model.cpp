@@ -2,7 +2,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "ShaderUnit.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "VertexAttribute.h"
 #include "assimp/Importer.hpp"
 #include "assimp/mesh.h"
@@ -121,23 +121,23 @@ Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexU
     {
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-        std::vector<Texture *> diffuse_textures = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
-        std::vector<Texture *> specular_textures = LoadMaterialTextures(material, aiTextureType_SPECULAR);
+        std::vector<Texture2D *> diffuse_textures = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
+        std::vector<Texture2D *> specular_textures = LoadMaterialTextures(material, aiTextureType_SPECULAR);
 
         if (!diffuse_textures.empty())
             shader->SetTexture("material.diffuse", diffuse_textures[0]);
         else
-            shader->SetTexture("material.diffuse", Texture::GetWhite2DTexture());
+            shader->SetTexture("material.diffuse", Texture2D::GetWhite2DTexture());
 
         if (!specular_textures.empty())
             shader->SetTexture("material.specular", specular_textures[0]);
         else
-            shader->SetTexture("material.specular", Texture::GetWhite2DTexture());
+            shader->SetTexture("material.specular", Texture2D::GetWhite2DTexture());
     }
     else
     {
-        shader->SetTexture("material.diffuse", Texture::GetWhite2DTexture());
-        shader->SetTexture("material.specular", Texture::GetWhite2DTexture());
+        shader->SetTexture("material.diffuse", Texture2D::GetWhite2DTexture());
+        shader->SetTexture("material.specular", Texture2D::GetWhite2DTexture());
     }
     shader->SetFloat("material.shininess", 64.0f);
 
@@ -174,9 +174,9 @@ Mesh *Model::ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexU
     return new_mesh;
 }
 
-std::vector<Texture *> Model::LoadMaterialTextures(const aiMaterial *mat, const aiTextureType type)
+std::vector<Texture2D *> Model::LoadMaterialTextures(const aiMaterial *mat, const aiTextureType type)
 {
-    std::vector<Texture *> textures;
+    std::vector<Texture2D *> textures;
 
     unsigned int count = mat->GetTextureCount(type);
     for (unsigned int idx = 0; idx < count; idx++)
@@ -184,7 +184,7 @@ std::vector<Texture *> Model::LoadMaterialTextures(const aiMaterial *mat, const 
         aiString str;
         mat->GetTexture(type, idx, &str);
 
-        Texture *texture = new Texture();
+        Texture2D *texture = new Texture2D();
 
         const std::string &file_path = m_directory + '/' + str.C_Str();
         texture->Init(file_path.c_str());

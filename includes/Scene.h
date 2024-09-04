@@ -4,7 +4,7 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "Shader.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "Camera.h"
 #include "FrameBuffer.h"
 
@@ -13,7 +13,7 @@ class Scene
   private:
     std::vector<Mesh *> m_meshes;
     std::vector<Shader *> m_shaders;
-    std::vector<Texture *> m_textures;
+    std::vector<Texture2D *> m_textures;
     std::vector<Model *> m_models;
 
     FrameBuffer *m_fbo;
@@ -31,13 +31,13 @@ class Scene
 
     void AddMesh(Mesh *mesh);
     void AddShader(Shader *shader);
-    void AddTexture(Texture *texture);
+    void AddTexture(Texture2D *texture);
     void AddModel(Model *model);
 
     void SetupFrameBuffer(int width, int height);
 
     Shader *LoadShader(const std::string &vertextPath, const std::string &fragmentPath);
-    Texture *LoadTexture(const std::string &texturePath, const GLenum format, const GLint wrapMode = GL_REPEAT);
+    Texture2D *LoadTexture(const std::string &texturePath, const GLenum format, const GLint wrapMode = GL_REPEAT);
 
     void InitMVP(Shader *material);
 

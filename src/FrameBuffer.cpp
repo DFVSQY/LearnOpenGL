@@ -1,5 +1,4 @@
 #include "FrameBuffer.h"
-#include "Texture.h"
 
 /*
  * 在 OpenGL 中，`RenderBuffer Object`（RBO）和 `Texture Object` 是两种可以附加到 `FrameBuffer Object`（FBO）上的图像数据存储对象。它们有不同的用途和特性，适合于不同的渲染场景。

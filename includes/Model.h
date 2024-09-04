@@ -2,7 +2,7 @@
 
 #include "Mesh.h"
 #include "ShaderUnit.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "assimp/scene.h"
 #include <functional>
 #include <vector>
@@ -12,7 +12,7 @@ class Model
   private:
     std::vector<Mesh *> m_meshes;
     std::vector<Shader *> m_shaders;
-    std::vector<Texture *> m_textures;
+    std::vector<Texture2D *> m_textures;
 
     std::string m_directory;
 
@@ -20,7 +20,7 @@ class Model
 
     void ProcessNode(aiNode *node, const aiScene *scene, ShaderUnit &vertexUnit, ShaderUnit &fragmentUnit);
     Mesh *ProcessMesh(aiMesh *mesh, const aiScene *scene, ShaderUnit &vertexUnit, ShaderUnit &fragmentUnit);
-    std::vector<Texture *> LoadMaterialTextures(const aiMaterial *mat, const aiTextureType type);
+    std::vector<Texture2D *> LoadMaterialTextures(const aiMaterial *mat, const aiTextureType type);
 
   public:
     // 删除复制构造函数和赋值操作符
