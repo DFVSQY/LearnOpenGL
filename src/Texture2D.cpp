@@ -9,8 +9,8 @@ Texture2D *Texture2D::GetWhite2DTexture()
 {
     if (white_2d_texture == nullptr)
     {
-        white_2d_texture = new Texture2D();
-        white_2d_texture->Init("../textures/Default_White.png", GL_RGBA);
+        white_2d_texture = new Texture2D("../textures/Default_White.png", GL_RGBA);
+        // white_2d_texture->Init("../textures/Default_White.png", GL_RGBA);
     }
     return white_2d_texture;
 }
@@ -19,14 +19,16 @@ Texture2D *Texture2D::GetBlack2DTexture()
 {
     if (black_2d_texture == nullptr)
     {
-        black_2d_texture = new Texture2D();
-        black_2d_texture->Init("../textures/Default_Black.png", GL_RGBA);
+        black_2d_texture = new Texture2D("../textures/Default_Black.png", GL_RGBA);
+        // black_2d_texture->Init("../textures/Default_Black.png", GL_RGBA);
     }
     return black_2d_texture;
 }
 
-Texture2D::Texture2D() : texture_id(0), width(0), height(0), channel_num(0)
+Texture2D::Texture2D(const char *filePath, GLenum format, GLint wrapMode)
+    : texture_id(0), width(0), height(0), channel_num(0)
 {
+    InnerInit(filePath, format, wrapMode);
 }
 
 Texture2D::~Texture2D()
@@ -48,7 +50,7 @@ Texture2D::~Texture2D()
     }
 }
 
-bool Texture2D::Init(const char *filePath, GLenum format, GLint wrapMode)
+bool Texture2D::InnerInit(const char *filePath, GLenum format, GLint wrapMode)
 {
     /*
      * 该函数用于在加载纹理时上下翻转图像。
@@ -240,4 +242,9 @@ void Texture2D::Use(int idx) const
     glActiveTexture(GL_TEXTURE0 + idx);
 
     glBindTexture(GL_TEXTURE_2D, texture_id);
+}
+
+bool Texture2D::IsValidTexture() const
+{
+    return texture_id > 0;
 }

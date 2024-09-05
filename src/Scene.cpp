@@ -867,9 +867,8 @@ Shader *Scene::LoadShader(const std::string &vertexFilePath, const std::string &
 
 Texture2D *Scene::LoadTexture(const std::string &filePath, GLenum format, GLint wrapMode)
 {
-    Texture2D *texture = new Texture2D();
-    bool texture_succ = texture->Init(filePath.c_str(), format, wrapMode);
-    if (!texture_succ)
+    Texture2D *texture = new Texture2D(filePath.c_str(), format, wrapMode);
+    if (!texture->IsValidTexture())
     {
         delete texture;
         return nullptr;

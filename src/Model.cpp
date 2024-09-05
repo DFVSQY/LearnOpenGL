@@ -184,10 +184,8 @@ std::vector<Texture2D *> Model::LoadMaterialTextures(const aiMaterial *mat, cons
         aiString str;
         mat->GetTexture(type, idx, &str);
 
-        Texture2D *texture = new Texture2D();
-
         const std::string &file_path = m_directory + '/' + str.C_Str();
-        texture->Init(file_path.c_str());
+        Texture2D *texture = new Texture2D(file_path.c_str());
 
         m_textures.push_back(texture);
         textures.push_back(texture);
