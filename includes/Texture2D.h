@@ -16,7 +16,7 @@ class Texture2D : public Texture
 
   public:
     Texture2D(const char *filePath, GLenum format = 0, GLint wrapMode = GL_REPEAT);
-    ~Texture2D();
+    ~Texture2D() override;
 
     GLsizei GetWidth() const;
     GLsizei GetHeight() const;

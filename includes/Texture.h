@@ -12,7 +12,7 @@ class Texture
     Texture &operator=(const Texture &) = delete;
 
     Texture();
-    ~Texture();
+    virtual ~Texture();
 
     void Use(int idx) const;
     bool IsValidTexture() const;
