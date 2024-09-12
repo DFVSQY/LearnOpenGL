@@ -10,8 +10,8 @@ class TextureCubeMap : public Texture
 
   public:
     /*
-	 * faces:[right, left, top, bottom, front, back]
-	*/
+	   * faces:[right, left, top, bottom, front, back]
+	  */
     TextureCubeMap(const std::vector<const char *> &faces);
     ~TextureCubeMap() override;
 };

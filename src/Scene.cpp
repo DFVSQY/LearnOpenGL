@@ -49,6 +49,24 @@ Scene::~Scene()
         delete m_fbo;
         m_fbo = nullptr;
     }
+
+    if (m_skybox_mesh != nullptr)
+    {
+        delete m_skybox_mesh;
+        m_skybox_mesh = nullptr;
+    }
+
+    if (m_skybox_shader != nullptr)
+    {
+        delete m_skybox_shader;
+        m_skybox_shader = nullptr;
+    }
+
+    if (m_skybox_texture != nullptr)
+    {
+        delete m_skybox_texture;
+        m_skybox_texture = nullptr;
+    }
 }
 
 void Scene::Init(int width, int height)
@@ -823,6 +841,11 @@ void Scene::InitMVP(Shader *shader)
     shader->SetMat4f("model", model);
     shader->SetMat4f("view", view);
     shader->SetMat4f("projection", projection);
+}
+
+void Scene::SetupSkybox()
+{
+    // todo: 具体实现待定
 }
 
 /*

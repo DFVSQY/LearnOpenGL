@@ -16,6 +16,10 @@ class Scene
     std::vector<Texture2D *> m_textures;
     std::vector<Model *> m_models;
 
+    Mesh *m_skybox_mesh;
+    Shader *m_skybox_shader;
+    Texture2D *m_skybox_texture;
+
     FrameBuffer *m_fbo;
 
     Camera m_camera;
@@ -34,6 +38,7 @@ class Scene
     void AddTexture(Texture2D *texture);
     void AddModel(Model *model);
 
+    void SetupSkybox();
     void SetupFrameBuffer(int width, int height);
 
     Shader *LoadShader(const std::string &vertextPath, const std::string &fragmentPath);
