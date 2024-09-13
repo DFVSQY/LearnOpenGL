@@ -13,6 +13,10 @@ static void glfw_error_callback(int error, const char *description)
     std::cerr << "Error: " << description << std::endl;
 }
 
+static bool is_full_screen = false;
+static int win_store_width, win_store_height;
+static int win_store_xpos, win_store_ypos;
+
 // 键盘输入回调函数
 static void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -35,6 +39,52 @@ static void glfw_key_callback(GLFWwindow *window, int key, int scancode, int act
     else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT))
     {
         Game::getInstance().On_Key_D_Press();
+    }
+    else if (key == GLFW_KEY_F11 && action == GLFW_PRESS)
+    {
+        if (!is_full_screen)
+        {
+            // 保存窗口模式下的位置和大小
+            glfwGetWindowPos(window, &win_store_xpos, &win_store_ypos);
+            glfwGetWindowSize(window, &win_store_width, &win_store_height);
+
+            // 获取窗口当前所在的显示器
+            int monitorCount;
+            GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
+            GLFWmonitor *currentMonitor = NULL;
+
+            for (int idx = 0; idx < monitorCount; idx++)
+            {
+                int mx, my, mw, mh;
+                glfwGetMonitorWorkarea(monitors[idx], &mx, &my, &mw, &mh);
+
+                if (win_store_xpos >= mx && win_store_xpos < mx + mw && win_store_ypos >= my &&
+                    win_store_ypos < my + mh)
+                {
+                    currentMonitor = monitors[idx];
+                    break;
+                }
+            }
+
+            if (currentMonitor == NULL)
+            {
+                // 如果没找到，使用主显示器
+                currentMonitor = glfwGetPrimaryMonitor();
+            }
+
+            const GLFWvidmode *mode = glfwGetVideoMode(currentMonitor);
+
+            // 切换到全屏模式
+            glfwSetWindowMonitor(window, currentMonitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+
+            is_full_screen = true;
+        }
+        else
+        {
+            // 切换回窗口模式
+            glfwSetWindowMonitor(window, NULL, win_store_xpos, win_store_ypos, win_store_width, win_store_height, 0);
+            is_full_screen = false;
+        }
     }
 }
 
@@ -140,7 +190,7 @@ static void APIENTRY glfw_debug_output(GLenum source, GLenum type, unsigned int 
 }
 /***********************************************************************************************************/
 
-Game::Game() : window(nullptr), scene(){};
+Game::Game() : window(nullptr), scene() {};
 
 Game::~Game()
 {
