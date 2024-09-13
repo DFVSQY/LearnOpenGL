@@ -206,7 +206,7 @@ bool Game::Init(const char *title, int width, int height)
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // 隐藏光标
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // 设置鼠标移动回调
     glfwSetCursorPosCallback(window, mouse_callback);
