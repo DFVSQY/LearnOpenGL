@@ -79,7 +79,7 @@ bool Shader::IsValidProgram() const
     return shader_program > 0;
 }
 
-void Shader::SetTexture(const std::string &name, const Texture2D *texture)
+void Shader::SetTexture(const std::string &name, const Texture *texture)
 {
     SetInt(name, texture_idx);
 

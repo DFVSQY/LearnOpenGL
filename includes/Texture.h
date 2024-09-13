@@ -7,6 +7,8 @@ class Texture
   protected:
     GLuint texture_id;
 
+    virtual GLenum GetTextureTarget() const = 0;
+
   public:
     Texture(const Texture &) = delete;
     Texture &operator=(const Texture &) = delete;

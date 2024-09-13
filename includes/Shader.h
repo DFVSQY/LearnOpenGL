@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "Texture2D.h"
+#include "Texture.h"
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "ShaderUnit.h"
@@ -13,7 +13,7 @@ class Shader
     struct TexturePair
     {
         const int idx;
-        const Texture2D *texture;
+        const Texture *texture;
     };
 
     GLuint shader_program;
@@ -38,7 +38,7 @@ class Shader
     Shader(const ShaderUnit &vertexShader, const ShaderUnit &fragmentShader);
     ~Shader();
 
-    void SetTexture(const std::string &name, const Texture2D *texture);
+    void SetTexture(const std::string &name, const Texture *texture);
     void SetBool(const std::string &name, const GLboolean value) const;
     void SetInt(const std::string &name, const GLint value) const;
     void SetFloat(const std::string &name, const GLfloat value) const;

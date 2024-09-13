@@ -195,3 +195,8 @@ GLsizei Texture2D::GetHeight() const
 {
     return height;
 }
+
+GLenum Texture2D::GetTextureTarget() const
+{
+    return GL_TEXTURE_2D;
+}

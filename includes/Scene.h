@@ -7,6 +7,7 @@
 #include "Texture2D.h"
 #include "Camera.h"
 #include "FrameBuffer.h"
+#include "TextureCubeMap.h"
 
 class Scene
 {
@@ -18,7 +19,7 @@ class Scene
 
     Mesh *m_skybox_mesh;
     Shader *m_skybox_shader;
-    Texture2D *m_skybox_texture;
+    TextureCubeMap *m_skybox_texture;
 
     FrameBuffer *m_fbo;
 
@@ -50,6 +51,7 @@ class Scene
     void UpdateViewMatrix(Shader &shader, bool ignoreNotView = false);
     void UpdateProjectionMatrix(Shader &shader);
 
+    void DrawSkybox();
     void DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader);
     void DrawGlassWithoutBlend(Mesh *cube, Mesh *rectangle);
     void DrawGlassWithBlend(Mesh *cube, Mesh *rectangle);

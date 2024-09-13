@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include <iostream>
 
 Texture::Texture() : texture_id(0)
 {
@@ -52,7 +53,8 @@ void Texture::Use(int idx) const
     */
     glActiveTexture(GL_TEXTURE0 + idx);
 
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    GLenum target = GetTextureTarget();
+    glBindTexture(target, texture_id);
 }
 
 bool Texture::IsValidTexture() const

@@ -14,6 +14,8 @@ class Texture2D : public Texture
 
     bool InnerInit(const char *filePath, GLenum format, GLint wrapMode);
 
+    GLenum GetTextureTarget() const override;
+
   public:
     Texture2D(const char *filePath, GLenum format = 0, GLint wrapMode = GL_REPEAT);
     ~Texture2D() override;

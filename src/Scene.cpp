@@ -4,7 +4,9 @@
 #include "Model.h"
 #include "Shader.h"
 #include "ShaderUnit.h"
+#include "Texture.h"
 #include "Texture2D.h"
+#include "TextureCubeMap.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
 #include "glm/fwd.hpp"
@@ -74,13 +76,15 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    SetupFrameBuffer(width, height);
+    // SetupFrameBuffer(width, height);
 
-    Shader *cube_shader = SetupMat_8();
-    SetupCubeMesh(*cube_shader);
+    // Shader *cube_shader = SetupMat_8();
+    // SetupCubeMesh(*cube_shader);
 
-    Shader *rect_shader = SetupMat_ScreenRect();
-    SetupRectangleMesh(*rect_shader);
+    // Shader *rect_shader = SetupMat_ScreenRect();
+    // SetupRectangleMesh(*rect_shader);
+
+    SetupSkybox();
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -845,7 +849,81 @@ void Scene::InitMVP(Shader *shader)
 
 void Scene::SetupSkybox()
 {
-    // todo: 具体实现待定
+    // 天空盒纹理
+    std::vector<const char *> faces = {
+        "../textures/skybox1/right.jpg",  // 右
+        "../textures/skybox1/left.jpg",   // 左
+        "../textures/skybox1/top.jpg",    // 上
+        "../textures/skybox1/bottom.jpg", // 下
+        "../textures/skybox1/front.jpg",  // 前
+        "../textures/skybox1/back.jpg",   // 后
+    };
+    TextureCubeMap *cube_map = new TextureCubeMap(faces);
+    if (!cube_map->IsValidTexture())
+    {
+        delete cube_map;
+        return;
+    }
+    m_skybox_texture = cube_map;
+
+    // 天空盒着色器
+    Shader *shader = LoadShader("../shaders/skybox.vert", "../shaders/skybox.frag");
+    if (!shader)
+    {
+        std::cerr << "SetupSkybox error: shader is nullptr!" << std::endl;
+        return;
+    }
+    shader->SetTexture("cube_map", m_skybox_texture);
+    m_skybox_shader = shader;
+
+    // 天空盒顶点数据
+    std::vector<GLfloat> skybox_vertices = {
+        // 前面
+        -1.0f, -1.0f, 1.0f, //
+        1.0f, -1.0f, 1.0f,  //
+        1.0f, 1.0f, 1.0f,   //
+        -1.0f, 1.0f, 1.0f,  //
+
+        // 后面
+        -1.0f, -1.0f, -1.0f, //
+        -1.0f, 1.0f, -1.0f,  //
+        1.0f, 1.0f, -1.0f,   //
+        1.0f, -1.0f, -1.0f,  //
+
+        // 左面
+        -1.0f, 1.0f, 1.0f,   //
+        -1.0f, 1.0f, -1.0f,  //
+        -1.0f, -1.0f, -1.0f, //
+        -1.0f, -1.0f, 1.0f,  //
+
+        // 右面
+        1.0f, 1.0f, 1.0f,   //
+        1.0f, -1.0f, 1.0f,  //
+        1.0f, -1.0f, -1.0f, //
+        1.0f, 1.0f, -1.0f,  //
+
+        // 上面
+        -1.0f, 1.0f, -1.0f, //
+        -1.0f, 1.0f, 1.0f,  //
+        1.0f, 1.0f, 1.0f,   //
+        1.0f, 1.0f, -1.0f,  //
+
+        // 下面
+        -1.0f, -1.0f, -1.0f, //
+        1.0f, -1.0f, -1.0f,  //
+        1.0f, -1.0f, 1.0f,   //
+        -1.0f, -1.0f, 1.0f,  //
+    };
+    std::vector<GLuint> indices = {
+        0,  1,  2,  2,  3,  0,  // 前面
+        4,  5,  6,  6,  7,  4,  // 后面
+        8,  9,  10, 10, 11, 8,  // 左面
+        12, 13, 14, 14, 15, 12, // 右面
+        16, 17, 18, 18, 19, 16, // 上面
+        20, 21, 22, 22, 23, 20  // 下面
+    };
+
+    m_skybox_mesh = new Mesh(skybox_vertices, indices, VertexAttributePresets::GetPosLayout(), shader);
 }
 
 /*
@@ -929,12 +1007,15 @@ void Scene::Render()
     m_deltaTime = now_time - m_lastFrameTime;
     m_lastFrameTime = now_time;
 
+    // 天空盒渲染
+    DrawSkybox();
+
     // 网格渲染
     if (!m_meshes.empty())
     {
-        Mesh *mesh = m_meshes[0];
-        Mesh *screen_rect_mesh = m_meshes[1];
-        DrawRenderToTexture(mesh, screen_rect_mesh);
+        // Mesh *mesh = m_meshes[0];
+        // Mesh *screen_rect_mesh = m_meshes[1];
+        // DrawRenderToTexture(mesh, screen_rect_mesh);
     }
 
     // 模型渲染
@@ -952,6 +1033,27 @@ void Scene::Render()
         model->ForeachMesh(each_mesh_func);
         model->Draw();
     }
+}
+
+/*
+ * 绘制天空盒
+*/
+void Scene::DrawSkybox()
+{
+    if (!m_skybox_mesh)
+        return;
+
+    Shader &shader = m_skybox_mesh->GetShader();
+
+    glm::mat4 rotView = glm::mat4(glm::mat3(m_camera.GetViewMatrix()));
+    shader.SetMat4f("rotView", rotView);
+
+    glm::mat4 projection = m_camera.GetProjectionMatrix();
+    shader.SetMat4f("projection", projection);
+
+    glDepthMask(GL_FALSE);
+    m_skybox_mesh->Draw();
+    glDepthMask(GL_TRUE);
 }
 
 /*

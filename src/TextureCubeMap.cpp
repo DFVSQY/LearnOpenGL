@@ -15,21 +15,6 @@ TextureCubeMap::~TextureCubeMap()
 bool TextureCubeMap::InnerInit(const std::vector<const char *> &faces)
 {
     /*
-     * 该函数用于在加载纹理时上下翻转图像。
-
-     * 在OpenGL中，进行纹理映射后渲染出来的图像出现上下颠倒的情况是很常见的。这主要是因为OpenGL和大多数图像文件格式在坐标系统上存在差异。
-
-     * 详细解释：
-     *  坐标系统差异：
-     *    OpenGL纹理坐标系：原点(0,0)在左下角，y轴向上。
-     *    大多数图像文件格式：原点(0,0)在左上角，y轴向下。
-
-     * 加载图像时的影响：
-     *    当你加载一个图像作为纹理时，通常图像数据是从顶部到底部存储的。但是当你在OpenGL中使用这些数据时，它会从底部开始渲染，导致图像看起来是上下颠倒的。
-    */
-    stbi_set_flip_vertically_on_load(true);
-
-    /*
 	 * 分配一个未使用的纹理对象名称（即纹理ID），用于后续的纹理操作。
 	*/
     glGenTextures(1, &texture_id);
@@ -79,4 +64,9 @@ bool TextureCubeMap::InnerInit(const std::vector<const char *> &faces)
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
     return true;
+}
+
+GLenum TextureCubeMap::GetTextureTarget() const
+{
+    return GL_TEXTURE_CUBE_MAP;
 }
