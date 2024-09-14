@@ -1045,13 +1045,50 @@ void Scene::DrawSkybox()
 
     Shader &shader = m_skybox_mesh->GetShader();
 
+    /*
+     * 在渲染天空盒时，rotView 采用去除平移部分的视图矩阵而不是完整的 view 矩阵，主要原因是为了避免天空盒跟随摄像机的移动，从而产生错误的视觉效果。
+
+     * 具体原因：
+     *  天空盒的本质： 天空盒通常是用于模拟一个无限远的背景。它的目的在于给玩家一种身处某个广阔空间的感觉，如天空或宇宙。
+     *              因此，天空盒本身并不应该表现出深度感或近距物体那样的相对移动。
+
+     *  完整的 view 矩阵包含平移信息： 在 OpenGL 中，view 矩阵通常由相机的平移和旋转组成。当我们使用完整的 view 矩阵时，天空盒会根据摄像机的位置发生平移，
+     *              这会给人一种天空盒随摄像机一起移动的感觉，这显然是不符合预期的。这样做会导致一种非常不自然的视觉错觉，即天空盒看起来并不在无限远处。
+
+     *  去掉平移只保留旋转： 通过将 view 矩阵的平移部分去除（即只保留旋转），我们保证了天空盒只会随着摄像机的旋转而旋转，而不会因为摄像机的移动而发生平移。
+     *              这样天空盒看起来始终处于视野的背景中，给人一种它位于无限远的空间中的错觉。
+
+     * 在代码中，glm::mat4(glm::mat3(m_camera.GetViewMatrix())) 的作用就是将 view 矩阵的旋转部分提取出来，丢弃其平移分量：
+     *  m_camera.GetViewMatrix() 返回完整的 view 矩阵，它包含摄像机的位置和方向信息。
+     *  glm::mat3(m_camera.GetViewMatrix()) 提取出 view 矩阵中的旋转部分（3x3 矩阵），去掉了平移分量。
+     *  glm::mat4(glm::mat3(...)) 是将这个 3x3 旋转矩阵重新转换为 4x4 矩阵，以便继续与 4x4 的投影矩阵和顶点数据进行运算。
+
+     * 去除平移的 rotView 矩阵是为了让天空盒固定在视角的背景中，只随摄像机的旋转而旋转，而不会因摄像机的平移而偏移。
+     * 这样才能保持天空盒的无限远感，让它充当一个背景元素而不会参与场景的深度变化。
+    */
     glm::mat4 rotView = glm::mat4(glm::mat3(m_camera.GetViewMatrix()));
     shader.SetMat4f("rotView", rotView);
 
     glm::mat4 projection = m_camera.GetProjectionMatrix();
     shader.SetMat4f("projection", projection);
 
-    glDepthMask(GL_FALSE);
+    /*
+     * glDepthMask 是 OpenGL 中用于控制深度缓冲区写入操作的函数。其主要作用是控制在绘制几何体时，深度缓冲区是否接受来自当前渲染的写入操作。
+
+     * 函数原型：void glDepthMask(GLboolean flag);
+     * 参数解释：
+     *  flag：一个布尔值，用于指定是否允许深度缓冲区写入。
+     *   如果 flag 是 GL_TRUE，则允许写入深度缓冲区（这是默认设置）。
+     *   如果 flag 是 GL_FALSE，则禁止写入深度缓冲区。
+
+     * 作用：
+     * 深度缓冲区（Depth Buffer 或 Z Buffer）是一个与帧缓冲区（Frame Buffer）相对应的缓冲区，用来存储每个像素的深度信息。
+     * 当启用了深度测试时（通过 glEnable(GL_DEPTH_TEST)），OpenGL 会在每次绘制像素时根据深度缓冲区的值来决定是否更新像素颜色。
+     * 如果当前像素比已经在深度缓冲区中的像素更靠近视点，则更新深度缓冲区中的值。
+     * glDepthMask 控制的仅仅是深度缓冲区的写入权限，而不影响深度测试本身的行为。
+     * 也就是说，即使关闭了深度写入，深度测试依然可以照常进行，只是深度缓冲区中的值不会被更新。
+    */
+    glDepthMask(GL_FALSE); // 关闭深度写入，确保天空盒不会遮挡其他物体绘制
     m_skybox_mesh->Draw();
     glDepthMask(GL_TRUE);
 }
