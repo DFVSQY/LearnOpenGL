@@ -76,15 +76,10 @@ void Scene::Init(int width, int height)
     m_lastCursorPosX = (double)width / 2;
     m_lastCursorPosY = (double)height / 2;
 
-    // SetupFrameBuffer(width, height);
-
-    // Shader *cube_shader = SetupMat_8();
-    // SetupCubeMesh(*cube_shader);
-
-    // Shader *rect_shader = SetupMat_ScreenRect();
-    // SetupRectangleMesh(*rect_shader);
-
     SetupSkybox();
+
+    Shader *cube_shader = SetupMat_8();
+    SetupCubeMesh(*cube_shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -1013,9 +1008,12 @@ void Scene::Render()
     // 网格渲染
     if (!m_meshes.empty())
     {
-        // Mesh *mesh = m_meshes[0];
-        // Mesh *screen_rect_mesh = m_meshes[1];
-        // DrawRenderToTexture(mesh, screen_rect_mesh);
+        Mesh *mesh = m_meshes[0];
+        Shader &shader = mesh->GetShader();
+        UpdateModelMatrix(shader);
+        UpdateViewMatrix(shader);
+        UpdateProjectionMatrix(shader);
+        mesh->Draw();
     }
 
     // 模型渲染
