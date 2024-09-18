@@ -862,7 +862,12 @@ void Scene::SetupSkybox()
     m_skybox_texture = cube_map;
 
     // 天空盒着色器
-    Shader *shader = LoadShader("../shaders/skybox.vert", "../shaders/skybox.frag");
+    // Shader *shader = LoadShader("../shaders/skybox.vert", "../shaders/skybox.frag");
+
+    /*
+     * 使用优化版本（优化版本调整了输出的深度值，从而可以将天空盒放在最后渲染）
+    */
+    Shader *shader = LoadShader("../shaders/skybox_optimized.vert", "../shaders/skybox_optimized.frag");
     if (!shader)
     {
         std::cerr << "SetupSkybox error: shader is nullptr!" << std::endl;
@@ -1002,8 +1007,10 @@ void Scene::Render()
     m_deltaTime = now_time - m_lastFrameTime;
     m_lastFrameTime = now_time;
 
-    // 天空盒渲染
-    DrawSkybox();
+    /*
+     * 先渲染天空盒不能利用Early-z进行片元剔除
+    */
+    // DrawSkybox()
 
     // 网格渲染
     if (!m_meshes.empty())
@@ -1031,6 +1038,12 @@ void Scene::Render()
         model->ForeachMesh(each_mesh_func);
         model->Draw();
     }
+
+    /*
+     * 把天空盒放到最后渲染从而进行优化，先渲染天空盒不能利用Early-z进行片元剔除，
+     * 后渲染天空盒时可以通过影响输出的深度值从而避免天空盒遮挡其他物体，进而可以利用Early-z进行片元剔除。
+    */
+    DrawOptimizedSkybox();
 }
 
 /*
@@ -1089,6 +1102,55 @@ void Scene::DrawSkybox()
     glDepthMask(GL_FALSE); // 关闭深度写入，确保天空盒不会遮挡其他物体绘制
     m_skybox_mesh->Draw();
     glDepthMask(GL_TRUE);
+}
+
+/*
+ * 放在场景最后渲染，可以利用Early-z测试来剔除不必要的片元
+*/
+void Scene::DrawOptimizedSkybox()
+{
+    if (!m_skybox_mesh)
+        return;
+
+    Shader &shader = m_skybox_mesh->GetShader();
+
+    /*
+     * 在渲染天空盒时，rotView 采用去除平移部分的视图矩阵而不是完整的 view 矩阵，主要原因是为了避免天空盒跟随摄像机的移动，从而产生错误的视觉效果。
+
+     * 具体原因：
+     *  天空盒的本质： 天空盒通常是用于模拟一个无限远的背景。它的目的在于给玩家一种身处某个广阔空间的感觉，如天空或宇宙。
+     *              因此，天空盒本身并不应该表现出深度感或近距物体那样的相对移动。
+
+     *  完整的 view 矩阵包含平移信息： 在 OpenGL 中，view 矩阵通常由相机的平移和旋转组成。当我们使用完整的 view 矩阵时，天空盒会根据摄像机的位置发生平移，
+     *              这会给人一种天空盒随摄像机一起移动的感觉，这显然是不符合预期的。这样做会导致一种非常不自然的视觉错觉，即天空盒看起来并不在无限远处。
+
+     *  去掉平移只保留旋转： 通过将 view 矩阵的平移部分去除（即只保留旋转），我们保证了天空盒只会随着摄像机的旋转而旋转，而不会因为摄像机的移动而发生平移。
+     *              这样天空盒看起来始终处于视野的背景中，给人一种它位于无限远的空间中的错觉。
+
+     * 在代码中，glm::mat4(glm::mat3(m_camera.GetViewMatrix())) 的作用就是将 view 矩阵的旋转部分提取出来，丢弃其平移分量：
+     *  m_camera.GetViewMatrix() 返回完整的 view 矩阵，它包含摄像机的位置和方向信息。
+     *  glm::mat3(m_camera.GetViewMatrix()) 提取出 view 矩阵中的旋转部分（3x3 矩阵），去掉了平移分量。
+     *  glm::mat4(glm::mat3(...)) 是将这个 3x3 旋转矩阵重新转换为 4x4 矩阵，以便继续与 4x4 的投影矩阵和顶点数据进行运算。
+
+     * 去除平移的 rotView 矩阵是为了让天空盒固定在视角的背景中，只随摄像机的旋转而旋转，而不会因摄像机的平移而偏移。
+     * 这样才能保持天空盒的无限远感，让它充当一个背景元素而不会参与场景的深度变化。
+    */
+    glm::mat4 rotView = glm::mat4(glm::mat3(m_camera.GetViewMatrix()));
+    shader.SetMat4f("rotView", rotView);
+
+    glm::mat4 projection = m_camera.GetProjectionMatrix();
+    shader.SetMat4f("projection", projection);
+
+    /*
+     * 需要保证天空盒在值小于或等于深度缓冲而不是小于时通过深度测试。
+    */
+    glDepthFunc(GL_LEQUAL);
+    m_skybox_mesh->Draw();
+
+    /*
+     * 恢复深度测试函数
+    */
+    glDepthFunc(GL_LESS);
 }
 
 /*

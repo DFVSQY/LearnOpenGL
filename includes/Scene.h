@@ -52,6 +52,7 @@ class Scene
     void UpdateProjectionMatrix(Shader &shader);
 
     void DrawSkybox();
+    void DrawOptimizedSkybox();
     void DrawMeshAndOutline(Mesh *mesh, Shader *shader, Shader *outlineShader);
     void DrawGlassWithoutBlend(Mesh *cube, Mesh *rectangle);
     void DrawGlassWithBlend(Mesh *cube, Mesh *rectangle);
