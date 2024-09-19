@@ -38,4 +38,5 @@ class Camera
     void MoveLeftOrRight(float delta);
     void TuneYawAndPitch(float deltaYaw, float deltaPitch);
     void TuneZoom(float delta);
+    void UpdateAspect(double aspect);
 };

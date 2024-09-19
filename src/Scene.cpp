@@ -1609,3 +1609,8 @@ void Scene::UpdateCamZoom(double yOffset)
 {
     m_camera.TuneZoom(yOffset);
 }
+
+void Scene::UpdateCamAspect(double aspect)
+{
+    m_camera.UpdateAspect(aspect);
+}

@@ -95,3 +95,8 @@ void Camera::TuneZoom(float delta)
     m_fov -= delta;
     m_fov = glm::clamp(m_fov, 1.0, 60.0);
 }
+
+void Camera::UpdateAspect(double aspect)
+{
+    m_aspect = aspect;
+}

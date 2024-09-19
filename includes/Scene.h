@@ -114,4 +114,5 @@ class Scene
     void MoveCamRight();
     void UpdateCamYawAndPitch(double xPos, double yPos);
     void UpdateCamZoom(double yoffset);
+    void UpdateCamAspect(double aspect);
 };

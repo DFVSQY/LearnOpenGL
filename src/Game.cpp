@@ -100,9 +100,7 @@ static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 
 static void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    glViewport(0, 0, width, height);
-
-    Game::getInstance().Draw();
+    Game::getInstance().On_FrameBuffer_Size(width, height);
 }
 
 static void APIENTRY glfw_debug_output(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length,
@@ -493,4 +491,14 @@ void Game::On_Mouse_Move(double xpos, double ypos)
 void Game::On_Mouse_Scroll(double xoffset, double yoffset)
 {
     scene.UpdateCamZoom(yoffset);
+}
+
+void Game::On_FrameBuffer_Size(int width, int height)
+{
+    glViewport(0, 0, width, height);
+
+    double aspect = static_cast<double>(width) / height;
+    scene.UpdateCamAspect(aspect);
+
+    Draw();
 }
