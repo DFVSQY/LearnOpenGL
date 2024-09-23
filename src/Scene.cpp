@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Cube.h"
 #include "FrameBuffer.h"
 #include "Mesh.h"
 #include "Model.h"
@@ -80,7 +81,7 @@ void Scene::Init(int width, int height)
     SetupSkybox();
 
     Shader *shader = SetupMat_8();
-    SetupSphereMesh(*shader);
+    SetupCubeMesh(*shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -713,58 +714,10 @@ Shader *Scene::SetupMat_ScreenRect()
 
 Mesh *Scene::SetupCubeMesh(Shader &shader)
 {
-    std::vector<GLfloat> vertices = {
-        // Positions          // Normals           // Texture2D Coords
-        // 前面
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, //
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  //
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   //
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  //
+    Cube *cube = new Cube(shader, 0.5f);
+    AddMesh(cube);
 
-        // 后面
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, //
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,  //
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,   //
-        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,  //
-
-        // 左面
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   //
-        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  //
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, //
-        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
-
-        // 右面
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   //
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, //
-        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  //
-
-        // 上面
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, //
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,  //
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   //
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  //
-
-        // 下面
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, //
-        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,  //
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,   //
-        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f   //
-    };
-
-    std::vector<GLuint> indices = {
-        0,  1,  2,  2,  3,  0,  // 前面
-        4,  5,  6,  6,  7,  4,  // 后面
-        8,  9,  10, 10, 11, 8,  // 左面
-        12, 13, 14, 14, 15, 12, // 右面
-        16, 17, 18, 18, 19, 16, // 上面
-        20, 21, 22, 22, 23, 20  // 下面
-    };
-
-    Mesh *mesh = new Mesh(vertices, indices, VertexAttributePresets::GetPosNormalTexLayout(), &shader);
-    AddMesh(mesh);
-
-    return mesh;
+    return cube;
 }
 
 Mesh *Scene::SetupRectangleMesh(Shader &shader)
