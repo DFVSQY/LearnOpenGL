@@ -92,6 +92,7 @@ class Scene
 
     Mesh *SetupCubeMesh(Shader &shader);      /* 立方体 */
     Mesh *SetupRectangleMesh(Shader &shader); /* 矩形 */
+    Mesh *SetupSphereMesh(Shader &shader);    /* 球体 */
 
     void SetupModel_1();
     void SetupModel_2();

@@ -1,13 +1,15 @@
 #include <vector>
 #include "Mesh.h"
 
+Mesh::Mesh(Shader *shader) : shader(shader)
+{
+}
+
 Mesh::Mesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
            const std::vector<VertexAttribute> &attributes, Shader *shader)
     : shader(shader)
 {
     SetupMesh(vertices, indices, attributes);
-
-    index_num = indices.size();
 }
 
 Mesh::~Mesh()
@@ -268,4 +270,6 @@ void Mesh::SetupMesh(const std::vector<GLfloat> &vertices, const std::vector<GLu
      * Modifying other VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     */
     glBindVertexArray(0);
+
+    index_num = indices.size();
 }

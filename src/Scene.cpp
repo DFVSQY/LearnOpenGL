@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "Shader.h"
 #include "ShaderUnit.h"
+#include "Sphere.h"
 #include "Texture.h"
 #include "Texture2D.h"
 #include "TextureCubeMap.h"
@@ -78,8 +79,8 @@ void Scene::Init(int width, int height)
 
     SetupSkybox();
 
-    Shader *cube_shader = SetupMat_8();
-    SetupCubeMesh(*cube_shader);
+    Shader *shader = SetupMat_8();
+    SetupSphereMesh(*shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -785,6 +786,14 @@ Mesh *Scene::SetupRectangleMesh(Shader &shader)
     AddMesh(mesh);
 
     return mesh;
+}
+
+Mesh *Scene::SetupSphereMesh(Shader &shader)
+{
+    Sphere *sphere = new Sphere(shader, 1.0f, 30, 30);
+    AddMesh(sphere);
+
+    return sphere;
 }
 
 void Scene::SetupModel_1()

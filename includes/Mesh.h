@@ -6,7 +6,7 @@
 
 class Mesh
 {
-  private:
+  protected:
     GLuint vao;
     GLuint vbo;
     GLuint ebo;
@@ -17,6 +17,9 @@ class Mesh
 
     void SetupMesh(const std::vector<GLfloat> &vertices, const std::vector<GLuint> &indices,
                    const std::vector<VertexAttribute> &attributes);
+
+    /* 只希望在子类中调用 */
+    Mesh(Shader *shader);
 
   public:
     ~Mesh();
