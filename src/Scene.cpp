@@ -80,8 +80,8 @@ void Scene::Init(int width, int height)
 
     SetupSkybox();
 
-    Shader *shader = SetupMat_8();
-    SetupCubeMesh(*shader);
+    Shader *shader = SetupMat_ReflectSkybox();
+    SetupSphereMesh(*shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -706,6 +706,23 @@ Shader *Scene::SetupMat_ScreenRect()
     Shader *shader = LoadShader("../shaders/vertex_screenrect.vert", "../shaders/fragment_screenrect.frag");
     if (!shader)
         return nullptr;
+
+    AddShader(shader);
+
+    return shader;
+}
+
+Shader *Scene::SetupMat_ReflectSkybox()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/reflect_skybox.vert", "../shaders/reflect_skybox.frag");
+    if (!shader)
+        return nullptr;
+
+    if (m_skybox_texture != nullptr)
+    {
+        shader->SetTexture("skybox", m_skybox_texture);
+    }
 
     AddShader(shader);
 

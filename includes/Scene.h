@@ -89,6 +89,7 @@ class Scene
     Shader *SetupMat_Grass();
     Shader *SetupMat_Enlarge();
     Shader *SetupMat_ScreenRect();
+    Shader *SetupMat_ReflectSkybox();
 
     Mesh *SetupCubeMesh(Shader &shader);      /* 立方体 */
     Mesh *SetupRectangleMesh(Shader &shader); /* 矩形 */
