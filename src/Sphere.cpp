@@ -5,12 +5,9 @@
 #include <vector>
 #include <cmath>
 
-Sphere::Sphere(Shader &shader, float radius, unsigned int longitudeDivs, unsigned int latitudeDivs) : Mesh(&shader)
+Sphere::Sphere(Shader &shader, float radius, unsigned int longitudeDivs, unsigned int latitudeDivs)
+    : Mesh(&shader), radius(radius), longitude_divs(longitudeDivs), latitude_divs(latitudeDivs)
 {
-    this->radius = radius;
-    this->longitude_divs = longitudeDivs;
-    this->latitude_divs = latitudeDivs;
-
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;
     GenMeshData(vertices, indices);
