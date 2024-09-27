@@ -6,9 +6,9 @@ class Cube : public Mesh
 {
   protected:
     /* 半径 */
-    float radius;
+    GLfloat radius;
 
   public:
-    Cube(Shader &shader, float radius = 0.5f);
+    Cube(Shader &shader, GLfloat radius = 0.5f);
     ~Cube();
 };
