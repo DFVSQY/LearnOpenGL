@@ -3,6 +3,7 @@
 #include "FrameBuffer.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "Rectangle.h"
 #include "Shader.h"
 #include "ShaderUnit.h"
 #include "Sphere.h"
@@ -80,8 +81,9 @@ void Scene::Init(int width, int height)
 
     SetupSkybox();
 
-    Shader *shader = SetupMat_ReflectSkybox();
-    SetupSphereMesh(*shader);
+    Shader *shader = SetupMat_RefractSkybox();
+    InitMVP(shader, true);
+    SetupRectangleMesh(*shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -729,6 +731,23 @@ Shader *Scene::SetupMat_ReflectSkybox()
     return shader;
 }
 
+Shader *Scene::SetupMat_RefractSkybox()
+{
+    // Shader
+    Shader *shader = LoadShader("../shaders/refract_skybox.vert", "../shaders/refract_skybox.frag");
+    if (!shader)
+        return nullptr;
+
+    if (m_skybox_texture != nullptr)
+    {
+        shader->SetTexture("skybox", m_skybox_texture);
+    }
+
+    AddShader(shader);
+
+    return shader;
+}
+
 Mesh *Scene::SetupCubeMesh(Shader &shader)
 {
     Cube *cube = new Cube(shader, 0.5f);
@@ -739,23 +758,10 @@ Mesh *Scene::SetupCubeMesh(Shader &shader)
 
 Mesh *Scene::SetupRectangleMesh(Shader &shader)
 {
-    const std::vector<GLfloat> vertices_vec = {
-        // postion                      // color                      // 纹理坐标
-        0.5f,  0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // top right
-        0.5f,  -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // bottom left
-        -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, // top left
-    };
+    Rectangle *rect = new Rectangle(shader, 2.0f, 2.0f);
+    AddMesh(rect);
 
-    const std::vector<GLuint> indices_vec = {
-        0, 1, 3, // first Triangle
-        1, 2, 3  // second Triangle
-    };
-
-    Mesh *mesh = new Mesh(vertices_vec, indices_vec, VertexAttributePresets::GetPosColorTexLayout(), &shader);
-    AddMesh(mesh);
-
-    return mesh;
+    return rect;
 }
 
 Mesh *Scene::SetupSphereMesh(Shader &shader)
@@ -790,7 +796,7 @@ void Scene::SetupModel_2()
     AddModel(model);
 }
 
-void Scene::InitMVP(Shader *shader)
+void Scene::InitMVP(Shader *shader, bool setNormal)
 {
     /* 
      * MVP矩阵初始化为单位矩阵
@@ -819,6 +825,15 @@ void Scene::InitMVP(Shader *shader)
     shader->SetMat4f("model", model);
     shader->SetMat4f("view", view);
     shader->SetMat4f("projection", projection);
+
+    if (setNormal) // 不忽略非 model 值时
+    {
+        /*
+        * 将法向量从模型空间变换到世界空间中需要用到的矩阵
+        */
+        glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model)));
+        shader->SetMat3f("normalMatrix", normal_matrix);
+    }
 }
 
 void Scene::SetupSkybox()
@@ -996,7 +1011,7 @@ void Scene::Render()
     {
         Mesh *mesh = m_meshes[0];
         Shader &shader = mesh->GetShader();
-        UpdateModelMatrix(shader);
+        // UpdateModelMatrix(shader);
         UpdateViewMatrix(shader);
         UpdateProjectionMatrix(shader);
         mesh->Draw();

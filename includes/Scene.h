@@ -45,7 +45,7 @@ class Scene
     Shader *LoadShader(const std::string &vertextPath, const std::string &fragmentPath);
     Texture2D *LoadTexture(const std::string &texturePath, const GLenum format, const GLint wrapMode = GL_REPEAT);
 
-    void InitMVP(Shader *material);
+    void InitMVP(Shader *material, bool setNormal = false);
 
     void UpdateModelMatrix(Shader &shader, bool ignoreNotModel = false);
     void UpdateViewMatrix(Shader &shader, bool ignoreNotView = false);
@@ -90,6 +90,7 @@ class Scene
     Shader *SetupMat_Enlarge();
     Shader *SetupMat_ScreenRect();
     Shader *SetupMat_ReflectSkybox();
+    Shader *SetupMat_RefractSkybox();
 
     Mesh *SetupCubeMesh(Shader &shader);      /* 立方体 */
     Mesh *SetupRectangleMesh(Shader &shader); /* 矩形 */
