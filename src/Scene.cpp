@@ -82,8 +82,7 @@ void Scene::Init(int width, int height)
     SetupSkybox();
 
     Shader *shader = SetupMat_RefractSkybox();
-    InitMVP(shader, true);
-    SetupRectangleMesh(*shader);
+    SetupSphereMesh(*shader);
 }
 
 ////////////////////////////////////////////////// 配置渲染用的材质和网格 ///////////////////////////////////////////////
@@ -1011,7 +1010,7 @@ void Scene::Render()
     {
         Mesh *mesh = m_meshes[0];
         Shader &shader = mesh->GetShader();
-        // UpdateModelMatrix(shader);
+        UpdateModelMatrix(shader);
         UpdateViewMatrix(shader);
         UpdateProjectionMatrix(shader);
         mesh->Draw();
