@@ -241,6 +241,9 @@ bool Game::Init(const char *title, int width, int height)
     // 打印GPU的一些信息
     PrintGPUInfo();
 
+    // 打印顶点着色器和片段着色器的最大uniform组件数量
+    QueryMaxVertexAndFragmentUniformComponents();
+
     // 打印默认帧缓存的信息
     QueryDefaultFramebufferInfos();
 
@@ -338,6 +341,19 @@ void Game::QueryDefaultFramebufferInfos() const
                                           &stencilSize);
     std::cout << "Stencil buffer bit size: " << stencilSize << std::endl;
 };
+
+void Game::QueryMaxVertexAndFragmentUniformComponents() const
+{
+    // 查询顶点着色器的最大 uniform 组件数
+    GLint maxVertexUniformComponents = 0;
+    glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &maxVertexUniformComponents);
+    std::cout << "Maximum Vertex Uniform Components: " << maxVertexUniformComponents << std::endl;
+
+    // 查询片段着色器的最大 uniform 组件数
+    GLint maxFragmentUniformComponents = 0;
+    glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &maxFragmentUniformComponents);
+    std::cout << "Maximum Fragment Uniform Components: " << maxFragmentUniformComponents << std::endl;
+}
 
 void Game::PrintOpenGLVersion() const
 {

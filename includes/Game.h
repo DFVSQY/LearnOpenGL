@@ -22,6 +22,8 @@ class Game
 
     void QueryDefaultFramebufferInfos() const;
 
+    void QueryMaxVertexAndFragmentUniformComponents() const;
+
   public:
     // 删除复制构造函数和赋值操作符
     Game(const Game &) = delete;
