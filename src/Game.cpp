@@ -386,6 +386,14 @@ void Game::SetupWindowHint() const
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    /*
+     * 在MacOS上，需要设置GLFW_OPENGL_FORWARD_COMPAT为GL_TRUE，
+     * 这段代码告诉GLFW在创建 OpenGL 上下文时，启用前向兼容模式。
+     * 在 macOS 上，使用 OpenGL 前向兼容模式通常是推荐的做法，甚至在某些情况下是必须的。 
+     * 苹果公司倾向于鼓励开发者使用最新的 OpenGL 版本和特性，并逐渐移除对旧版本的支持。
+     * 如果没有启用前向兼容模式，在某些版本的 macOS 上，你可能会遇到 OpenGL 相关的问题，例如无法创建 OpenGL 上下文或遇到一些兼容性错误。
+     * Apple's OpenGL implementation does not support legacy functionality in a default context since macOS 10.14.
+    */
 #if __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
