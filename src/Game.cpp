@@ -368,9 +368,11 @@ void Game::PrintGPUInfo() const
 {
     const GLubyte *vendor = glGetString(GL_VENDOR);     // 返回厂商名称
     const GLubyte *renderer = glGetString(GL_RENDERER); // 返回渲染器名称（GPU 型号）
+    const GLubyte *version = glGetString(GL_VERSION);
 
     std::cout << "Vendor: " << vendor << std::endl;
     std::cout << "Renderer: " << renderer << std::endl;
+    std::cout << "OpenGL Version: " << version << std::endl;
 }
 
 void Game::SetupWindowHint() const
